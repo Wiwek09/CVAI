@@ -1,12 +1,12 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
+'use client';
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 // import { ViewContext } from "@/app/dashboard/context/ViewContext";
-import { IFormInputData } from "@/interfaces/FormInputData";
-import { IDocumentData } from "@/interfaces/DocumentData";
-import Link from "next/link";
-import axiosInstance from "@/utils/axiosConfig";
-import GridViewSkeleton from "./ui/Skeleton/GridViewSkeleton";
+import { IFormInputData } from '@/interfaces/FormInputData';
+import { IDocumentData } from '@/interfaces/DocumentData';
+import Link from 'next/link';
+import axiosInstance from '@/utils/axiosConfig';
+import GridViewSkeleton from './ui/Skeleton/GridViewSkeleton';
 
 interface GridViewProps {
   data: IDocumentData[];
@@ -14,6 +14,7 @@ interface GridViewProps {
 }
 
 function GridView({ data, searchData }: GridViewProps) {
+  // console.log(data);
   const [imageDataID, setImageDataID] = useState<any[]>([]);
   // const contextValue = useContext(ViewContext);
   const [loading, setLoading] = useState(true);
@@ -64,7 +65,7 @@ function GridView({ data, searchData }: GridViewProps) {
         searchData,
         {
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         }
       );
@@ -72,10 +73,10 @@ function GridView({ data, searchData }: GridViewProps) {
         setImageDataID(response.data);
         setLoading(true);
       } else {
-        console.error("Unexpected response status:", response.status);
+        console.error('Unexpected response status:', response.status);
       }
     } catch (error) {
-      console.error("Erro Fetching", error);
+      console.error('Erro Fetching', error);
     } finally {
       setLoading(false);
     }
@@ -104,25 +105,25 @@ function GridView({ data, searchData }: GridViewProps) {
   // }
 
   return (
-    <div className="masonry-container bg-gray-100">
+    <div className='masonry-container bg-gray-100'>
       {loading ? (
-        <div className="flex justify-between items-center ">
+        <div className='flex justify-between items-center '>
           <GridViewSkeleton />
           <GridViewSkeleton />
           <GridViewSkeleton />
         </div>
       ) : data?.length > 0 && imageDataID.length <= 0 ? (
         data?.map((item: any, index) => (
-          <div key={item.doc_id} className="mb-6 cursor-pointer">
-            <Link href={`/cv-detail/${item.doc_id}`} target="_blank">
+          <div key={item.doc_id} className='mb-6 cursor-pointer'>
+            <Link href={`/cv-detail/${item.doc_id}`} target='_blank'>
               <Image
-                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cv_images/${item.image_id}.webp`}
+                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}cv_images/${item.image_id}.webp`}
                 alt={`Image ${index + 1}`}
                 height={500}
                 width={700}
-                className="rounded-lg object-cover shadow-lg w-full"
-                loading="lazy"
-                layout="responsive"
+                className='rounded-lg object-cover shadow-lg w-full'
+                loading='lazy'
+                layout='responsive'
               />
 
               {/* Overlay that appears on hover */}
@@ -148,17 +149,17 @@ function GridView({ data, searchData }: GridViewProps) {
           <div
             key={index}
             // onClick={() => router.push(`/cv-detail/${item.doc_id}`)}
-            className="mb-6 cursor-pointer"
+            className='mb-6 cursor-pointer'
           >
-            <Link href={`/cv-detail/${item.doc_id}`} target="_blank">
+            <Link href={`/cv-detail/${item.doc_id}`} target='_blank'>
               <Image
                 src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cv_images/${item.img_id}.webp`}
                 alt={`Image ${index + 1}`}
                 height={500}
                 width={700}
-                className="rounded-lg object-cover shadow-lg w-full h-auto"
-                loading="lazy"
-                layout="responsive"
+                className='rounded-lg object-cover shadow-lg w-full h-auto'
+                loading='lazy'
+                layout='responsive'
               />
 
               {/* Overlay that appears on hover */}

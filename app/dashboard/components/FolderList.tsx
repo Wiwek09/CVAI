@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { FaChevronDown } from "react-icons/fa";
-import { RxHamburgerMenu } from "react-icons/rx";
-import axiosInstance from "@/utils/axiosConfig";
-import Link from "next/link";
+import React, { useState, useEffect, useRef } from 'react';
+import { FaChevronDown } from 'react-icons/fa';
+import { RxHamburgerMenu } from 'react-icons/rx';
+import axiosInstance from '@/utils/axiosConfig';
+import Link from 'next/link';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
+} from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 // import { Button } from "@/components/ui/button";
 
 const FolderList = ({ updateFolderList }) => {
@@ -16,16 +17,23 @@ const FolderList = ({ updateFolderList }) => {
   const [openFolder, setOpenFolder] = useState(null);
   const [folderContents, setFolderContents] = useState({});
   const [editingFolder, setEditingFolder] = useState(null);
-  const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderName, setNewFolderName] = useState('');
+  const inputRefs = useRef({});
+  useEffect(() => {
+    if (editingFolder && inputRefs.current[editingFolder]) {
+      inputRefs.current[editingFolder].focus();
+    }
+  }, [editingFolder]);
 
   useEffect(() => {
     const fetchFoldersAndContents = async () => {
       try {
         const foldersResponse = await axiosInstance.get(
-          "/folder/getAllFolders"
+          '/folder/getAllFolders'
         );
         const fetchedFolders = foldersResponse.data;
-        setFolders(fetchedFolders);
+        console.log('Fetched folders', fetchedFolders);
+        // setFolders(fetchedFolders);
 
         const contentsPromises = fetchedFolders.map((folder) =>
           axiosInstance
@@ -54,8 +62,9 @@ const FolderList = ({ updateFolderList }) => {
         );
 
         setFolderContents(contentsObject);
+        console.log('This', contentsObject);
       } catch (error) {
-        console.error("Error fetching folders:", error);
+        console.error('Error fetching folders:', error);
       }
     };
 
@@ -68,9 +77,9 @@ const FolderList = ({ updateFolderList }) => {
 
   const handleRename = async (folderId) => {
     try {
-      await axiosInstance.put(`/folder/renameFolder`, {
+      await axiosInstance.put(`/folderrenameFolder/${folderId}`, {
         folder_id: folderId,
-        folder_name: newFolderName,
+        new_name: newFolderName,
       });
 
       // Update folder name in the UI
@@ -84,42 +93,58 @@ const FolderList = ({ updateFolderList }) => {
 
       // Reset editing state
       setEditingFolder(null);
-      setNewFolderName("");
+      setNewFolderName('');
+      toast('Successfully edited the folder');
     } catch (error) {
-      console.error("Error renaming folder:", error);
+      console.error('Error renaming folder:', error);
+      toast('Failed to edit', {
+        description: error.response.data.detail,
+        style: {
+          background: 'black',
+          color: 'white',
+        },
+      });
     }
   };
 
   return (
-    <div className="text-white">
+    <div className='text-white'>
       {folders.map((folder) => (
-        <div key={folder.folder_id} className="mb-4">
-          <div className="flex gap-2 w-full justify-between items-center flex-1 rounded">
+        <div key={folder.folder_id} className='mb-4'>
+          <div className='flex gap-2 w-full justify-between items-center flex-1 rounded'>
             {editingFolder === folder.folder_id ? (
-              <input
-                type="text"
-                value={newFolderName}
-                onChange={(e) => setNewFolderName(e.target.value)}
-                onBlur={() => setEditingFolder(null)}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && handleRename(folder.folder_id)
-                }
-                className="bg-gray-800 w-full text-white rounded p-1"
-              />
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRename(folder.folder_id);
+                }}
+              >
+                <input
+                  type='text'
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  onBlur={() => setEditingFolder(null)}
+                  className='bg-gray-800 w-full text-white rounded p-1'
+                  ref={(el) => {
+                    if (el) inputRefs.current[folder.folder_id] = el;
+                  }}
+                />
+                <button type='submit' className='hidden'></button>
+              </form>
             ) : (
-              <div className="flex items-center gap-2 ">
+              <div className='flex items-center gap-2 '>
                 <span>
-                  <Checkbox className="bg-white" />
+                  <Checkbox className='bg-white' />
                 </span>
                 <span>{folder.folder_name}</span>
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div className='flex gap-4'>
               <span
                 onClick={() => toggleDropdown(folder.folder_id)}
                 className={`ml-auto w-6 h-6 hover:bg-gray-700 rounded-full items-center justify-center flex transform transition-transform duration-300 ${
-                  openFolder === folder.folder_id ? "rotate-180" : "rotate-0"
+                  openFolder === folder.folder_id ? 'rotate-180' : 'rotate-0'
                 }`}
               >
                 <FaChevronDown />
@@ -133,7 +158,7 @@ const FolderList = ({ updateFolderList }) => {
                       <RxHamburgerMenu />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-12 p-1 text-center cursor-pointer">
+                  <PopoverContent className='w-12 p-1 text-center cursor-pointer'>
                     <p
                       onClick={() => {
                         setEditingFolder(folder.folder_id);
@@ -149,23 +174,23 @@ const FolderList = ({ updateFolderList }) => {
           </div>
 
           {openFolder === folder.folder_id && (
-            <div className="mt-2 ml-6 border-l border-gray-600 pl-4">
+            <div className='mt-2 ml-6 border-l border-gray-600 pl-4 max-w-[12rem]'>
               {folderContents[folder.folder_id]?.length ? (
-                folderContents[folder.folder_id].map(
-                  ([pdfId, fileName], index) => (
-                    <Link
-                      key={index}
-                      href={`/cv-detail/${pdfId}`}
-                      target="_blank"
-                    >
-                      <div className="flex items-center gap-2 p-1 text-gray-300 ease-in-out hover:bg-gray-700 duration-150 delay-75 rounded">
-                        <span className="truncate">{fileName}</span>
-                      </div>
-                    </Link>
-                  )
-                )
+                folderContents[folder.folder_id].map((file) => (
+                  <Link
+                    key={file.doc_id}
+                    href={`/cv-detail/${file.doc_id}`}
+                    target='_blank'
+                  >
+                    <div className='flex items-center gap-2 p-1 text-gray-300 ease-in-out hover:bg-gray-700 duration-150 delay-75 rounded'>
+                      <span className=' text-white'>
+                        {file.doc_name} {console.log(file.doc_name)}
+                      </span>
+                    </div>
+                  </Link>
+                ))
               ) : (
-                <div className="text-gray-400 italic">No PDFs uploaded.</div>
+                <div className='text-gray-400 italic'>No PDFs uploaded.</div>
               )}
             </div>
           )}

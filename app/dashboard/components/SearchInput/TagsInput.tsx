@@ -4,7 +4,7 @@ import React, {
   useEffect,
   KeyboardEvent,
   ChangeEvent,
-} from "react";
+} from 'react';
 
 interface Tag {
   id: string;
@@ -23,7 +23,7 @@ const TagsInput: React.FC<InlineTagInputProps> = ({
   placeholderText,
 }) => {
   const [tags, setTags] = useState<Tag[]>([]);
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const TagsInput: React.FC<InlineTagInputProps> = ({
   useEffect(() => {
     if (!tagsValue) {
       setTags([]); // Reset tags to an empty array
-      setInput(""); // Reset input field
+      setInput(''); // Reset input field
       onTagsChange([]); // Send empty tags to parent
     }
   }, [tagsValue, onTagsChange]);
@@ -46,10 +46,10 @@ const TagsInput: React.FC<InlineTagInputProps> = ({
   };
 
   const handleInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
+    if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       addTag();
-    } else if (e.key === "Backspace" && input === "" && tags.length > 0) {
+    } else if (e.key === 'Backspace' && input === '' && tags.length > 0) {
       removeTag(tags[tags.length - 1].id);
     }
   };
@@ -62,29 +62,29 @@ const TagsInput: React.FC<InlineTagInputProps> = ({
         { id: Date.now().toString(), text: trimmedInput },
       ];
       setTags(newTags);
-      setInput("");
-      onTagsChange(newTags.map((tag) => tag.text)); // Send updated tags to parent
+      setInput('');
+      onTagsChange(newTags.map((tag) => tag.text));
     }
   };
 
   const removeTag = (tagId: string) => {
     const newTags = tags.filter((tag) => tag.id !== tagId);
     setTags(newTags);
-    onTagsChange(newTags.map((tag) => tag.text)); // Send updated tags to parent
+    onTagsChange(newTags.map((tag) => tag.text));
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto">
-      <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-gray-900">
+    <div className='w-full max-w-sm mx-auto'>
+      <div className='flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-gray-900'>
         {tags.map((tag) => (
           <span
             key={tag.id}
-            className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center"
+            className='bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center'
           >
             {tag.text}
             <button
               onClick={() => removeTag(tag.id)}
-              className="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none"
+              className='ml-1 text-blue-600 hover:text-blue-800 focus:outline-none'
             >
               &times;
             </button>
@@ -92,12 +92,12 @@ const TagsInput: React.FC<InlineTagInputProps> = ({
         ))}
         <input
           ref={inputRef}
-          type="text"
+          type='text'
           value={input}
           onChange={handleInputChange}
           onKeyDown={handleInputKeyDown}
-          placeholder={tags.length === 0 ? placeholderText : ""}
-          className="flex-grow w-52 outline-none bg-transparent"
+          placeholder={tags.length === 0 ? placeholderText : ''}
+          className='flex-grow w-52 outline-none bg-transparent'
         />
       </div>
     </div>

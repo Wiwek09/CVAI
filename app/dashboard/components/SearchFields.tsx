@@ -1,13 +1,13 @@
-"use client";
-import React, { useState, useContext } from "react";
-import { Input } from "@/components/ui/input";
+'use client';
+import React, { useState, useContext } from 'react';
+import { Input } from '@/components/ui/input';
 // import { ImLocation } from "react-icons/im";
-import { FaSearch } from "react-icons/fa";
-import TagsInput from "./SearchInput/TagsInput";
-import { IFormInputData } from "@/interfaces/FormInputData";
-import { SearchContext } from "../context/SearchContext";
-import { ViewContext } from "../context/ViewContext";
-import LinearTagsInput from "./SearchInput/LinearTagsInput";
+import { FaSearch } from 'react-icons/fa';
+import TagsInput from './SearchInput/TagsInput';
+import { IFormInputData } from '@/interfaces/FormInputData';
+import { SearchContext } from '../context/SearchContext';
+import { ViewContext } from '../context/ViewContext';
+import LinearTagsInput from './SearchInput/LinearTagsInput';
 
 // import {
 //   Select,
@@ -17,7 +17,7 @@ import LinearTagsInput from "./SearchInput/LinearTagsInput";
 //   SelectTrigger,
 //   SelectValue,
 // } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 const SearchFields = () => {
   const searchContext = useContext(SearchContext);
@@ -25,12 +25,12 @@ const SearchFields = () => {
 
   if (!searchContext) {
     throw new Error(
-      "SearchContext must be used within a SearchContext.Provider"
+      'SearchContext must be used within a SearchContext.Provider'
     );
   }
 
   if (!viewContext) {
-    throw new Error("ViewContext must be used within a ViewProvider");
+    throw new Error('ViewContext must be used within a ViewProvider');
   }
 
   const { setSearchData } = searchContext;
@@ -38,11 +38,11 @@ const SearchFields = () => {
   // const { view } = viewContext;
 
   const [formData, setFormData] = useState<IFormInputData>({
-    prompt: "",
-    programming_language: [""],
-    skill: [""],
-    address: "",
-    foldersToSearch: [""],
+    prompt: '',
+    programming_language: [''],
+    skill: [''],
+    address: '',
+    foldersToSearch: [''],
   });
 
   const [tagsValue, setTagsValue] = useState(true);
@@ -53,11 +53,11 @@ const SearchFields = () => {
     setSearchData(formData);
     // Clear the form fields after submission
     setFormData({
-      prompt: "",
-      programming_language: [""],
-      skill: [""],
-      address: "",
-      foldersToSearch: [""],
+      prompt: '',
+      programming_language: [''],
+      skill: [''],
+      address: '',
+      foldersToSearch: [''],
     });
     setTagsValue(false);
   };
@@ -89,25 +89,25 @@ const SearchFields = () => {
 
   // Disable Enter key for input fields to prevent submission
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
     }
   };
 
   return (
-    <div className="w-full mt-8 flex flex-col justify-center space-y-6">
+    <div className='w-full mt-8 flex flex-col justify-center space-y-6'>
       {/* Top search fields */}
       <form onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-3">
-          <div className="flex gap-3 justify-between text-center">
+        <div className='flex flex-col gap-3'>
+          <div className='flex gap-3 justify-between text-center'>
             <div>
-              <Input
-                className="w-[20rem]"
-                type="string"
-                name="prompt"
+              <input
+                className='placeholder:text-gray-400 border-2 py-2 px-2 rounded-md '
+                type='string'
+                name='prompt'
                 value={formData.prompt}
                 onChange={handleChange}
-                placeholder="Enter Prompt (skills)"
+                placeholder='Enter Prompt (skills)'
                 onKeyDown={handleKeyDown} // Prevent form submission on Enter key
               />
             </div>
@@ -122,33 +122,33 @@ const SearchFields = () => {
             />
           </div> */}
 
-            <div className="max-h-14">
+            <div className='max-h-14'>
               {/* Inline tag input for programming languages */}
               <TagsInput
                 onTagsChange={handleProgrammingLanguageTagsChange}
                 tagsValue={tagsValue}
-                placeholderText="Enter Programming Language"
+                placeholderText='Programming Language'
               />
             </div>
 
             {/* Tags Input for Skill */}
-            <div className="max-h-12">
+            <div className='max-h-12'>
               <TagsInput
                 onTagsChange={handleSkillTagsChange}
                 tagsValue={tagsValue}
-                placeholderText="Enter Skill"
+                placeholderText='Enter Skill'
               />
             </div>
 
-            <div className="flex flex-shrink-0 ">
-              <div className="flex items-center border rounded-lg">
+            <div className='flex flex-shrink-0 '>
+              <div className='flex items-center border rounded-lg'>
                 <Input
-                  className="w-[12rem] border-none"
-                  type="text"
-                  name="address"
+                  className='w-[12rem] border-none'
+                  type='text'
+                  name='address'
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Location"
+                  placeholder='Location'
                   onKeyDown={handleKeyDown}
                   // onFocus={() => setIsFocused(true)}
                   // onBlur={() => setIsFocused(false)}
@@ -156,11 +156,11 @@ const SearchFields = () => {
                 {/* {!isFocused && <ImLocation className="" />} */}
               </div>
               <Button
-                type="submit"
-                className=" bg-white ml-2 rounded-3xl group hover:bg-inherit"
+                type='submit'
+                className=' bg-white ml-2 rounded-3xl group hover:bg-inherit'
               >
-                <span className="transform transition-transform duration-300 ease-in-out group-hover:translate-y-[-3px]">
-                  <FaSearch className="text-black" />
+                <span className='transform transition-transform duration-300 ease-in-out group-hover:translate-y-[-3px]'>
+                  <FaSearch className='text-black' />
                 </span>
                 {/* <span>Search</span> */}
               </Button>
