@@ -7,6 +7,15 @@ import { IDocumentData } from '@/interfaces/DocumentData';
 import Link from 'next/link';
 import axiosInstance from '@/utils/axiosConfig';
 import GridViewSkeleton from './ui/Skeleton/GridViewSkeleton';
+import { RxHamburgerMenu } from 'react-icons/rx';
+import { IoCallOutline } from 'react-icons/io5';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
+import { FaGithub } from 'react-icons/fa';
+import { CiLinkedin } from 'react-icons/ci';
 
 interface GridViewProps {
   data: IDocumentData[];
@@ -18,6 +27,9 @@ function GridView({ data, searchData }: GridViewProps) {
   const [imageDataID, setImageDataID] = useState<any[]>([]);
   // const contextValue = useContext(ViewContext);
   const [loading, setLoading] = useState(true);
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [hoveredUser, setHoveredUser] = useState<any[]>([]);
 
   // useEffect(() => {
   //   const storedSearchData = sessionStorage.getItem("searchData");
@@ -57,6 +69,18 @@ function GridView({ data, searchData }: GridViewProps) {
   //   if (imageDataID?.length > 0) {
   //   }
   // }, [imageDataID]);
+  useEffect(() => {
+    const getHoveredDetails = async () => {
+      const response = await axiosInstance.get(`/document/cv/${hoveredId}`);
+      console.log(response.data.parsed_cv);
+      setHoveredUser(response.data.parsed_cv);
+    };
+    if (hoveredId) {
+      getHoveredDetails();
+    } else {
+      console.log('no hover');
+    }
+  }, [hoveredId]);
 
   const getFullImageData = async (searchData: IFormInputData) => {
     try {
@@ -76,10 +100,31 @@ function GridView({ data, searchData }: GridViewProps) {
         console.error('Unexpected response status:', response.status);
       }
     } catch (error) {
-      console.error('Erro Fetching', error);
+      console.error('Error Fetching', error);
     } finally {
       setLoading(false);
     }
+  };
+  const handleMouseOver = (id: any) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    const newTimeoutId = setTimeout(() => {
+      console.log('This is the id', id);
+
+      setHoveredId(id);
+    }, 800);
+
+    setTimeoutId(newTimeoutId);
+  };
+  const handleMouseLeave = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setHoveredId(null);
+    }
+
+    setHoveredId(null);
   };
 
   // const getSkillSummary = async () => {
@@ -106,6 +151,12 @@ function GridView({ data, searchData }: GridViewProps) {
 
   return (
     <div className='masonry-container bg-gray-100'>
+      {hoveredId && (
+        <div
+          className='fixed inset-0 bg-black opacity-80 z-10'
+          style={{ filter: 'brightness(0)', pointerEvents: 'none' }}
+        ></div>
+      )}
       {loading ? (
         <div className='flex justify-between items-center '>
           <GridViewSkeleton />
@@ -114,8 +165,97 @@ function GridView({ data, searchData }: GridViewProps) {
         </div>
       ) : data?.length > 0 && imageDataID.length <= 0 ? (
         data?.map((item: any, index) => (
-          <div key={item.doc_id} className='mb-6 cursor-pointer'>
+          // <HoverCard>
+          //   <HoverCardTrigger>
+          <div
+            key={item.doc_id}
+            className={`mb-6 cursor-pointer transition-transform duration-300 relative ${
+              hoveredId === item.doc_id ? 'z-20' : 'z-0'
+            }`}
+            onMouseOver={() => {
+              handleMouseOver(item.doc_id);
+            }}
+            onMouseLeave={() => {
+              handleMouseLeave();
+            }}
+          >
+            {/* {hoveredId === item.image_id && (
+              <RxHamburgerMenu className='z-20 absolute right-0' />
+            )} */}
             <Link href={`/cv-detail/${item.doc_id}`} target='_blank'>
+              {hoveredId === item.doc_id && (
+                <div className='absolute flex rounded-md pl-9 pr-9 py-2 flex-col bg-white w-full h-full z-50'>
+                  <h1 className='font-bold  text-xl py-5'>
+                    {hoveredUser.name?.toUpperCase()}
+                  </h1>
+                  <p className='space-y-5'>
+                    <section className='flex space-x-4 items-center'>
+                      <button className='bg-gray-600 p-[4px] rounded-full'>
+                        <IoCallOutline color='white' />
+                      </button>
+                      <h1> {hoveredUser.phone_number}</h1>
+                    </section>
+                    <section className='flex  items-center'>
+                      {hoveredUser.linkedin_url ? (
+                        <section className='truncate'>
+                          <button className='bg-gray-600 p-[4px] rounded-full'>
+                            <CiLinkedin color='white' />
+                          </button>
+                          <a
+                            href={hoveredUser.linkedin_url}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-blue-600 space-x-4 hover:underline '
+                          >
+                            <h1> {hoveredUser.linkedin_url}</h1>
+                          </a>{' '}
+                        </section>
+                      ) : hoveredUser.git_url ? (
+                        <section className='truncate'>
+                          <a
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                            href={hoveredUser.linkedin_url}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-blue-600 space-x-4 flex hover:underline'
+                          >
+                            <button className='bg-gray-600 p-[4px] rounded-full'>
+                              <FaGithub color='white' />
+                            </button>
+                            <h1> {hoveredUser.git_url}</h1>
+                          </a>
+                        </section>
+                      ) : (
+                        ''
+                      )}
+                    </section>
+                    <section>
+                      <h1 className='text-lg font-semibold'>Experience</h1>
+                      {hoveredUser.work_experience?.map((jobs) => (
+                        <h3 className='text-gray-600'>{jobs.job_title}</h3>
+                      ))}
+                    </section>
+                    <section>
+                      <h1 className='text-lg font-semibold'>Skills</h1>
+                      {hoveredUser.skills?.slice(0, 3).map((skill, index) => (
+                        <h3 key={index} className='text-gray-600'>
+                          {skill}
+                        </h3>
+                      ))}
+                    </section>
+                    <section>
+                      <h1 className='text-lg font-semibold'>Education</h1>
+                      {hoveredUser.education?.slice(0, 3).map((ed, index) => (
+                        <h3 key={index} className='text-gray-600'>
+                          {ed.degree}
+                        </h3>
+                      ))}
+                    </section>
+                  </p>
+                </div>
+              )}
               <Image
                 src={`${process.env.NEXT_PUBLIC_API_BASE_URL}cv_images/${item.image_id}.webp`}
                 alt={`Image ${index + 1}`}
@@ -143,6 +283,11 @@ function GridView({ data, searchData }: GridViewProps) {
               </div> */}
             </Link>
           </div>
+          // </HoverCardTrigger>
+          // <HoverCardContent>
+          //   <div>Hello</div>
+          // </HoverCardContent>
+          // </HoverCard>
         ))
       ) : imageDataID?.length > 0 ? (
         imageDataID.map((item: any, index) => (

@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { BsFillGridFill } from 'react-icons/bs';
 import { FaListUl } from 'react-icons/fa';
 import {
@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { ViewContext } from '../context/ViewContext';
+import { IoStarSharp } from 'react-icons/io5';
 
 const ToogleView = () => {
   const context = useContext(ViewContext);
@@ -26,10 +27,23 @@ const ToogleView = () => {
   }
 
   const { view, setView } = context;
+  const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  const data = [
+    {
+      rating: 1,
+    },
+    {
+      rating: 2,
+    },
+    {
+      rating: 3,
+    },
+  ];
 
   return (
     <div className='flex  justify-between items-center gap-1'>
-      <div className=' w-[90%] flex justify-between items-center'>
+      <div className=' w-[90%] flex justify-between  items-center'>
+        <></>
         <h1 className=' font-bold text-xl'>Availability:</h1>
 
         <Select>
@@ -53,8 +67,14 @@ const ToogleView = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value='3Stars'>3 Stars</SelectItem>
-              <SelectItem value='2Stars'>2 Stars</SelectItem>
+              {data.map((item) => (
+                <SelectItem key={item.rating} value={item.rating.toString()}>
+                  <span className=' flex items-center justify-between'>
+                    <IoStarSharp className='mr-2' />
+                    {item.rating}
+                  </span>
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -67,7 +87,7 @@ const ToogleView = () => {
         </form>
 
         <Select>
-          <SelectTrigger className='border-2 w-[180px]'>
+          <SelectTrigger className='border-2 w-[150px]'>
             <SelectValue placeholder='Sort by' />
           </SelectTrigger>
           <SelectContent>

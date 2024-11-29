@@ -1,13 +1,15 @@
 'use client';
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 // import { ImLocation } from "react-icons/im";
 import { FaSearch } from 'react-icons/fa';
-import TagsInput from './SearchInput/TagsInput';
+
 import { IFormInputData } from '@/interfaces/FormInputData';
 import { SearchContext } from '../context/SearchContext';
 import { ViewContext } from '../context/ViewContext';
 import LinearTagsInput from './SearchInput/LinearTagsInput';
+import { RxCrossCircled } from 'react-icons/rx';
+import { PiPlusCircleThin } from 'react-icons/pi';
 
 // import {
 //   Select,
@@ -22,7 +24,8 @@ import { Button } from '@/components/ui/button';
 const SearchFields = () => {
   const searchContext = useContext(SearchContext);
   const viewContext = useContext(ViewContext);
-
+  const [tags, setTags] = useState(false);
+  const inputRefs = useRef(null);
   if (!searchContext) {
     throw new Error(
       'SearchContext must be used within a SearchContext.Provider'
@@ -36,6 +39,11 @@ const SearchFields = () => {
   const { setSearchData } = searchContext;
 
   // const { view } = viewContext;
+  useEffect(() => {
+    if (tags && inputRefs.current) {
+      inputRefs.current.focus();
+    }
+  }, [tags]);
 
   const [formData, setFormData] = useState<IFormInputData>({
     prompt: '',
@@ -46,19 +54,23 @@ const SearchFields = () => {
   });
 
   const [tagsValue, setTagsValue] = useState(true);
+  const [tagsArray, setTagsArray] = useState([]);
+  useEffect(() => {
+    console.log(tagsArray);
+  }, [tagsArray]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    console.log('SUbbmited');
     setSearchData(formData);
     // Clear the form fields after submission
-    setFormData({
-      prompt: '',
-      programming_language: [''],
-      skill: [''],
-      address: '',
-      foldersToSearch: [''],
-    });
+    // setFormData({
+    //   prompt: '',
+    //   programming_language: [''],
+    //   skill: [''],
+    //   address: '',
+    //   foldersToSearch: [''],
+    // });
     setTagsValue(false);
   };
 
@@ -88,27 +100,44 @@ const SearchFields = () => {
   // const [isFocused, setIsFocused] = useState(false);
 
   // Disable Enter key for input fields to prevent submission
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-    }
-  };
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter') {
+  //     e.preventDefault();
+  //   }
+  // };
 
   return (
-    <div className='w-full mt-8 flex flex-col justify-center space-y-6'>
+    <div className='w-full mt-3 flex flex-col justify-center'>
       {/* Top search fields */}
       <form onSubmit={handleSubmit}>
-        <div className='flex flex-col gap-3'>
-          <div className='flex gap-3 justify-between text-center'>
-            <div>
+        <div className='flex flex-col '>
+          <div className='w-full justify-start flex py-2 mb-5'>
+            {tags ? (
+              <div className='flex w-3/5 max-w-full justify-start'>
+                <LinearTagsInput />
+              </div>
+            ) : (
+              <section
+                onClick={() => {
+                  setTags(true);
+                }}
+                className='flex items-center '
+              >
+                <h1 className='font-medium text-2xl'>Suggested Tags:</h1>
+                <PiPlusCircleThin className='h-10 mt-1 hover:cursor-pointer ml-2 w-10' />
+              </section>
+            )}
+          </div>
+          <div className='flex  justify-between items-center  text-center'>
+            <div className='w-[60%] flex justify-start'>
               <input
-                className='placeholder:text-gray-400 border-2 py-2 px-2 rounded-md '
+                className='placeholder:text-gray-400 border-2 w-[85%] py-2 px-2  rounded-md '
                 type='string'
                 name='prompt'
                 value={formData.prompt}
                 onChange={handleChange}
                 placeholder='Enter Prompt (skills)'
-                onKeyDown={handleKeyDown} // Prevent form submission on Enter key
+                // onKeyDown={handleKeyDown} // Prevent form submission on Enter key
               />
             </div>
 
@@ -122,26 +151,25 @@ const SearchFields = () => {
             />
           </div> */}
 
-            <div className='max-h-14'>
-              {/* Inline tag input for programming languages */}
+            {/* <div className='max-h-14'>
               <TagsInput
                 onTagsChange={handleProgrammingLanguageTagsChange}
                 tagsValue={tagsValue}
                 placeholderText='Programming Language'
               />
-            </div>
+            </div> */}
 
             {/* Tags Input for Skill */}
-            <div className='max-h-12'>
+            {/* <div className='max-h-12'>
               <TagsInput
                 onTagsChange={handleSkillTagsChange}
                 tagsValue={tagsValue}
                 placeholderText='Enter Skill'
               />
-            </div>
+            </div> */}
 
-            <div className='flex flex-shrink-0 '>
-              <div className='flex items-center border rounded-lg'>
+            <div className='flex items-center w-[35%]  justify-around flex-shrink-0 '>
+              <div className='flex items-center border-2 rounded-lg'>
                 <Input
                   className='w-[12rem] border-none'
                   type='text'
@@ -149,12 +177,17 @@ const SearchFields = () => {
                   value={formData.address}
                   onChange={handleChange}
                   placeholder='Location'
-                  onKeyDown={handleKeyDown}
+                  // onKeyDown={handleKeyDown}
                   // onFocus={() => setIsFocused(true)}
                   // onBlur={() => setIsFocused(false)}
                 />
                 {/* {!isFocused && <ImLocation className="" />} */}
               </div>
+              <RxCrossCircled
+                color='red'
+                size='35px'
+                className='hover:cursor-pointer hover:opacity-50'
+              />
               <Button
                 type='submit'
                 className=' bg-white ml-2 rounded-3xl group hover:bg-inherit'
@@ -165,10 +198,6 @@ const SearchFields = () => {
                 {/* <span>Search</span> */}
               </Button>
             </div>
-          </div>
-
-          <div>
-            <LinearTagsInput />
           </div>
         </div>
       </form>

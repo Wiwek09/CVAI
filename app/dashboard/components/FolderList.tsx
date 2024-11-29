@@ -10,7 +10,12 @@ import {
 } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-// import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 const FolderList = ({ updateFolderList }) => {
   const [folders, setFolders] = useState([]);
@@ -31,9 +36,10 @@ const FolderList = ({ updateFolderList }) => {
         const foldersResponse = await axiosInstance.get(
           '/folder/getAllFolders'
         );
+
         const fetchedFolders = foldersResponse.data;
         console.log('Fetched folders', fetchedFolders);
-        // setFolders(fetchedFolders);
+        setFolders(fetchedFolders);
 
         const contentsPromises = fetchedFolders.map((folder) =>
           axiosInstance
@@ -94,7 +100,13 @@ const FolderList = ({ updateFolderList }) => {
       // Reset editing state
       setEditingFolder(null);
       setNewFolderName('');
-      toast('Successfully edited the folder');
+      toast('Successfully edited the folder', {
+        description: 'Folder has been renamed successfully',
+        style: {
+          color: 'white',
+          background: 'black',
+        },
+      });
     } catch (error) {
       console.error('Error renaming folder:', error);
       toast('Failed to edit', {
@@ -106,8 +118,25 @@ const FolderList = ({ updateFolderList }) => {
       });
     }
   };
-
+  useEffect(() => {
+    console.log('This is folders', folders);
+  }, [folders]);
   return (
+    // <div>
+    //   <Accordion type='multiple' className='w-full'>
+    //     {folders.map((folder) => (
+    //       <AccordionItem
+    //         className='border-none hover:no-underline'
+    //         value={folder.folder_id}
+    //       >
+    //         <AccordionTrigger className='text-white border-none hover:no-underline'>
+    //           {folder.folder_name}
+    //         </AccordionTrigger>
+    //         <AccordionContent>{folder.folder_name}</AccordionContent>
+    //       </AccordionItem>
+    //     ))}
+    //   </Accordion>
+    // </div>
     <div className='text-white'>
       {folders.map((folder) => (
         <div key={folder.folder_id} className='mb-4'>

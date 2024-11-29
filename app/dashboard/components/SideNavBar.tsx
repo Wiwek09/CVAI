@@ -37,7 +37,20 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import axiosInstance from '../../../utils/axiosConfig';
-
+import { VersionSwitcher } from '@/components/version-switcher';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 const SideNavBar = () => {
   const [uploading, setUploading] = useState<boolean>(false);
 
@@ -189,91 +202,98 @@ const SideNavBar = () => {
   };
 
   return (
-    <Card className='border border-black h-[100vh] rounded-none flex flex-col items-center bg-black space-y-6 py-6'>
-      <h1 className='text-2xl text-center w-full px-4 text-white'>CV_AI</h1>
-
-      <div className='w-full max-w-sm px-4'>
-        <div
-          onDrop={handleDrop}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          className={`relative flex flex-col gap-2 items-center justify-center h-52 border-2 border-dashed border-gray-400 p-4 rounded-md  bg-black text-white transition-all duration-300 ease-in-out ${
-            isDragging ? 'opacity-50 backdrop-blur-sm' : 'opacity-100'
-          }`}
-        >
-          {uploading ? (
-            <div className='absolute inset-0 flex h-full w-full flex-col items-center justify-center pointer-events-none bg-black bg-opacity-50 '>
-              {/* Loader for uploading state */}
-              <svg
-                className='animate-spin h-10 w-10 text-gray-300'
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-              >
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                ></circle>
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8v8H4z'
-                ></path>
-              </svg>
-              <p className='text-gray-400 mt-2'>Uploading...</p>
-            </div>
-          ) : (
-            <div className='flex flex-col items-center h-full w-full justify-center'>
-              <IoIosCloudUpload size={40} className='text-gray-400' />
-              <p className='text-center'>Drag and drop your files here</p>
-              <label
-                // onClick={(e) => e.stopPropagation()}
-                className='cursor-pointer'
-              >
-                <span>Choose File</span>
-                <input
-                  className='hidden'
-                  type='file'
-                  accept='application/pdf'
-                  onChange={handleFileSelect}
-                  multiple
-                  disabled={uploading}
-                />
-              </label>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className='w-full px-4'>
-        <Select onValueChange={(value) => setSelectedFolderId(value)}>
-          <SelectTrigger className='w-full'>
-            <SelectValue placeholder='Uploading to ....' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              {folderListData.map((item: any, index) => (
-                <div key={index} className=''>
-                  <SelectItem value={item.folder_id}>
-                    {item.folder_name}
-                  </SelectItem>
+    <Sidebar>
+      {/* <SidebarTrigger className='absolute top-1/2 border rounded-lg bg-white right-0'></SidebarTrigger> */}
+      <Card className='border border-black h-[100vh] rounded-none flex flex-col items-center bg-black space-y-6 py-6'>
+        <SidebarHeader>
+          {' '}
+          <h1 className='text-2xl text-center w-full px-4 text-white'>
+            CV_AI
+          </h1>{' '}
+        </SidebarHeader>
+        <SidebarContent className='space-y-6'>
+          <div className='w-full max-w-sm px-4'>
+            <div
+              onDrop={handleDrop}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              className={`relative flex flex-col gap-2 items-center justify-center h-48 border-2 border-dashed border-gray-400 p-4 rounded-md  bg-black text-white transition-all duration-300 ease-in-out ${
+                isDragging ? 'opacity-50 backdrop-blur-sm' : 'opacity-100'
+              }`}
+            >
+              {uploading ? (
+                <div className='absolute inset-0 flex h-full w-full flex-col items-center justify-center pointer-events-none bg-black bg-opacity-50 '>
+                  {/* Loader for uploading state */}
+                  <svg
+                    className='animate-spin h-10 w-10 text-gray-300'
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                  >
+                    <circle
+                      className='opacity-25'
+                      cx='12'
+                      cy='12'
+                      r='10'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                    ></circle>
+                    <path
+                      className='opacity-75'
+                      fill='currentColor'
+                      d='M4 12a8 8 0 018-8v8H4z'
+                    ></path>
+                  </svg>
+                  <p className='text-gray-400 mt-2'>Uploading...</p>
                 </div>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+              ) : (
+                <div className='flex flex-col items-center h-full w-full justify-center'>
+                  <IoIosCloudUpload size={40} className='text-gray-400' />
+                  <p className='text-center'>Drag and drop your files here</p>
+                  <label
+                    // onClick={(e) => e.stopPropagation()}
+                    className='cursor-pointer'
+                  >
+                    <span>Choose File</span>
+                    <input
+                      className='hidden'
+                      type='file'
+                      accept='application/pdf'
+                      onChange={handleFileSelect}
+                      multiple
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
 
-      {/* <h1 className="text-start w-full px-4 text-xl font-medium text-white">
+          <div className='w-full px-4'>
+            <Select onValueChange={(value) => setSelectedFolderId(value)}>
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='Uploading to ....' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {folderListData.map((item: any, index) => (
+                    <div key={index} className=''>
+                      <SelectItem value={item.folder_id}>
+                        {item.folder_name}
+                      </SelectItem>
+                    </div>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* <h1 className="text-start w-full px-4 text-xl font-medium text-white">
         Files Uploaded
       </h1> */}
 
-      {/* <div className="flex flex-col w-full items-start px-4 overflow-y-auto scrollbar-thin h-52 gap-2 max-w-sm">
+          {/* <div className="flex flex-col w-full items-start px-4 overflow-y-auto scrollbar-thin h-52 gap-2 max-w-sm">
         {apiData &&
           apiData.map((item: any, index: number) => (
             <span key={index} className="text-gray-300 text-sm">
@@ -282,15 +302,15 @@ const SideNavBar = () => {
           ))}
       </div> */}
 
-      <div className='w-full px-4'>
-        <FolderCreation onFolderCreated={handleFolderCreated} />
-      </div>
+          <div className='w-full px-4'>
+            <FolderCreation onFolderCreated={handleFolderCreated} />
+          </div>
 
-      <div className='w-full px-4'>
-        <FolderList updateFolderList={updateFolderList} />
-      </div>
+          <div className='w-full px-4'>
+            <FolderList updateFolderList={updateFolderList} />
+          </div>
 
-      {/* <div>
+          {/* <div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button className="bg-red-500 hover:bg-red-800">Delete All</Button>
@@ -315,7 +335,9 @@ const SideNavBar = () => {
           </AlertDialogContent>
         </AlertDialog>
       </div> */}
-    </Card>
+        </SidebarContent>
+      </Card>
+    </Sidebar>
   );
 };
 

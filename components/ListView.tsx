@@ -151,7 +151,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     isSearching && searchResults.length > 0 ? searchResults : allData;
 
   return (
-    <div className='flex flex-col px-4 py-4 rounded-md bg-gray-100 h-[100vh] overflow-y-scroll space-y-5 scrollbar-thin '>
+    <div className='flex flex-col px-4 py-4 rounded-md bg-gray-100   space-y-5 scrollbar-thin '>
       {loading ? (
         <div className='flex flex-col gap-3'>
           <ListViewSkeletion />
