@@ -197,11 +197,14 @@ function GridView({ data, searchData }: GridViewProps) {
                     </section>
                     <section className='flex  items-center'>
                       {hoveredUser.linkedin_url ? (
-                        <section className='truncate'>
+                        <section className='flex space-x-4 truncate'>
                           <button className='bg-gray-600 p-[4px] rounded-full'>
                             <CiLinkedin color='white' />
                           </button>
                           <a
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
                             href={hoveredUser.linkedin_url}
                             target='_blank'
                             rel='noopener noreferrer'
@@ -216,7 +219,7 @@ function GridView({ data, searchData }: GridViewProps) {
                             onClick={(e) => {
                               e.stopPropagation();
                             }}
-                            href={hoveredUser.linkedin_url}
+                            href={hoveredUser.git_url}
                             target='_blank'
                             rel='noopener noreferrer'
                             className='text-blue-600 space-x-4 flex hover:underline'
@@ -234,13 +237,13 @@ function GridView({ data, searchData }: GridViewProps) {
                     <section>
                       <h1 className='text-lg font-semibold'>Experience</h1>
                       {hoveredUser.work_experience?.map((jobs) => (
-                        <h3 className='text-gray-600'>{jobs.job_title}</h3>
+                        <h3 className='text-gray-600 ml-3'>{jobs.job_title}</h3>
                       ))}
                     </section>
                     <section>
                       <h1 className='text-lg font-semibold'>Skills</h1>
                       {hoveredUser.skills?.slice(0, 3).map((skill, index) => (
-                        <h3 key={index} className='text-gray-600'>
+                        <h3 key={index} className='text-gray-600 ml-3'>
                           {skill}
                         </h3>
                       ))}
@@ -248,7 +251,7 @@ function GridView({ data, searchData }: GridViewProps) {
                     <section>
                       <h1 className='text-lg font-semibold'>Education</h1>
                       {hoveredUser.education?.slice(0, 3).map((ed, index) => (
-                        <h3 key={index} className='text-gray-600'>
+                        <h3 key={index} className='text-gray-600 ml-3'>
                           {ed.degree}
                         </h3>
                       ))}
