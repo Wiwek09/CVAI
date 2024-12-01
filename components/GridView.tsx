@@ -70,6 +70,7 @@ function GridView({ data, searchData }: GridViewProps) {
   //   }
   // }, [imageDataID]);
   useEffect(() => {
+    // setHoveredUser([]);
     const getHoveredDetails = async () => {
       const response = await axiosInstance.get(`/document/cv/${hoveredId}`);
       console.log(response.data.parsed_cv);
@@ -122,8 +123,9 @@ function GridView({ data, searchData }: GridViewProps) {
     if (timeoutId) {
       clearTimeout(timeoutId);
       setHoveredId(null);
+      setHoveredUser([]);
     }
-
+    setHoveredUser([]);
     setHoveredId(null);
   };
 

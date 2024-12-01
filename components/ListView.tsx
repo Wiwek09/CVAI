@@ -169,7 +169,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
               {/* Basic Information */}
               <div className='flex flex-col gap-1 w-[25%] overflow-clip'>
                 <div className='flex mb-0 flex-col'>
-                  <h1 className='mb-1 text-base underline  underline-offset-2 font-bold'>
+                  <h1 className='mb-3 text-base underline  underline-offset-4  font-bold'>
                     {item?.parsed_cv.position
                       ? item?.parsed_cv.position.toUpperCase()
                       : ''}
