@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/hover-card';
 import { FaGithub } from 'react-icons/fa';
 import { CiLinkedin } from 'react-icons/ci';
+import ListViewSkeleton from './ui/Skeleton/ListViewSkeleton';
 
 interface GridViewProps {
   data: IDocumentData[];
@@ -65,12 +66,7 @@ function GridView({ data, searchData }: GridViewProps) {
     }
   }, [searchData]);
 
-  // useEffect(() => {
-  //   if (imageDataID?.length > 0) {
-  //   }
-  // }, [imageDataID]);
   useEffect(() => {
-    // setHoveredUser([]);
     const getHoveredDetails = async () => {
       const response = await axiosInstance.get(`/document/cv/${hoveredId}`);
       console.log(response.data.parsed_cv);
@@ -186,79 +182,95 @@ function GridView({ data, searchData }: GridViewProps) {
             )} */}
             <Link href={`/cv-detail/${item.doc_id}`} target='_blank'>
               {hoveredId === item.doc_id && (
-                <div className='absolute flex rounded-md pl-9 pr-9 py-2 flex-col bg-white w-full h-full z-50'>
-                  <h1 className='font-bold  text-xl py-5'>
-                    {hoveredUser.name?.toUpperCase()}
-                  </h1>
-                  <p className='space-y-5'>
-                    <section className='flex space-x-4 items-center'>
-                      <button className='bg-gray-600 p-[4px] rounded-full'>
-                        <IoCallOutline color='white' />
-                      </button>
-                      <h1> {hoveredUser.phone_number}</h1>
-                    </section>
-                    <section className='flex  items-center'>
-                      {hoveredUser.linkedin_url ? (
-                        <section className='flex space-x-4 truncate'>
+                <div
+                  className={`absolute flex rounded-md pl-9 pr-9 py-2 flex-col bg-white w-full h-full z-50 transition-opacity duration-500 ease-in-out ${
+                    hoveredUser.name
+                      ? 'opacity-100 translate-y-0'
+                      : 'opacity-0 translate-y-5'
+                  }`}
+                >
+                  {hoveredUser.name ? (
+                    <div>
+                      <h1 className='font-bold text-xl py-5'>
+                        {hoveredUser.name?.toUpperCase()}
+                      </h1>
+                      <div className='space-y-5'>
+                        <section className='flex space-x-4 items-center'>
                           <button className='bg-gray-600 p-[4px] rounded-full'>
-                            <CiLinkedin color='white' />
+                            <IoCallOutline color='white' />
                           </button>
-                          <a
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                            href={hoveredUser.linkedin_url}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='text-blue-600 space-x-4 hover:underline '
-                          >
-                            <h1> {hoveredUser.linkedin_url}</h1>
-                          </a>{' '}
+                          <h1>{hoveredUser.phone_number}</h1>
                         </section>
-                      ) : hoveredUser.git_url ? (
-                        <section className='truncate'>
-                          <a
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                            href={hoveredUser.git_url}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='text-blue-600 space-x-4 flex hover:underline'
-                          >
-                            <button className='bg-gray-600 p-[4px] rounded-full'>
-                              <FaGithub color='white' />
-                            </button>
-                            <h1> {hoveredUser.git_url}</h1>
-                          </a>
+
+                        <section className='flex items-center'>
+                          {hoveredUser.linkedin_url ? (
+                            <div className='flex space-x-4 truncate'>
+                              <button className='bg-gray-600 p-[4px] rounded-full'>
+                                <CiLinkedin color='white' />
+                              </button>
+                              <a
+                                onClick={(e) => e.stopPropagation()}
+                                href={hoveredUser.linkedin_url}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='text-blue-600 hover:underline'
+                              >
+                                <h1>{hoveredUser.linkedin_url}</h1>
+                              </a>
+                            </div>
+                          ) : hoveredUser.git_url ? (
+                            <div className='truncate'>
+                              <a
+                                onClick={(e) => e.stopPropagation()}
+                                href={hoveredUser.git_url}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='text-blue-600 flex space-x-4 hover:underline'
+                              >
+                                <button className='bg-gray-600 p-[4px] rounded-full'>
+                                  <FaGithub color='white' />
+                                </button>
+                                <h1>{hoveredUser.git_url}</h1>
+                              </a>
+                            </div>
+                          ) : null}
                         </section>
-                      ) : (
-                        ''
-                      )}
-                    </section>
-                    <section>
-                      <h1 className='text-lg font-semibold'>Experience</h1>
-                      {hoveredUser.work_experience?.map((jobs) => (
-                        <h3 className='text-gray-600 ml-3'>{jobs.job_title}</h3>
-                      ))}
-                    </section>
-                    <section>
-                      <h1 className='text-lg font-semibold'>Skills</h1>
-                      {hoveredUser.skills?.slice(0, 3).map((skill, index) => (
-                        <h3 key={index} className='text-gray-600 ml-3'>
-                          {skill}
-                        </h3>
-                      ))}
-                    </section>
-                    <section>
-                      <h1 className='text-lg font-semibold'>Education</h1>
-                      {hoveredUser.education?.slice(0, 3).map((ed, index) => (
-                        <h3 key={index} className='text-gray-600 ml-3'>
-                          {ed.degree}
-                        </h3>
-                      ))}
-                    </section>
-                  </p>
+
+                        <section>
+                          <h1 className='text-lg font-semibold'>Experience</h1>
+                          {hoveredUser.work_experience?.map((job, index) => (
+                            <h3 key={index} className='text-gray-600 ml-3'>
+                              {job.job_title}
+                            </h3>
+                          ))}
+                        </section>
+
+                        <section>
+                          <h1 className='text-lg font-semibold'>Skills</h1>
+                          {hoveredUser.skills
+                            ?.slice(0, 3)
+                            .map((skill, index) => (
+                              <h3 key={index} className='text-gray-600 ml-3'>
+                                {skill}
+                              </h3>
+                            ))}
+                        </section>
+
+                        <section>
+                          <h1 className='text-lg font-semibold'>Education</h1>
+                          {hoveredUser.education
+                            ?.slice(0, 3)
+                            .map((ed, index) => (
+                              <h3 key={index} className='text-gray-600 ml-3'>
+                                {ed.degree}
+                              </h3>
+                            ))}
+                        </section>
+                      </div>
+                    </div>
+                  ) : (
+                    <ListViewSkeleton variant='hover' />
+                  )}
                 </div>
               )}
               <Image

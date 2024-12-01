@@ -16,13 +16,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import DialogueComponent from './DialogueComponent';
 
 const FolderList = ({ updateFolderList }) => {
   const [folders, setFolders] = useState([]);
   const [openFolder, setOpenFolder] = useState(null);
+  const [files, setFiles] = useState([]);
   const [folderContents, setFolderContents] = useState({});
   const [editingFolder, setEditingFolder] = useState(null);
   const [newFolderName, setNewFolderName] = useState('');
+  const [dialogOpen, setDialogueOpen] = useState(false);
   const inputRefs = useRef({});
   useEffect(() => {
     if (editingFolder && inputRefs.current[editingFolder]) {
@@ -76,12 +79,31 @@ const FolderList = ({ updateFolderList }) => {
 
     fetchFoldersAndContents();
   }, [updateFolderList]);
-
-  const toggleDropdown = (folderId) => {
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const response = await axiosInstance.get(
+          `/folder/getFiles/${openFolder}`
+        );
+        console.log('files', response);
+        setFiles(response.data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchFiles();
+  }, [openFolder]);
+  // useEffect(() => {
+  //   console.log('Use effect files', files);
+  // }, [files]);
+  const handleDialogue = (state) => {
+    setDialogueOpen(state);
+  };
+  const toggleDropdown = (folderId: string) => {
     setOpenFolder(openFolder === folderId ? null : folderId);
   };
 
-  const handleRename = async (folderId) => {
+  const handleRename = async (folderId: string) => {
     try {
       await axiosInstance.put(`/folderrenameFolder/${folderId}`, {
         folder_id: folderId,
@@ -138,6 +160,12 @@ const FolderList = ({ updateFolderList }) => {
     //   </Accordion>
     // </div>
     <div className='text-white'>
+      {dialogOpen && (
+        <DialogueComponent
+          variant='selectMultiple'
+          handleDialogue={handleDialogue}
+        />
+      )}
       {folders.map((folder) => (
         <div key={folder.folder_id} className='mb-4'>
           <div className='flex gap-2 w-full justify-between items-center flex-1 rounded'>
@@ -196,6 +224,13 @@ const FolderList = ({ updateFolderList }) => {
                     >
                       Edit
                     </p>
+                    <h2
+                      onClick={() => {
+                        handleDialogue(true);
+                      }}
+                    >
+                      Select multiple
+                    </h2>
                   </PopoverContent>
                 </Popover>
               </span>
@@ -204,8 +239,9 @@ const FolderList = ({ updateFolderList }) => {
 
           {openFolder === folder.folder_id && (
             <div className='mt-2 ml-6 border-l border-gray-600 pl-4 max-w-[12rem]'>
-              {folderContents[folder.folder_id]?.length ? (
-                folderContents[folder.folder_id].map((file) => (
+              {/* {console.log('This is the id', folder)} */}
+              {files.length ? (
+                files.map((file) => (
                   <Link
                     key={file.doc_id}
                     href={`/cv-detail/${file.doc_id}`}

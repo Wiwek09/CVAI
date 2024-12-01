@@ -154,8 +154,8 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     <div className='flex flex-col px-4 py-4 rounded-md bg-gray-100   space-y-5 scrollbar-thin '>
       {loading ? (
         <div className='flex flex-col gap-3'>
-          <ListViewSkeletion />
-          <ListViewSkeletion />
+          <ListViewSkeletion variant='listView' />
+          <ListViewSkeletion variant='listView' />
         </div>
       ) : displayedData?.length === 0 ? (
         <p>No Document Available</p>
