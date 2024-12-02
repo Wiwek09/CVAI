@@ -9,10 +9,11 @@ import {
 } from '@/components/ui/dialog';
 import axiosInstance from '@/utils/axiosConfig';
 import { toast } from 'sonner';
+import { IoCopy } from 'react-icons/io5';
 
 import axios from 'axios';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaCopy, FaTrashAlt } from 'react-icons/fa';
 
 function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
   const [files, setFiles] = useState([]);
@@ -96,6 +97,15 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
       console.log(error);
     }
   };
+  const handleDocumentArchive = async () => {
+    try {
+      const response = await axiosInstance.post('/document/archive_document', {
+        document_ids: selectedFiles,
+      });
+      console.log('Document archive', response);
+      toast(response.data.message);
+    } catch (error) {}
+  };
   // const archiveFiles = async () => {
   //   try {
   //     const response = await axiosInstance.post();
@@ -170,18 +180,26 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
           <DialogHeader>
             <div className=' flex flex-col w-full space-y-6  mb-8 mt-4'>
               <h1 className='text-xl'>{name}</h1>
-              <section className='flex  items-center justify-between space-x-2'>
+              <section className='flex  items-center justify-between '>
                 <input
                   type='text'
                   className='rounded-md border border-#CCCC px-2 py-1'
                   placeholder='Search'
                 />
-                <button className='border px-3 py-2 rounded-md'>
-                  <FaTrashAlt
-                    onClick={() => {}}
-                    className='hover:cursor-pointer'
-                  />
-                </button>
+                <article className='space-x-2'>
+                  <button className='border px-3 py-2 rounded-md'>
+                    <FaTrashAlt
+                      onClick={() => {
+                        handleDocumentArchive();
+                        handleDialogue(false);
+                      }}
+                      className='hover:cursor-pointer'
+                    />
+                  </button>
+                  <button className='border px-3 py-2 rounded-md'>
+                    <FaCopy />
+                  </button>
+                </article>
               </section>
             </div>
             <div className='space-y-5 '>
@@ -194,7 +212,7 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
               {files ? (
                 <section className='w-full  flex-col'>
                   <div className='flex flex-row-reverse justify-between border-#CCCC  pb-4'>
-                    <article className='flex  items-center'>
+                    <article className='flex   items-center'>
                       <button className='text-sm'>Select All</button>
                       <Checkbox
                         onCheckedChange={() => {
@@ -204,7 +222,7 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
                       />
                     </article>
 
-                    <h1 className='text-sm '>Folders</h1>
+                    <h1 className='text-sm'>Folders</h1>
                   </div>
                   {files.map((file) => (
                     <section className='flex pb-4 border-b border-#CCCC mt-4 items-center '>
@@ -214,7 +232,7 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
                         id={`file-${file.doc_id}`}
                         className='cursor-pointer mr-4'
                       />
-                      <h1 className='text-sm'>{file.doc_name}</h1>
+                      <h1 className='text-sm font-light'>{file.doc_name}</h1>
                     </section>
                   ))}
                 </section>
@@ -246,18 +264,19 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
         <DialogContent className=' py-10 '>
           <DialogHeader>
             <div className=' flex w-full justify-between items-center mb-8 mt-4'>
-              <section className='flex '>
-                <h1 className='text-xl'>Folders</h1>
-              </section>
-              <section className='flex  items-center space-x-2'>
-                <input
-                  type='text'
-                  className='rounded-md border border-#CCCC px-2 py-1'
-                  placeholder='Search'
-                />
-                {/* <button className='border px-3 py-2 rounded-md'>
+              <section className='flex-col space-y-6'>
+                <h1 className='text-lg'>Select Folders</h1>
+
+                <section className='flex  items-center space-x-2'>
+                  <input
+                    type='text'
+                    className='rounded-md border border-#CCCC px-2 py-1'
+                    placeholder='Search'
+                  />
+                  {/* <button className='border px-3 py-2 rounded-md'>
                   <FaTrashAlt className='hover:cursor-pointer' />
                 </button> */}
+                </section>
               </section>
             </div>
             <div className='space-y-5'>
@@ -331,7 +350,7 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
         }}
       >
         <DialogContent className=' py-10 '>
-          <div className=' flex flex-col px-5 w-full space-y-6 mb-5 mt-4'>
+          <div className=' flex flex-col w-full space-y-6 mb-5 mt-4'>
             <h1 className='text-xl font-semibold'>Archive</h1>
             <section className='flex  items-center space-x-2'>
               <input
@@ -349,7 +368,7 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
           </div>
 
           {files ? (
-            <section className='w-full px-5 flex-col'>
+            <section className='w-full px-0 flex-col'>
               <div className='flex flex-row-reverse justify-between border-#CCCC  pb-4'>
                 <article className='flex  items-center'>
                   <button className='text-sm'>Select All</button>

@@ -137,15 +137,14 @@ function FolderCreation({ onFolderCreated }) {
               <BsThreeDotsVertical />
             </button>
           </PopoverTrigger>
-          <PopoverContent className='w-22 flex flex-col gap-3 '>
-            <Button
+          <PopoverContent className='w-auto px-2 py-2 flex flex-col gap-3 '>
+            <button
               onClick={() => {
                 handleDialogue(true);
               }}
             >
-              Select All
-            </Button>
-            <Button>Archieve</Button>
+              Select
+            </button>
           </PopoverContent>
         </Popover>
       </div>
