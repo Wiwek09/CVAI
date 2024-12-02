@@ -35,7 +35,7 @@ const LinearTagsInput = () => {
   return (
     <div className='w-full max-w-[53rem]'>
       <div
-        className='min-h-12 p-2 border-2 border-#CCCC rounded-lg flex flex-wrap items-center gap-2 focus-within:ring-1 focus-within:ring-gray-900 cursor-text'
+        className='min-h-10 p-[0.4rem] border-2 border-#CCCC rounded-lg flex flex-wrap items-center gap-2 focus-within:ring-1 focus-within:ring-gray-900 cursor-text'
         onClick={handleClick}
       >
         <button
@@ -47,7 +47,7 @@ const LinearTagsInput = () => {
           className=' hover:opacity-75 flex justify-center items-center focus:outline-none'
         >
           <PiPlusCircleThin
-            size={'35px'}
+            size={'30px'}
             className='font-bold hover:cursor-pointer'
           />
         </button>

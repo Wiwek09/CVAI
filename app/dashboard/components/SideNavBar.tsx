@@ -51,6 +51,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import DialogueComponent from './DialogueComponent';
 const SideNavBar = () => {
   const [uploading, setUploading] = useState<boolean>(false);
 
@@ -61,9 +62,13 @@ const SideNavBar = () => {
   const [updateFolderList, setUpdateFolderList] = useState(false);
   const [folderListData, setFolderListData] = useState<IFolderData[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [dialogOpen, setDialogueOpen] = useState(false);
 
   const handleFolderCreated = () => {
     setUpdateFolderList((prev) => !prev);
+  };
+  const handleDialogue = (state) => {
+    setDialogueOpen(state);
   };
 
   useEffect(() => {
@@ -205,6 +210,14 @@ const SideNavBar = () => {
     <Sidebar>
       {/* <SidebarTrigger className='absolute top-1/2 border rounded-lg bg-white right-0'></SidebarTrigger> */}
       <Card className='border border-black h-[100vh] rounded-none flex flex-col items-center bg-black space-y-6 py-6'>
+        {dialogOpen ? (
+          <DialogueComponent
+            variant='archive'
+            handleDialogue={handleDialogue}
+          />
+        ) : (
+          ''
+        )}
         <SidebarHeader>
           {' '}
           <h1 className='text-2xl text-center w-full px-4 text-white'>
@@ -308,6 +321,16 @@ const SideNavBar = () => {
 
           <div className='w-full px-4'>
             <FolderList updateFolderList={updateFolderList} />
+          </div>
+          <div>
+            <button
+              className='bg-inherit px-5 py-2 flex justify-start hover:bg-gray-900 hover:opacity-80 w-full text-white'
+              onClick={() => {
+                handleDialogue(true);
+              }}
+            >
+              Archive
+            </button>
           </div>
 
           {/* <div>

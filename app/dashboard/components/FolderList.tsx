@@ -26,6 +26,10 @@ const FolderList = ({ updateFolderList }) => {
   const [editingFolder, setEditingFolder] = useState(null);
   const [newFolderName, setNewFolderName] = useState('');
   const [dialogOpen, setDialogueOpen] = useState(false);
+  const [dialogAlert, setDialogueAlert] = useState(false);
+  const [selectedFile, setSelectedFile] = useState('');
+  const [name, setName] = useState('');
+
   const inputRefs = useRef({});
   useEffect(() => {
     if (editingFolder && inputRefs.current[editingFolder]) {
@@ -96,8 +100,11 @@ const FolderList = ({ updateFolderList }) => {
   // useEffect(() => {
   //   console.log('Use effect files', files);
   // }, [files]);
-  const handleDialogue = (state) => {
+  const handleDialogue = (state: boolean) => {
     setDialogueOpen(state);
+  };
+  const handleAlert = (state: boolean) => {
+    setDialogueAlert(state);
   };
   const toggleDropdown = (folderId: string) => {
     setOpenFolder(openFolder === folderId ? null : folderId);
@@ -162,10 +169,21 @@ const FolderList = ({ updateFolderList }) => {
     <div className='text-white'>
       {dialogOpen && (
         <DialogueComponent
+          folders={folders}
+          id={selectedFile}
           variant='selectMultiple'
           handleDialogue={handleDialogue}
+          name={name}
         />
       )}
+      {dialogAlert && (
+        <DialogueComponent
+          variant='alert'
+          handleDialogue={handleAlert}
+          id={selectedFile}
+        />
+      )}
+
       {folders.map((folder) => (
         <div key={folder.folder_id} className='mb-4'>
           <div className='flex gap-2 w-full justify-between items-center flex-1 rounded'>
@@ -211,12 +229,17 @@ const FolderList = ({ updateFolderList }) => {
               <span>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button>
+                    <button
+                      onClick={() => {
+                        setSelectedFile(folder.folder_id);
+                      }}
+                    >
                       <RxHamburgerMenu />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className='w-12 p-1 text-center cursor-pointer'>
+                  <PopoverContent className='w-32 p-1 text-center cursor-pointer'>
                     <p
+                      className='py-1 hover:opacity-50'
                       onClick={() => {
                         setEditingFolder(folder.folder_id);
                         setNewFolderName(folder.folder_name);
@@ -224,13 +247,27 @@ const FolderList = ({ updateFolderList }) => {
                     >
                       Edit
                     </p>
-                    <h2
+                    <hr />
+                    <button
                       onClick={() => {
                         handleDialogue(true);
+                        setEditingFolder(folder.folder_id);
+                        setName(folder.folder_name);
                       }}
+                      className='py-1 hover:opacity-50'
                     >
-                      Select multiple
-                    </h2>
+                      Select
+                    </button>
+                    <hr />
+                    <button
+                      onClick={() => {
+                        handleAlert(true);
+                        // setEditingFolder(folder.folder_id);
+                      }}
+                      className='py-1 hover:opacity-50'
+                    >
+                      Archive
+                    </button>
                   </PopoverContent>
                 </Popover>
               </span>

@@ -210,14 +210,14 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                   {item?.parsed_cv.email && (
                     <div className='flex items-center gap-2'>
                       <span>
-                        <MdEmail className='text-base' />
+                        <MdEmail className='text-base  hover:opacity-60' />
                       </span>
                       <span>
                         <a
                           href={`mailto:${item?.parsed_cv.email}`}
                           target='_blank'
                           rel='noopener noreferrer'
-                          className='text-gray-500'
+                          className='text-gray-500  hover:opacity-60'
                         >
                           {item?.parsed_cv.email}
                         </a>
@@ -238,9 +238,9 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                         className='flex gap-2 '
                       >
                         <span>
-                          <FaLinkedin className='cursor-pointer' />
+                          <FaLinkedin className='cursor-pointer hover:opacity-60' />
                         </span>
-                        <span className='text-gray-500 text-sm'>
+                        <span className='text-gray-500 text-sm hover:opacity-75'>
                           {item?.parsed_cv?.linkedin_url}
                         </span>
                       </Link>

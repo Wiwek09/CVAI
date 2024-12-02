@@ -11,11 +11,33 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import axiosInstance from '@/utils/axiosConfig';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
+import DialogueComponent from './DialogueComponent';
 
 function FolderCreation({ onFolderCreated }) {
   const [folderName, setFolderName] = useState('');
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
+  const [dialogOpen, setDialogueOpen] = useState(false);
+  const handleDialogue = (state: boolean) => {
+    setDialogueOpen(state);
+  };
+
+  const checkedFolders = (fileid: string) => {
+    if (selectedFolders.includes(fileid)) {
+      return selectedFolders.filter((id) => id != fileid);
+    } else {
+      setSelectedFolders([...selectedFolders, fileid]);
+    }
+  };
 
   const handleFolderCreate = async (
     event: React.FormEvent<HTMLFormElement>
@@ -58,6 +80,12 @@ function FolderCreation({ onFolderCreated }) {
   return (
     <div className='flex justify-between items-center'>
       <div className='text-lg font-semibold flex-1 text-white'>Folder</div>
+      {dialogOpen && (
+        <DialogueComponent
+          variant='selectMultipleFolders'
+          handleDialogue={handleDialogue}
+        />
+      )}
 
       <div className='flex items-center gap-4'>
         {/* folder creation icon */}
@@ -110,7 +138,13 @@ function FolderCreation({ onFolderCreated }) {
             </button>
           </PopoverTrigger>
           <PopoverContent className='w-22 flex flex-col gap-3 '>
-            <Button>Select All</Button>
+            <Button
+              onClick={() => {
+                handleDialogue(true);
+              }}
+            >
+              Select All
+            </Button>
             <Button>Archieve</Button>
           </PopoverContent>
         </Popover>

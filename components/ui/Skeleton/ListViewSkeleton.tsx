@@ -107,6 +107,25 @@ const ListViewSkeleton = ({ variant }) => {
         </div>
       </>
     );
+  } else if (variant === 'archive') {
+    return (
+      <div>
+        {Array(3)
+          .fill(null)
+          .map((_, index) => (
+            <div
+              key={index}
+              className='flex justify-between mt-5 animate-pulse'
+            >
+              {/* Folder Name Skeleton */}
+              <div className='w-1/3 h-5 bg-gray-300 rounded'></div>
+
+              {/* Button Skeleton */}
+              <div className='w-20 h-5 bg-gray-300 rounded'></div>
+            </div>
+          ))}
+      </div>
+    );
   }
 };
 
