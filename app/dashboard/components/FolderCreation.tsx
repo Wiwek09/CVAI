@@ -105,7 +105,7 @@ function FolderCreation({ onFolderCreated }) {
         </Popover>
 
         {/* three dot icons */}
-        <Popover>
+        {/* <Popover>
           <PopoverTrigger asChild>
             <button aria-label="options" className="text-white">
               <BsThreeDotsVertical />
@@ -115,7 +115,7 @@ function FolderCreation({ onFolderCreated }) {
             <Button>Select All</Button>
             <Button>Archieve</Button>
           </PopoverContent>
-        </Popover>
+        </Popover> */}
       </div>
     </div>
   );

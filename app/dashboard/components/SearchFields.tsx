@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useContext } from "react";
 import { Input } from "@/components/ui/input";
-// import { ImLocation } from "react-icons/im";
+import { IoLocationOutline } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
-import TagsInput from "./SearchInput/TagsInput";
+// import TagsInput from "./SearchInput/TagsInput";
 import { IFormInputData } from "@/interfaces/FormInputData";
 import { SearchContext } from "../context/SearchContext";
 import { ViewContext } from "../context/ViewContext";
@@ -99,10 +99,13 @@ const SearchFields = () => {
       {/* Top search fields */}
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-3">
-          <div className="flex gap-3 justify-between text-center">
+          <div>
+            <LinearTagsInput />
+          </div>
+          <div className="flex gap-3 text-center">
             <div>
               <Input
-                className="w-[20rem]"
+                className="w-[30rem]"
                 type="string"
                 name="prompt"
                 value={formData.prompt}
@@ -122,23 +125,21 @@ const SearchFields = () => {
             />
           </div> */}
 
-            <div className="max-h-14">
-              {/* Inline tag input for programming languages */}
+            {/* <div className="max-h-14">
               <TagsInput
                 onTagsChange={handleProgrammingLanguageTagsChange}
                 tagsValue={tagsValue}
                 placeholderText="Programming Language"
               />
-            </div>
+            </div> */}
 
-            {/* Tags Input for Skill */}
-            <div className="max-h-12">
+            {/* <div className="max-h-12">
               <TagsInput
                 onTagsChange={handleSkillTagsChange}
                 tagsValue={tagsValue}
                 placeholderText="Skills"
               />
-            </div>
+            </div> */}
 
             <div className="flex flex-shrink-0 ">
               <div className="flex items-center border rounded-lg">
@@ -150,10 +151,7 @@ const SearchFields = () => {
                   onChange={handleChange}
                   placeholder="Location"
                   onKeyDown={handleKeyDown}
-                  // onFocus={() => setIsFocused(true)}
-                  // onBlur={() => setIsFocused(false)}
                 />
-                {/* {!isFocused && <ImLocation className="" />} */}
               </div>
               <Button
                 type="submit"
@@ -166,22 +164,8 @@ const SearchFields = () => {
               </Button>
             </div>
           </div>
-
-          <div>
-            <LinearTagsInput />
-          </div>
         </div>
       </form>
-
-      {/* <div>
-        <hr className="bg-slate-500 h-1 " />
-      </div> */}
-
-      {/* <div className="mt-4 text-center">Tags</div> */}
-
-      {/* <div>
-        <hr className='bg-slate-200 mt-3 h-[1px]' />
-      </div> */}
 
       {/* sorting search */}
       {/* <div className="flex items-center ">
