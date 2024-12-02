@@ -276,52 +276,16 @@ const SideNavBar = () => {
         </Select>
       </div>
 
-      {/* <h1 className="text-start w-full px-4 text-xl font-medium text-white">
-        Files Uploaded
-      </h1> */}
-
-      {/* <div className="flex flex-col w-full items-start px-4 overflow-y-auto scrollbar-thin h-52 gap-2 max-w-sm">
-        {apiData &&
-          apiData.map((item: any, index: number) => (
-            <span key={index} className="text-gray-300 text-sm">
-              {index + 1 + ". " + item.doc_name}
-            </span>
-          ))}
-      </div> */}
-
       <div className="w-full px-4">
         <FolderCreation onFolderCreated={handleFolderCreated} />
       </div>
 
       <div className="w-full px-4">
-        <FolderList updateFolderList={updateFolderList} />
+        <FolderList
+          updateFolderList={updateFolderList}
+          setUpdateFolderList={setUpdateFolderList}
+        />
       </div>
-
-      {/* <div>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button className="bg-red-500 hover:bg-red-800">Delete All</Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete all
-                your uploaded files.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-red-700 hover:bg-red-500"
-                onClick={deleteAllCV}
-              >
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div> */}
     </Card>
   );
 };
