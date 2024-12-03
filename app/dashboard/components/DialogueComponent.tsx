@@ -487,15 +487,36 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
                 ''
               )}
               <div className='flex justify-end'>
-                <button
-                  className='px-5 py-2 border border-#CCCC bg-black text-gray-100 mt-10 rounded-lg'
-                  onClick={() => {
-                    handleMultipleFolderArchive();
-                    handleDialogue(false);
-                  }}
-                >
-                  Archive
-                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger className='p-0 mt-[1px]' asChild>
+                    <button className='px-5 py-2 border border-#CCCC bg-black text-gray-100 mt-10 rounded-lg'>
+                      Archive
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        The folder(s) you selected will not be visible and you
+                        will need to go the "Archive" file if you want to access
+                        it again
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          handleMultipleFolderArchive();
+                          handleDialogue(false);
+                        }}
+                      >
+                        Archive
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </DialogHeader>
