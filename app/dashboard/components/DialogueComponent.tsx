@@ -10,19 +10,39 @@ import {
 import axiosInstance from '@/utils/axiosConfig';
 import { toast } from 'sonner';
 import { IoCopy } from 'react-icons/io5';
+import { Check, ChevronsUpDown, Key } from 'lucide-react';
 
-import axios from 'axios';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FaCopy, FaTrashAlt } from 'react-icons/fa';
+import { BsFolderSymlink } from 'react-icons/bs';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
   const [files, setFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [refresh, setRefresh] = useState(true);
-
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState('');
+  const [folderId, setFolderId] = useState('');
+  console.log('Folders', folders);
+  ``;
   useEffect(() => {
-    console.log('selected files', selectedFiles);
-  }, [selectedFiles]);
+    console.log('selected files', folderId);
+  }, [folderId]);
   useEffect(() => {
     if (variant === 'selectMultiple') {
       const fetchFiles = async () => {
@@ -167,6 +187,51 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
       console.log(error);
     }
   };
+  const handleMove = async () => {
+    if (selectedFiles.length > 0) {
+      if (!folderId === null) {
+        try {
+          const response = await axiosInstance.post(`/folder/moveFiles`, {
+            from_folder: id,
+            to_folder: folderId,
+            document_id: selectedFiles,
+          });
+          console.log(response);
+          toast('successfully moved files', {
+            style: {
+              backgroundColor: 'black',
+              color: 'white',
+            },
+          });
+          handleDialogue(false);
+        } catch (error) {
+          toast('Failed to move files');
+        }
+      } else {
+        toast('Select a folder first', {
+          style: {
+            background: 'black',
+            color: 'white',
+          },
+        });
+      }
+    } else {
+      toast('Select a file first ', {
+        style: {
+          backgroundColor: 'black',
+          color: 'white',
+        },
+      });
+    }
+  };
+  const archiveFile = async () => {
+    try {
+      const response = await axiosInstance.post(`/document/archive_document`, {
+        document_ids: [id],
+      });
+      console.log(response);
+    } catch (error) {}
+  };
   console.log('This is the id', id);
   if (variant === 'selectMultiple') {
     return (
@@ -187,7 +252,7 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
                   placeholder='Search'
                 />
                 <article className='space-x-2'>
-                  <button className='border px-3 py-2 rounded-md'>
+                  <button className='border px-3 py-2 hover:opacity-60 rounded-md'>
                     <FaTrashAlt
                       onClick={() => {
                         handleDocumentArchive();
@@ -196,9 +261,82 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
                       className='hover:cursor-pointer'
                     />
                   </button>
-                  <button className='border px-3 py-2 rounded-md'>
-                    <FaCopy />
-                  </button>
+
+                  {/* <button className='border px-3 py-2 rounded-md hover:opacity-60'> */}
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        role='combobox'
+                        aria-expanded={open}
+                        className=' justify-between'
+                      >
+                        {value
+                          ? folders.find(
+                              (folder) => folder.folder_name === value
+                            )?.label
+                          : ''}
+                        <BsFolderSymlink />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-[200px] p-0'>
+                      <Command>
+                        <CommandInput
+                          placeholder='Search folder'
+                          className='h-9'
+                        />
+                        <CommandList>
+                          <CommandEmpty>No folders found.</CommandEmpty>
+                          <CommandGroup>
+                            {folders.map((folder) => (
+                              <CommandItem
+                                key={folder.folder_id}
+                                value={folder.folder_name}
+                                onSelect={(currentValue) => {
+                                  setValue(
+                                    currentValue === value ? '' : currentValue
+                                  );
+                                  setFolderId(folder.folder_id);
+                                  // setOpen(false);
+                                }}
+                              >
+                                {folder.folder_name}
+                                <Check
+                                  className={cn(
+                                    'ml-auto',
+                                    value === folder.folder_name
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                            {/* <div className='w-full  flex justify-end'>
+                              <button
+                                className='text-sm bg-black text-white rounded-lg mb-2 px-4 py-1 mt-10 flex justify-end'
+                                onClick={() => {
+                                  // console.log('clicked');
+                                }}
+                              >
+                                Move
+                              </button>
+                            </div> */}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                      <div className='w-full px-2  flex justify-end'>
+                        <button
+                          className='text-sm bg-black text-white rounded-lg mb-5 px-4 py-1 mt-5 flex justify-end'
+                          onClick={() => {
+                            handleMove();
+                          }}
+                        >
+                          Move
+                        </button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  {/* </button> */}
                 </article>
               </section>
             </div>
@@ -302,7 +440,7 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
                     <h1 className='text-sm '>Folders</h1>
                   </div>
                   {files.map((file) => (
-                    <section className='flex border-b border-#CCCC pb-4  mt-5 items-center '>
+                    <section className='flex border-b border-#CCCC pb-4  mt-4 items-center '>
                       <Checkbox
                         checked={selectedFiles.includes(file.folder_id)}
                         onCheckedChange={() => handleFileSelect(file.folder_id)}
@@ -453,6 +591,47 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
                 onClick={() => {
                   handleDialogue(false);
                   archiveFolder();
+                }}
+              >
+                Okay
+              </button>
+            </section>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  if (variant === 'alertFile') {
+    return (
+      <Dialog
+        defaultOpen
+        onOpenChange={() => {
+          handleDialogue(false);
+        }}
+      >
+        <DialogContent>
+          <div className='px-4 py-5 space-y-5 '>
+            <h1 className='text-2xl font-semibold  '>
+              Are you sure you want to archive?
+            </h1>
+            <p className='text-gray-600'>
+              The file you selected will not be visible and you will need to go
+              the "Archive" file if you want to access it again
+            </p>
+            <section className='w-full   flex space-x-7  justify-end  '>
+              <button
+                className='hover:opacity-70'
+                onClick={() => {
+                  handleDialogue(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className='bg-black text-white px-5 py-2 rounded-lg hover:opacity-70 '
+                onClick={() => {
+                  handleDialogue(false);
+                  archiveFile();
                 }}
               >
                 Okay

@@ -15,6 +15,7 @@ import { IoIosCloudUpload } from 'react-icons/io';
 import FolderCreation from './FolderCreation';
 import FolderList from './FolderList';
 import { IFolderData } from '@/interfaces/FolderData';
+import { GiBackwardTime } from 'react-icons/gi';
 
 // import {
 //   AlertDialog,
@@ -52,6 +53,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import DialogueComponent from './DialogueComponent';
+import { MdFolderZip } from 'react-icons/md';
 const SideNavBar = () => {
   const [uploading, setUploading] = useState<boolean>(false);
 
@@ -321,15 +323,14 @@ const SideNavBar = () => {
 
           <div className='w-full px-4'>
             <FolderList updateFolderList={updateFolderList} />
-          </div>
-          <div>
             <button
-              className='bg-inherit px-5 py-2 flex justify-start hover:bg-gray-900 hover:opacity-80 w-full text-white'
+              className='bg-inherit px-0 items-center py-1 flex justify-start hover:opacity-60 w-full text-white'
               onClick={() => {
                 handleDialogue(true);
               }}
             >
-              Archive
+              <MdFolderZip className='text-gray-300 opacity-70' />
+              <h1 className='ml-6 '> Archive </h1>
             </button>
           </div>
 

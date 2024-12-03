@@ -17,6 +17,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import DialogueComponent from './DialogueComponent';
+import { BsThreeDots, BsThreeDotsVertical } from 'react-icons/bs';
 
 const FolderList = ({ updateFolderList }) => {
   const [folders, setFolders] = useState([]);
@@ -29,6 +30,7 @@ const FolderList = ({ updateFolderList }) => {
   const [dialogAlert, setDialogueAlert] = useState(false);
   const [selectedFile, setSelectedFile] = useState('');
   const [name, setName] = useState('');
+  const [dialogAlertFile, setDialogueAlertFile] = useState(false);
 
   const inputRefs = useRef({});
   useEffect(() => {
@@ -106,6 +108,9 @@ const FolderList = ({ updateFolderList }) => {
   const handleAlert = (state: boolean) => {
     setDialogueAlert(state);
   };
+  const handleAlertFile = (state: boolean) => {
+    setDialogueAlertFile(state);
+  };
   const toggleDropdown = (folderId: string) => {
     setOpenFolder(openFolder === folderId ? null : folderId);
   };
@@ -116,8 +121,6 @@ const FolderList = ({ updateFolderList }) => {
         folder_id: folderId,
         new_name: newFolderName,
       });
-
-      // Update folder name in the UI
       setFolders((prevFolders) =>
         prevFolders.map((folder) =>
           folder.folder_id === folderId
@@ -183,6 +186,13 @@ const FolderList = ({ updateFolderList }) => {
           id={selectedFile}
         />
       )}
+      {dialogAlertFile && (
+        <DialogueComponent
+          variant='alertFile'
+          handleDialogue={handleAlertFile}
+          id={selectedFile}
+        />
+      )}
 
       {folders.map((folder) => (
         <div key={folder.folder_id} className='mb-4'>
@@ -207,17 +217,63 @@ const FolderList = ({ updateFolderList }) => {
                 <button type='submit' className='hidden'></button>
               </form>
             ) : (
-              <div className='flex items-center gap-2 '>
+              <div className='flex items-center justify-between  gap-2 '>
                 <span>
-                  <Checkbox className='bg-white' />
+                  <span>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          onClick={() => {
+                            setSelectedFile(folder.folder_id);
+                          }}
+                        >
+                          <RxHamburgerMenu />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-32 p-1 text-center cursor-pointer'>
+                        <p
+                          className='py-1 hover:opacity-50'
+                          onClick={() => {
+                            setEditingFolder(folder.folder_id);
+                            setNewFolderName(folder.folder_name);
+                          }}
+                        >
+                          Edit
+                        </p>
+                        <hr />
+                        <button
+                          onClick={() => {
+                            handleDialogue(true);
+                            setEditingFolder(folder.folder_id);
+                            setName(folder.folder_name);
+                          }}
+                          className='py-1 hover:opacity-50'
+                        >
+                          Select
+                        </button>
+                        <hr />
+                        <button
+                          onClick={() => {
+                            handleAlert(true);
+                            // setEditingFolder(folder.folder_id);
+                          }}
+                          className='py-1 hover:opacity-50'
+                        >
+                          Archive
+                        </button>
+                      </PopoverContent>
+                    </Popover>
+                  </span>
                 </span>
-                <span>{folder.folder_name}</span>
+                <span className='ml-5'>{folder.folder_name}</span>
               </div>
             )}
 
-            <div className='flex gap-4'>
+            <div
+              className='flex gap-4'
+              onClick={() => toggleDropdown(folder.folder_id)}
+            >
               <span
-                onClick={() => toggleDropdown(folder.folder_id)}
                 className={`ml-auto w-6 h-6 hover:bg-gray-700 rounded-full items-center justify-center flex transform transition-transform duration-300 ${
                   openFolder === folder.folder_id ? 'rotate-180' : 'rotate-0'
                 }`}
@@ -226,70 +282,50 @@ const FolderList = ({ updateFolderList }) => {
               </span>
 
               {/* Hamburger */}
-              <span>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      onClick={() => {
-                        setSelectedFile(folder.folder_id);
-                      }}
-                    >
-                      <RxHamburgerMenu />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-32 p-1 text-center cursor-pointer'>
-                    <p
-                      className='py-1 hover:opacity-50'
-                      onClick={() => {
-                        setEditingFolder(folder.folder_id);
-                        setNewFolderName(folder.folder_name);
-                      }}
-                    >
-                      Edit
-                    </p>
-                    <hr />
-                    <button
-                      onClick={() => {
-                        handleDialogue(true);
-                        setEditingFolder(folder.folder_id);
-                        setName(folder.folder_name);
-                      }}
-                      className='py-1 hover:opacity-50'
-                    >
-                      Select
-                    </button>
-                    <hr />
-                    <button
-                      onClick={() => {
-                        handleAlert(true);
-                        // setEditingFolder(folder.folder_id);
-                      }}
-                      className='py-1 hover:opacity-50'
-                    >
-                      Archive
-                    </button>
-                  </PopoverContent>
-                </Popover>
-              </span>
             </div>
           </div>
 
           {openFolder === folder.folder_id && (
-            <div className='mt-2 ml-6 border-l border-gray-600 pl-4 max-w-[12rem]'>
-              {/* {console.log('This is the id', folder)} */}
+            <div className='mt-2 ml-6  border-l  border-gray-600 pl-4 max-w-[12rem]'>
               {files.length ? (
                 files.map((file) => (
-                  <Link
-                    key={file.doc_id}
-                    href={`/cv-detail/${file.doc_id}`}
-                    target='_blank'
-                  >
-                    <div className='flex items-center gap-2 p-1 text-gray-300 ease-in-out hover:bg-gray-700 duration-150 delay-75 rounded'>
-                      <span className=' text-white'>
-                        {file.doc_name} {console.log(file.doc_name)}
+                  <div className='flex items-center gap-2 p-1 text-gray-300 ease-in-out duration-150 delay-75 rounded'>
+                    <Link
+                      key={file.doc_id}
+                      href={`/cv-detail/${file.doc_id}`}
+                      target='_blank'
+                    >
+                      <span className=' px-2 py-1  hover:opacity-60'>
+                        {file.doc_name.replace('.pdf', '')}
+                        {console.log(file.doc_name)}
                       </span>
-                    </div>
-                  </Link>
+                    </Link>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button>
+                          <BsThreeDots
+                            className='text-white hover:opacity-60 hover:cursor-pointer'
+                            size={'15px'}
+                          />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-20 p-0  '>
+                        <span
+                          className='flex items-center p-1 hover:cursor-pointer hover:opacity-50 justify-center'
+                          onClick={() => {
+                            handleAlertFile(true);
+                            setSelectedFile(file.doc_id);
+                          }}
+                        >
+                          Archive
+                        </span>
+                        <hr />
+                        {/* <span className='flex items-center p-1 hover:cursor-pointer hover:opacity-50 justify-center'>
+                          Move
+                        </span> */}
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 ))
               ) : (
                 <div className='text-gray-400 italic'>No PDFs uploaded.</div>
