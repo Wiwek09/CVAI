@@ -189,7 +189,7 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
   };
   const handleMove = async () => {
     if (selectedFiles.length > 0) {
-      if (!folderId === null) {
+      if (!(folderId === null)) {
         try {
           const response = await axiosInstance.post(`/folder/moveFiles`, {
             from_folder: id,
@@ -574,8 +574,8 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
               Are you sure you want to archive?
             </h1>
             <p className='text-gray-600'>
-              The file you selected will not be visible and you will need to go
-              the "Archive" file if you want to access it again
+              The folder you selected will not be visible and you will need to
+              go the "Archive" file if you want to access it again
             </p>
             <section className='w-full   flex space-x-7  justify-end  '>
               <button

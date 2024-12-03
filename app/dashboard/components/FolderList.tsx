@@ -8,14 +8,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
+
 import { toast } from 'sonner';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+
 import DialogueComponent from './DialogueComponent';
 import { BsThreeDots, BsThreeDotsVertical } from 'react-icons/bs';
 
