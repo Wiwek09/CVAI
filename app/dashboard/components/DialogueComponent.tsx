@@ -7,6 +7,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import axiosInstance from '@/utils/axiosConfig';
 import { toast } from 'sonner';
 import { IoCopy } from 'react-icons/io5';
@@ -252,15 +263,36 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
                   placeholder='Search'
                 />
                 <article className='space-x-2'>
-                  <button className='border px-3 py-2 hover:opacity-60 rounded-md'>
-                    <FaTrashAlt
-                      onClick={() => {
-                        handleDocumentArchive();
-                        handleDialogue(false);
-                      }}
-                      className='hover:cursor-pointer'
-                    />
-                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger className='p-0 mt-[1px]' asChild>
+                      <button className='border px-4 py-[0.67rem] hover:backdrop-brightness-95 rounded-md'>
+                        <FaTrashAlt className='hover:cursor-pointer' />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          The folder you selected will not be visible and you
+                          will need to go the "Archive" file if you want to
+                          access it again
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            handleDocumentArchive();
+                            handleDialogue(false);
+                          }}
+                        >
+                          Continue
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
 
                   {/* <button className='border px-3 py-2 rounded-md hover:opacity-60'> */}
                   <Popover open={open} onOpenChange={setOpen}>
