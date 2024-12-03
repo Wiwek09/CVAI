@@ -281,18 +281,18 @@ const FolderList = ({ updateFolderList }) => {
           </div>
 
           {openFolder === folder.folder_id && (
-            <div className='mt-2 ml-6  border-l  border-gray-600 pl-4 max-w-[12rem]'>
+            <div className='mt-2 ml-6  border-l  border-gray-600 pl-4 w-52 max-w-52 truncate'>
               {files.length ? (
                 files.map((file) => (
-                  <div className='flex items-center gap-2 p-1 text-gray-300 ease-in-out duration-150 delay-75 rounded'>
+                  <div className='relative flex items-center justify-between p-1 text-gray-300 ease-in-out duration-150 delay-75 rounded truncate '>
                     <Link
                       key={file.doc_id}
                       href={`/cv-detail/${file.doc_id}`}
                       target='_blank'
+                      className='truncate '
                     >
-                      <span className=' px-2 py-1  hover:opacity-60'>
+                      <span className=' px-2 py-1 w-8  hover:opacity-60 max-w-12 text-sm truncate'>
                         {file.doc_name.replace('.pdf', '')}
-                        {console.log(file.doc_name)}
                       </span>
                     </Link>
                     <Popover>

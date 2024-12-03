@@ -226,7 +226,7 @@ const SideNavBar = () => {
             CV_AI
           </h1>{' '}
         </SidebarHeader>
-        <SidebarContent className='space-y-6'>
+        <SidebarContent className='space-y-6 '>
           <div className='w-full max-w-sm px-4'>
             <div
               onDrop={handleDrop}
