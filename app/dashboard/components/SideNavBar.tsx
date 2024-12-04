@@ -211,7 +211,7 @@ const SideNavBar = () => {
   return (
     <Sidebar>
       {/* <SidebarTrigger className='absolute top-1/2 border rounded-lg bg-white right-0'></SidebarTrigger> */}
-      <Card className='border border-black h-[100vh] rounded-none flex flex-col items-center bg-black space-y-6 py-6'>
+      <Card className='border border-black h-[100vh] overflow-y-auto scrollbar-thin rounded-none flex flex-col items-center bg-black space-y-6 py-6'>
         {dialogOpen ? (
           <DialogueComponent
             variant='archive'
@@ -226,7 +226,7 @@ const SideNavBar = () => {
             CV_AI
           </h1>{' '}
         </SidebarHeader>
-        <SidebarContent className='space-y-6 '>
+        <SidebarContent className='space-y-6 overflow-y-auto scrollbar-thinSide '>
           <div className='w-full max-w-sm px-4'>
             <div
               onDrop={handleDrop}

@@ -18,6 +18,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import ClipLoader from 'react-spinners/ClipLoader';
 import axiosInstance from '@/utils/axiosConfig';
 import { toast } from 'sonner';
 import { IoCopy } from 'react-icons/io5';
@@ -41,6 +48,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { MdOutlineFolder } from 'react-icons/md';
 
 function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
   const [files, setFiles] = useState([]);
@@ -49,11 +57,18 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
   const [folderId, setFolderId] = useState('');
+  const [archivedFiles, setArchivedFiles] = useState([
+    { name: 'YO' },
+    { name: 'ho' },
+  ]);
   console.log('Folders', folders);
   ``;
   useEffect(() => {
     console.log('selected files', folderId);
   }, [folderId]);
+  useEffect(() => {
+    console.log('selected files for', selectedFiles);
+  }, [selectedFiles]);
   useEffect(() => {
     if (variant === 'selectMultiple') {
       const fetchFiles = async () => {
@@ -89,6 +104,18 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
           toast.error('Failed to fetched Archive details');
         }
       };
+      const fetchArchiveFiles = async () => {
+        try {
+          const response = await axiosInstance.get(
+            '/document/archive_document'
+          );
+          console.log('archived files fetched', response);
+        } catch (error) {
+          console.log('this is error');
+          console.log(error);
+        }
+      };
+      // fetchArchiveFiles();
       fetchArchive();
     }
   }, [id, variant, refresh]);
@@ -573,7 +600,26 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
 
                 <h1 className='text-sm '>Folders</h1>
               </div>
-
+              <Accordion type='single' collapsible className='w-full'>
+                <AccordionItem value='item-1'>
+                  <AccordionTrigger className='hover:no-underline flex justify-between text-gray-400 text-sm'>
+                    <section className='flex items-center'>
+                      <MdOutlineFolder size={'20px'} />
+                      <h1 className='text-sm ml-3 mt-1'>Default</h1>
+                    </section>
+                  </AccordionTrigger>
+                  <AccordionContent className='ml-5'>
+                    <ul>
+                      {archivedFiles.map((file) => (
+                        <li className=' text-sm flex items-center'>
+                          <Checkbox className='mr-3' />
+                          {file.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
               {files.map((file) => (
                 <div className='flex border-b border-#CCCC  pb-4 items-center mt-5'>
                   <Checkbox
@@ -694,6 +740,26 @@ function DialogueComponent({ variant, handleDialogue, id, folders, name }) {
         </DialogContent>
       </Dialog>
     );
+  }
+  if (variant === 'spinner') {
+    <Dialog
+      defaultOpen
+      onOpenChange={() => {
+        handleDialogue(false);
+      }}
+    >
+      <DialogContent>
+        {console.log('Inside spionner')}
+        <div>
+          {' '}
+          <ClipLoader
+            size={150}
+            aria-label='Loading Spinner'
+            data-testid='loader'
+          />
+        </div>
+      </DialogContent>
+    </Dialog>;
   }
 }
 
