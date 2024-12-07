@@ -1,7 +1,7 @@
-'use client';
-import React, { createContext, ReactNode, useState } from 'react';
+"use client";
+import React, { createContext, ReactNode, useState } from "react";
 
-type ViewType = 'grid' | 'list';
+type ViewType = "grid" | "list";
 
 // Define the type for the context value
 interface ViewContextType {
@@ -14,7 +14,7 @@ export const ViewContext = createContext<ViewContextType | null>(null);
 
 // Create a provider component to wrap around the layout
 export const ViewProvider = ({ children }: { children: ReactNode }) => {
-  const [view, setView] = useState<ViewType>('list');
+  const [view, setView] = useState<ViewType>("grid");
 
   // Update sessionStorage whenever the view state changes
   // useEffect(() => {

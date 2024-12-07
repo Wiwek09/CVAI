@@ -1,30 +1,36 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
-import { RxHamburgerMenu } from 'react-icons/rx';
-import axiosInstance from '@/utils/axiosConfig';
-import Link from 'next/link';
+import React, { useState, useEffect, useRef } from "react";
+import { FaChevronDown } from "react-icons/fa";
+import { RxHamburgerMenu } from "react-icons/rx";
+import axiosInstance from "@/utils/axiosConfig";
+import Link from "next/link";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from "@/components/ui/popover";
 
-import { toast } from 'sonner';
+import { toast } from "sonner";
 
-import DialogueComponent from './DialogueComponent';
-import { BsThreeDots, BsThreeDotsVertical } from 'react-icons/bs';
+import DialogueComponent from "./DialogueComponent";
+import { BsThreeDots } from "react-icons/bs";
 
 const FolderList = ({ updateFolderList }) => {
   const [folders, setFolders] = useState([]);
   const [openFolder, setOpenFolder] = useState(null);
   const [files, setFiles] = useState([]);
-  const [folderContents, setFolderContents] = useState({});
+  // const [folderContents, setFolderContents] = useState({});
   const [editingFolder, setEditingFolder] = useState(null);
-  const [newFolderName, setNewFolderName] = useState('');
+  const [newFolderName, setNewFolderName] = useState("");
+  const [draggedFile, setDraggedFile] = useState(null);
   const [dialogOpen, setDialogueOpen] = useState(false);
   const [dialogAlert, setDialogueAlert] = useState(false);
-  const [selectedFile, setSelectedFile] = useState('');
-  const [name, setName] = useState('');
+  const [draggedOverFolder, setDraggedOverFolder] = useState(null);
+  const [selectedFile, setSelectedFile] = useState({
+    folder_id: "",
+    file_id: "",
+  });
+  const [selectedFolder, setSelectedFolder] = useState("");
+  const [name, setName] = useState("");
   const [dialogAlertFile, setDialogueAlertFile] = useState(false);
 
   const inputRefs = useRef({});
@@ -38,58 +44,57 @@ const FolderList = ({ updateFolderList }) => {
     const fetchFoldersAndContents = async () => {
       try {
         const foldersResponse = await axiosInstance.get(
-          '/folder/getAllFolders'
+          "/folder/getAllFolders"
         );
 
         const fetchedFolders = foldersResponse.data;
-        console.log('Fetched folders', fetchedFolders);
         setFolders(fetchedFolders);
 
-        const contentsPromises = fetchedFolders.map((folder) =>
-          axiosInstance
-            .get(`/folder/getFiles/${folder.folder_id}`)
-            .then((response) => ({
-              folderId: folder.folder_id,
-              files: Object.entries(response.data),
-            }))
-            .catch((error) => {
-              console.error(
-                `Error fetching contents for folder ${folder.folder_id}:`,
-                error
-              );
-              return { folderId: folder.folder_id, files: [] };
-            })
-        );
+        // const contentsPromises = fetchedFolders.map((folder) =>
+        //   axiosInstance
+        //     .get(`/folder/getFiles/${folder.folder_id}`)
+        //     .then((response) => ({
+        //       folderId: folder.folder_id,
+        //       files: Object.entries(response.data),
+        //     }))
+        //     .catch((error) => {
+        //       console.error(
+        //         `Error fetching contents for folder ${folder.folder_id}:`,
+        //         error
+        //       );
+        //       return { folderId: folder.folder_id, files: [] };
+        //     })
+        // );
 
-        const allContents = await Promise.all(contentsPromises);
+        // const allContents = await Promise.all(contentsPromises);
 
-        const contentsObject = allContents.reduce(
-          (acc, { folderId, files }) => ({
-            ...acc,
-            [folderId]: files,
-          }),
-          {}
-        );
+        // const contentsObject = allContents.reduce(
+        //   (acc, { folderId, files }) => ({
+        //     ...acc,
+        //     [folderId]: files,
+        //   }),
+        //   {}
+        // );
 
-        setFolderContents(contentsObject);
-        console.log('This', contentsObject);
+        // setFolderContents(contentsObject);
+        // console.log("This", contentsObject);
       } catch (error) {
-        console.error('Error fetching folders:', error);
+        console.error("Error fetching folders:", error);
       }
     };
 
     fetchFoldersAndContents();
   }, [updateFolderList]);
+
   useEffect(() => {
     const fetchFiles = async () => {
       try {
         const response = await axiosInstance.get(
           `/folder/getFiles/${openFolder}`
         );
-        console.log('files', response);
         setFiles(response.data);
       } catch (e) {
-        console.log(e);
+        console.error("Error:", e);
       }
     };
     fetchFiles();
@@ -111,6 +116,10 @@ const FolderList = ({ updateFolderList }) => {
   };
 
   const handleRename = async (folderId: string) => {
+    if (newFolderName.trim() === "") {
+      toast.error("Folder name is required");
+      return;
+    }
     try {
       await axiosInstance.put(`/folderrenameFolder/${folderId}`, {
         folder_id: folderId,
@@ -126,72 +135,119 @@ const FolderList = ({ updateFolderList }) => {
 
       // Reset editing state
       setEditingFolder(null);
-      setNewFolderName('');
-      toast('Successfully edited the folder', {
-        description: 'Folder has been renamed successfully',
+      setNewFolderName("");
+      toast("Successfully edited the folder", {
+        description: "Folder has been renamed successfully",
         style: {
-          color: 'white',
-          background: 'black',
+          color: "white",
+          background: "black",
         },
       });
     } catch (error) {
-      console.error('Error renaming folder:', error);
-      toast('Failed to edit', {
+      console.error("Error renaming folder:", error);
+      toast("Failed to edit", {
         description: error.response.data.detail,
         style: {
-          background: 'black',
-          color: 'white',
+          background: "black",
+          color: "white",
         },
       });
     }
   };
-  useEffect(() => {
-    console.log('This is folders', folders);
-  }, [folders]);
+
+  const handleDragStart = (file, fromFolderId) => {
+    setDraggedFile({ file, fromFolderId });
+  };
+
+  const handleDragEnd = () => {
+    setDraggedFile(null);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDragLeave = () => {
+    setDraggedOverFolder(null);
+  };
+
+  const handleDrop = async (toFolderId) => {
+    if (!draggedFile) return;
+    const { file, fromFolderId } = draggedFile;
+
+    if (fromFolderId === toFolderId) {
+      toast.error("File already in same folder");
+      return;
+    }
+
+    try {
+      await axiosInstance.post(`/folder/moveFiles`, {
+        from_folder: fromFolderId,
+        to_folder: toFolderId,
+        document_id: [file.doc_id],
+      });
+      // Update local state: remove the file from the source folder
+      setFiles((prevFiles) =>
+        prevFiles.filter(
+          (f) => !(openFolder === fromFolderId && f.doc_id === file.doc_id)
+        )
+      );
+
+      // Update local state: add the file to the target folder if open
+      if (openFolder === toFolderId) {
+        setFiles((prevFiles) => [...prevFiles, file]);
+      }
+      toast.success("File moved successfully!");
+    } catch (error) {
+      console.error("Error moving file:", error);
+      toast.error("Failed to move the file. Please try again.");
+    } finally {
+      setDraggedFile(null);
+    }
+  };
+
   return (
-    // <div>
-    //   <Accordion type='multiple' className='w-full'>
-    //     {folders.map((folder) => (
-    //       <AccordionItem
-    //         className='border-none hover:no-underline'
-    //         value={folder.folder_id}
-    //       >
-    //         <AccordionTrigger className='text-white border-none hover:no-underline'>
-    //           {folder.folder_name}
-    //         </AccordionTrigger>
-    //         <AccordionContent>{folder.folder_name}</AccordionContent>
-    //       </AccordionItem>
-    //     ))}
-    //   </Accordion>
-    // </div>
-    <div className='text-white'>
+    <div className="text-white">
       {dialogOpen && (
         <DialogueComponent
           folders={folders}
-          id={selectedFile}
-          variant='selectMultiple'
+          id={selectedFolder}
+          variant="selectMultiple"
           handleDialogue={handleDialogue}
           name={name}
         />
       )}
+
+      {/* Folder Dialogue */}
       {dialogAlert && (
         <DialogueComponent
-          variant='alert'
+          variant="alert"
           handleDialogue={handleAlert}
-          id={selectedFile}
+          id={selectedFolder}
         />
       )}
       {dialogAlertFile && (
         <DialogueComponent
-          variant='alertFile'
+          variant="alertFile"
           handleDialogue={handleAlertFile}
           id={selectedFile}
+          // setArchieveFiles={setFiles}
         />
       )}
 
       {folders.map((folder) => (
-        <div key={folder.folder_id} className='mb-4'>
-          <div className='flex gap-2 w-full justify-between items-center flex-1 rounded'>
+        <div
+          key={folder.folder_id}
+          className={`mb-4 transition-all duration-200 ${
+            draggedOverFolder === folder.folder_id
+              ? "opacity-50 bg-gray-700/30"
+              : ""
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={() => handleDrop(folder.folder_id)}
+        >
+          <div className="flex gap-2 w-full justify-between items-center flex-1 rounded">
             {editingFolder === folder.folder_id ? (
               <form
                 onSubmit={(e) => {
@@ -200,34 +256,34 @@ const FolderList = ({ updateFolderList }) => {
                 }}
               >
                 <input
-                  type='text'
+                  type="text"
                   value={newFolderName}
-                  onChange={(e) => setNewFolderName(e.target.value)}
+                  onChange={(e) => setNewFolderName(e.target.value.trim())}
                   onBlur={() => setEditingFolder(null)}
-                  className='bg-gray-800 w-full text-white rounded p-1'
+                  className="bg-gray-800 w-full text-white rounded p-1"
                   ref={(el) => {
                     if (el) inputRefs.current[folder.folder_id] = el;
                   }}
                 />
-                <button type='submit' className='hidden'></button>
+                <button type="submit" className="hidden"></button>
               </form>
             ) : (
-              <div className='flex items-center justify-between  gap-2 '>
-                <span>
-                  <span>
+              <div className="flex items-center justify-between  gap-2 ">
+                <div>
+                  <div>
                     <Popover>
                       <PopoverTrigger asChild>
                         <button
                           onClick={() => {
-                            setSelectedFile(folder.folder_id);
+                            setSelectedFolder(folder.folder_id);
                           }}
                         >
                           <RxHamburgerMenu />
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent className='w-32 p-1 text-center cursor-pointer'>
+                      <PopoverContent className="w-32 p-1 text-center cursor-pointer">
                         <p
-                          className='py-1 hover:opacity-50'
+                          className="py-1 hover:opacity-50"
                           onClick={() => {
                             setEditingFolder(folder.folder_id);
                             setNewFolderName(folder.folder_name);
@@ -239,10 +295,10 @@ const FolderList = ({ updateFolderList }) => {
                         <button
                           onClick={() => {
                             handleDialogue(true);
-                            setEditingFolder(folder.folder_id);
+                            // setEditingFolder(folder.folder_id);
                             setName(folder.folder_name);
                           }}
-                          className='py-1 hover:opacity-50'
+                          className="py-1 hover:opacity-50"
                         >
                           Select
                         </button>
@@ -252,25 +308,25 @@ const FolderList = ({ updateFolderList }) => {
                             handleAlert(true);
                             // setEditingFolder(folder.folder_id);
                           }}
-                          className='py-1 hover:opacity-50'
+                          className="py-1 hover:opacity-50"
                         >
                           Archive
                         </button>
                       </PopoverContent>
                     </Popover>
-                  </span>
-                </span>
-                <span className='ml-5'>{folder.folder_name}</span>
+                  </div>
+                </div>
+                <span className="ml-5">{folder.folder_name}</span>
               </div>
             )}
 
             <div
-              className='flex gap-4'
+              className="flex gap-4"
               onClick={() => toggleDropdown(folder.folder_id)}
             >
               <span
                 className={`ml-auto w-6 h-6 hover:bg-gray-700 rounded-full items-center justify-center flex transform transition-transform duration-300 ${
-                  openFolder === folder.folder_id ? 'rotate-180' : 'rotate-0'
+                  openFolder === folder.folder_id ? "rotate-180" : "rotate-0"
                 }`}
               >
                 <FaChevronDown />
@@ -281,49 +337,54 @@ const FolderList = ({ updateFolderList }) => {
           </div>
 
           {openFolder === folder.folder_id && (
-            <div className='mt-2 ml-6  border-l  border-gray-600 pl-4 w-52 max-w-52 truncate'>
+            <div className="mt-2 ml-6  border-l  border-gray-600 pl-4 w-52 max-w-52 truncate">
               {files.length ? (
                 files.map((file) => (
-                  <div className='relative flex items-center justify-between p-1 text-gray-300 ease-in-out duration-150 delay-75 rounded truncate '>
+                  <div className="relative flex items-center justify-between p-1 text-gray-300 ease-in-out duration-150 delay-75 rounded truncate ">
                     <Link
                       key={file.doc_id}
                       href={`/cv-detail/${file.doc_id}`}
-                      target='_blank'
-                      className='truncate '
+                      target="_blank"
+                      className="truncate "
+                      draggable
+                      onDragStart={() =>
+                        handleDragStart(file, folder.folder_id)
+                      }
+                      onDragEnd={handleDragEnd}
                     >
-                      <span className=' px-2 py-1 w-8  hover:opacity-60 max-w-12 text-sm truncate'>
-                        {file.doc_name.replace('.pdf', '')}
+                      <span className=" px-2 py-1 w-8  hover:opacity-60 max-w-12 text-sm truncate">
+                        {file.doc_name.replace(".pdf", "")}
                       </span>
                     </Link>
                     <Popover>
                       <PopoverTrigger asChild>
                         <button>
                           <BsThreeDots
-                            className='text-white hover:opacity-60 hover:cursor-pointer'
-                            size={'15px'}
+                            className="text-white hover:opacity-60 hover:cursor-pointer"
+                            size={"15px"}
                           />
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent className='w-20 p-0  '>
+                      <PopoverContent className="w-20 p-0  ">
                         <span
-                          className='flex items-center p-1 hover:cursor-pointer hover:opacity-50 justify-center'
+                          className="flex items-center p-1 hover:cursor-pointer hover:opacity-50 justify-center"
                           onClick={() => {
                             handleAlertFile(true);
-                            setSelectedFile(file.doc_id);
+                            setSelectedFile({
+                              folder_id: folder.folder_id,
+                              file_id: file.doc_id,
+                            });
                           }}
                         >
                           Archive
                         </span>
                         <hr />
-                        {/* <span className='flex items-center p-1 hover:cursor-pointer hover:opacity-50 justify-center'>
-                          Move
-                        </span> */}
                       </PopoverContent>
                     </Popover>
                   </div>
                 ))
               ) : (
-                <div className='text-gray-400 italic'>No PDFs uploaded.</div>
+                <div className="text-gray-400 italic">No PDFs uploaded.</div>
               )}
             </div>
           )}
