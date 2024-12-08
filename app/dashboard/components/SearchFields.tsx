@@ -89,7 +89,7 @@ const SearchFields = () => {
             {tagsOpen ? (
               <div className="flex w-full max-w-full justify-start">
                 <LinearTagsInput
-                  handleClear={handleClear}
+                  // handleClear={handleClear}
                   tags={tags}
                   setTags={setTags}
                 />
