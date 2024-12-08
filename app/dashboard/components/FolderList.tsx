@@ -340,7 +340,10 @@ const FolderList = ({ updateFolderList }) => {
             <div className="mt-2 ml-6  border-l  border-gray-600 pl-4 w-52 max-w-52 truncate">
               {files.length ? (
                 files.map((file) => (
-                  <div className="relative flex items-center justify-between p-1 text-gray-300 ease-in-out duration-150 delay-75 rounded truncate ">
+                  <div
+                    key={file.doc_id}
+                    className="relative flex items-center justify-between p-1 text-gray-300 ease-in-out duration-150 delay-75 rounded truncate "
+                  >
                     <Link
                       key={file.doc_id}
                       href={`/cv-detail/${file.doc_id}`}

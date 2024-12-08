@@ -2,7 +2,7 @@ import React, { useState, KeyboardEvent, useRef } from "react";
 import { X } from "lucide-react";
 import { PiPlusCircleThin } from "react-icons/pi";
 
-const LinearTagsInput = ({ tags, setTags, handleClear }) => {
+const LinearTagsInput = ({ tags, setTags }) => {
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 

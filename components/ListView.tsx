@@ -9,7 +9,7 @@ import axiosInstance from "@/utils/axiosConfig";
 import Link from "next/link";
 import { IFormInputData } from "@/interfaces/FormInputData";
 // import { RxCross2 } from 'react-icons/rx';
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast";
 // import {
 //   AlertDialog,
 //   AlertDialogAction,
@@ -114,7 +114,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
   const displayedData = isSearching ? searchResults : allData;
 
   return (
-    <div className="flex flex-col px-4 py-4 rounded-md bg-gray-100   space-y-5 scrollbar-thin ">
+    <div className="flex flex-col max-w-[100vw] px-4 py-4 overflow-clip rounded-md space-y-5">
       {loading ? (
         <div className="flex flex-col gap-3">
           <ListViewSkeletion variant="listView" />
@@ -124,10 +124,10 @@ const ListView = ({ data, searchData }: ListViewProps) => {
         <p>No Document Available</p>
       ) : (
         displayedData?.map((item: any) => (
-          <Link href={`/cv-detail/${item._id}`} target="_blank">
+          <Link key={item._id} href={`/cv-detail/${item._id}`} target="_blank">
             <Card
               key={item._id}
-              className="px-5 py-8 flex justify-between w-full shadow-lg transform mb-3  hover:scale-x-[1.01] hover:scale-y-[1.02] hover:cursor-pointer transition duration-500 ease-in-out "
+              className="px-5 py-8 flex justify-between  shadow-lg transform mb-3 hover:scale-x-[1.01] hover:scale-y-[1.02] hover:cursor-pointer overflow-clip transition duration-500 ease-in-out "
             >
               {/* Basic Information */}
               <div className="flex flex-col gap-1 w-[25%] overflow-clip">
@@ -236,7 +236,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
               </div>
 
               {/*Previous Experience */}
-              <div className="flex flex-col gap-6 w-[40%] overflow-clip ">
+              <div className="flex flex-col gap-6 w-[30%] overflow-clip ">
                 <div className="flex items-center gap-2">
                   <h1 className="font-medium text-base">Experience :</h1>
                   <p className="text-gray-500 text-sm ">

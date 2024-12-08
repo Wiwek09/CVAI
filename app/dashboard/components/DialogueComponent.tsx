@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+// import * as Dialog from "@radix-ui/react-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,13 +12,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { ProgressBar } from "react-loader-spinner";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import ClipLoader from "react-spinners/ClipLoader";
+// import ClipLoader from "react-spinners/ClipLoader";
 import axiosInstance from "@/utils/axiosConfig";
 import { toast } from "sonner";
 import { Check } from "lucide-react";
@@ -51,10 +53,11 @@ function DialogueComponent({
 }: // setArchieveFiles,
 {
   variant: string;
-  handleDialogue: any;
+  handleDialogue?: any;
   id?: any;
   folders?: any;
   name?: any;
+  openSpinner?: any;
   // setArchieveFiles?: any;
 }) {
   const [files, setFiles] = useState([]);
@@ -225,6 +228,7 @@ function DialogueComponent({
       console.error("Error occured", error);
     }
   };
+
   const archiveFolder = async () => {
     try {
       const response = await axiosInstance.post(`/folder/archiveFolder/`, {
@@ -257,6 +261,7 @@ function DialogueComponent({
           handleDialogue(false);
         } catch (error) {
           toast("Failed to move files");
+          console.error(error);
         }
       } else {
         toast("Select a folder first", {
@@ -298,7 +303,7 @@ function DialogueComponent({
           handleDialogue(false);
         }}
       >
-        <DialogContent className=" py-10 ">
+        <DialogContent className=" py-4 max-h-[90%] overflow-y-scroll scrollbar-thin">
           <DialogHeader>
             <div className=" flex flex-col w-full space-y-6  mb-8 mt-4">
               <h1 className="text-xl">{name}</h1>
@@ -321,9 +326,7 @@ function DialogueComponent({
                           Are you absolutely sure?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          The folder you selected will not be visible and you
-                          will need to go the "Archive" file if you want to
-                          access it again
+                          The file you selected will be archived.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -422,17 +425,22 @@ function DialogueComponent({
 
                     <h1 className="text-sm">Folders</h1>
                   </div>
-                  {files.map((file) => (
-                    <section className="flex pb-4 border-b border-#CCCC mt-4 items-center ">
-                      <Checkbox
-                        checked={selectedFiles.includes(file.doc_id)}
-                        onCheckedChange={() => handleFileSelect(file.doc_id)}
-                        id={`file-${file.doc_id}`}
-                        className="cursor-pointer mr-4"
-                      />
-                      <h1 className="text-sm font-light">{file.doc_name}</h1>
-                    </section>
-                  ))}
+                  <div className="">
+                    {files.map((file) => (
+                      <section
+                        key={file.doc_id}
+                        className="flex pb-4 border-b border-#CCCC mt-4 items-center "
+                      >
+                        <Checkbox
+                          checked={selectedFiles.includes(file.doc_id)}
+                          onCheckedChange={() => handleFileSelect(file.doc_id)}
+                          id={`file-${file.doc_id}`}
+                          className="cursor-pointer mr-4"
+                        />
+                        <h1 className="text-sm font-light">{file.doc_name}</h1>
+                      </section>
+                    ))}
+                  </div>
                 </section>
               ) : (
                 <p className="text-center font-semibold">No PDFs is uploaded</p>
@@ -451,7 +459,7 @@ function DialogueComponent({
           handleDialogue(false);
         }}
       >
-        <DialogContent className=" py-10 ">
+        <DialogContent className=" py-4 max-h-[90%] overflow-y-scroll scrollbar-thin ">
           <DialogHeader>
             <div className=" flex w-full justify-between items-center mb-8 mt-4">
               <section className="flex-col space-y-6">
@@ -483,7 +491,10 @@ function DialogueComponent({
                     <h1 className="text-sm ">Folders</h1>
                   </div>
                   {files.map((file) => (
-                    <section className="flex border-b border-#CCCC pb-4  mt-4 items-center ">
+                    <section
+                      key={file.folder_id}
+                      className="flex border-b border-#CCCC pb-4  mt-4 items-center "
+                    >
                       <Checkbox
                         checked={selectedFiles.includes(file.folder_id)}
                         onCheckedChange={() => handleFileSelect(file.folder_id)}
@@ -510,9 +521,7 @@ function DialogueComponent({
                         Are you absolutely sure?
                       </AlertDialogTitle>
                       <AlertDialogDescription>
-                        The folder(s) you selected will not be visible and you
-                        will need to go the "Archive" file if you want to access
-                        it again
+                        The folder(s) you selected will be archieved.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -545,7 +554,7 @@ function DialogueComponent({
           handleDialogue(false);
         }}
       >
-        <DialogContent className=" py-10 ">
+        <DialogContent className=" py-4 max-h-[90%] overflow-y-scroll scrollbar-thin">
           <div className=" flex flex-col w-full space-y-6 mb-5 mt-4">
             <h1 className="text-xl font-semibold">Archive</h1>
             <section className="flex  items-center space-x-2">
@@ -559,7 +568,7 @@ function DialogueComponent({
 
           {files ? (
             <section className="w-full px-0 flex-col">
-              <div className="flex flex-row-reverse justify-between border-#CCCC  pb-4">
+              <div className="flex flex-row-reverse justify-between border-#CCCC pb-4">
                 {files.length > 0 ? (
                   <div className="flex  items-center">
                     <button className="text-sm">Select All </button>
@@ -599,7 +608,10 @@ function DialogueComponent({
                 </AccordionItem>
               </Accordion>
               {files.map((file) => (
-                <div className="flex border-b border-#CCCC  pb-4 items-center mt-5">
+                <div
+                  key={file.folder_id}
+                  className="flex border-b border-#CCCC  pb-4 items-center mt-5"
+                >
                   <Checkbox
                     checked={selectedFiles.includes(file.folder_id)}
                     onCheckedChange={() => handleFileSelect(file.folder_id)}
@@ -642,8 +654,7 @@ function DialogueComponent({
               Are you sure you want to archive?
             </h1>
             <p className="text-gray-600">
-              The folder you selected will not be visible and you will need to
-              go the "Archive" file if you want to access it again
+              The folder you selected will not be visible.
             </p>
             <section className="w-full   flex space-x-7  justify-end  ">
               <button
@@ -685,8 +696,7 @@ function DialogueComponent({
               Are you sure you want to archive?
             </h1>
             <p className="text-gray-600">
-              The file you selected will not be visible and you will need to go
-              the "Archive" file if you want to access it again
+              The file you selected will not be visible.
             </p>
             <section className="w-full flex space-x-7  justify-end  ">
               <button
@@ -711,26 +721,6 @@ function DialogueComponent({
         </DialogContent>
       </Dialog>
     );
-  }
-  if (variant === "spinner") {
-    <Dialog
-      defaultOpen
-      onOpenChange={() => {
-        handleDialogue(false);
-      }}
-    >
-      <DialogContent>
-        {/* {console.log("Inside spionner")} */}
-        <div>
-          {" "}
-          <ClipLoader
-            size={150}
-            aria-label="Loading Spinner"
-            data-testid="loader"
-          />
-        </div>
-      </DialogContent>
-    </Dialog>;
   }
 }
 
