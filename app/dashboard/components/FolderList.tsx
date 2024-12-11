@@ -8,7 +8,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
 import { toast } from "sonner";
 
 import DialogueComponent from "./DialogueComponent";
@@ -16,9 +15,9 @@ import { BsThreeDots } from "react-icons/bs";
 
 const FolderList = ({ updateFolderList }) => {
   const [folders, setFolders] = useState([]);
-  const [openFolder, setOpenFolder] = useState(null);
+  const [openFolder, setOpenFolder] = useState([]);
   const [files, setFiles] = useState([]);
-  // const [folderContents, setFolderContents] = useState({});
+  const [folderContents, setFolderContents] = useState({});
   const [editingFolder, setEditingFolder] = useState(null);
   const [newFolderName, setNewFolderName] = useState("");
   const [draggedFile, setDraggedFile] = useState(null);
@@ -28,7 +27,7 @@ const FolderList = ({ updateFolderList }) => {
   const [selectedFile, setSelectedFile] = useState({
     folder_id: "",
     file_id: "",
-  });
+  }); //
   const [selectedFolder, setSelectedFolder] = useState("");
   const [name, setName] = useState("");
   const [dialogAlertFile, setDialogueAlertFile] = useState(false);
@@ -49,35 +48,30 @@ const FolderList = ({ updateFolderList }) => {
 
         const fetchedFolders = foldersResponse.data;
         setFolders(fetchedFolders);
+        const contentsPromises = fetchedFolders.map((folder) =>
+          axiosInstance
+            .get(`/folder/getFiles/${folder.folder_id}`)
+            .then((response) => ({
+              [folder.folder_id]: response.data || [],
+            }))
+            .catch((error) => {
+              console.error(
+                `Error fetching contents for folder ${folder.folder_id}:`,
+                error
+              );
+              return { [folder.folder_id]: [] };
+            })
+        );
 
-        // const contentsPromises = fetchedFolders.map((folder) =>
-        //   axiosInstance
-        //     .get(`/folder/getFiles/${folder.folder_id}`)
-        //     .then((response) => ({
-        //       folderId: folder.folder_id,
-        //       files: Object.entries(response.data),
-        //     }))
-        //     .catch((error) => {
-        //       console.error(
-        //         `Error fetching contents for folder ${folder.folder_id}:`,
-        //         error
-        //       );
-        //       return { folderId: folder.folder_id, files: [] };
-        //     })
-        // );
+        const allContents = await Promise.all(contentsPromises);
 
-        // const allContents = await Promise.all(contentsPromises);
+        const contentsObject = allContents.reduce(
+          (acc, content) => ({ ...acc, ...content }),
+          {}
+        );
 
-        // const contentsObject = allContents.reduce(
-        //   (acc, { folderId, files }) => ({
-        //     ...acc,
-        //     [folderId]: files,
-        //   }),
-        //   {}
-        // );
-
-        // setFolderContents(contentsObject);
-        // console.log("This", contentsObject);
+        setFolderContents(contentsObject);
+        // console.log("ContentsObject", contentsObject);
       } catch (error) {
         console.error("Error fetching folders:", error);
       }
@@ -86,22 +80,22 @@ const FolderList = ({ updateFolderList }) => {
     fetchFoldersAndContents();
   }, [updateFolderList]);
 
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const response = await axiosInstance.get(
-          `/folder/getFiles/${openFolder}`
-        );
-        setFiles(response.data);
-      } catch (e) {
-        console.error("Error:", e);
-      }
-    };
-    fetchFiles();
-  }, [openFolder]);
+  // console.log("Data", folderContents);
+
   // useEffect(() => {
-  //   console.log('Use effect files', files);
-  // }, [files]);
+  //   const fetchFiles = async () => {
+  //     try {
+  //       const response = await axiosInstance.get(
+  //         `/folder/getFiles/${openFolder}`
+  //       );
+  //       setFiles(response.data);
+  //     } catch (e) {
+  //       console.error("Error:", e);
+  //     }
+  //   };
+  //   fetchFiles();
+  // }, [openFolder]);
+
   const handleDialogue = (state: boolean) => {
     setDialogueOpen(state);
   };
@@ -111,8 +105,24 @@ const FolderList = ({ updateFolderList }) => {
   const handleAlertFile = (state: boolean) => {
     setDialogueAlertFile(state);
   };
-  const toggleDropdown = (folderId: string) => {
-    setOpenFolder(openFolder === folderId ? null : folderId);
+  const toggleDropDown = async (folderId: string) => {
+    setOpenFolder((prevOpenFolders) => {
+      if (prevOpenFolders.includes(folderId)) {
+        // If folder is already open, close it
+        return prevOpenFolders.filter((id) => id !== folderId);
+      }
+      // Open the folder
+      return [...prevOpenFolders, folderId];
+    });
+
+    // if(!folderContents[folderId]){
+    //   try {
+    //     const response = await axiosInstance.get(`/folder/getFiles/${folderId}`);
+
+    //   } catch (error) {
+
+    //   }
+    // }
   };
 
   const handleRename = async (folderId: string) => {
@@ -207,7 +217,7 @@ const FolderList = ({ updateFolderList }) => {
   };
 
   return (
-    <div className="text-white">
+    <div className="text-white w-full">
       {dialogOpen && (
         <DialogueComponent
           folders={folders}
@@ -322,11 +332,13 @@ const FolderList = ({ updateFolderList }) => {
 
             <div
               className="flex gap-4"
-              onClick={() => toggleDropdown(folder.folder_id)}
+              onClick={() => toggleDropDown(folder.folder_id)}
             >
               <span
                 className={`ml-auto w-6 h-6 hover:bg-gray-700 rounded-full items-center justify-center flex transform transition-transform duration-300 ${
-                  openFolder === folder.folder_id ? "rotate-180" : "rotate-0"
+                  openFolder.includes(folder.folder_id)
+                    ? "rotate-180"
+                    : "rotate-0"
                 }`}
               >
                 <FaChevronDown />
@@ -336,10 +348,10 @@ const FolderList = ({ updateFolderList }) => {
             </div>
           </div>
 
-          {openFolder === folder.folder_id && (
+          {openFolder.includes(folder.folder_id) && (
             <div className="mt-2 ml-6  border-l  border-gray-600 pl-4 w-52 max-w-52 truncate">
-              {files.length ? (
-                files.map((file) => (
+              {folderContents[folder.folder_id]?.length ? (
+                folderContents[folder.folder_id].map((file) => (
                   <div
                     key={file.doc_id}
                     className="relative flex items-center justify-between p-1 text-gray-300 ease-in-out duration-150 delay-75 rounded truncate "
@@ -348,7 +360,7 @@ const FolderList = ({ updateFolderList }) => {
                       key={file.doc_id}
                       href={`/cv-detail/${file.doc_id}`}
                       target="_blank"
-                      className="truncate "
+                      className="truncate"
                       draggable
                       onDragStart={() =>
                         handleDragStart(file, folder.folder_id)

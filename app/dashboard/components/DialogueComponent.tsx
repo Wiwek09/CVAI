@@ -67,6 +67,8 @@ function DialogueComponent({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [folderId, setFolderId] = useState("");
+  const [openFolder, setOpenFolder] = useState(null);
+  const [folderFiles, setFolderFiles] = useState([]);
 
   // API's Call
   useEffect(() => {
@@ -292,6 +294,18 @@ function DialogueComponent({
       toast.error("Error Archiving File  !!!");
     }
   };
+
+  //For opening the files from archive folder
+  const handleDropDown = async (folderId: string) => {
+    try {
+      const response = await axiosInstance.get(`/folder/getFiles/${folderId}`);
+      setFolderFiles(response.data);
+    } catch (error) {
+      console.error("Error Fetching Data", error);
+    }
+  };
+
+  console.log("folderFiles", folderFiles);
 
   //Opening Dailog on selecting select on folder
   if (variant === "selectMultiple") {
@@ -545,6 +559,8 @@ function DialogueComponent({
   }
 
   // Dialog on clicking Archieve Folder
+
+  console.log("FilesDailog", files);
   if (variant === "archive") {
     return (
       <Dialog
@@ -568,7 +584,7 @@ function DialogueComponent({
           {files ? (
             <section className="w-full px-0 flex-col">
               <div className="flex flex-row-reverse justify-between border-#CCCC pb-4">
-                {files.length > 0 ? (
+                {files.length > 0 && (
                   <div className="flex  items-center">
                     <button className="text-sm">Select All </button>
                     <Checkbox
@@ -578,10 +594,7 @@ function DialogueComponent({
                       className="ml-2 cursor-pointer"
                     />
                   </div>
-                ) : (
-                  <div></div>
                 )}
-
                 <h1 className="text-sm ">Folders</h1>
               </div>
               <Accordion type="single" collapsible className="w-full">
@@ -607,17 +620,30 @@ function DialogueComponent({
                 </AccordionItem>
               </Accordion>
               {files.map((file) => (
-                <div
-                  key={file.folder_id}
-                  className="flex border-b border-#CCCC  pb-4 items-center mt-5"
-                >
+                <div key={file.folder_id} className="flex items-center">
                   <Checkbox
                     checked={selectedFiles.includes(file.folder_id)}
                     onCheckedChange={() => handleFileSelect(file.folder_id)}
                     id={`file-${file.folder_id}`}
                     className="cursor-pointer mr-4 "
                   />
-                  <h1 className="text-sm">{file.folder_name}</h1>
+                  <Accordion
+                    type="multiple"
+                    // collapsible
+                    className=" w-full"
+                    onClick={() => handleDropDown(file.folder_id)}
+                  >
+                    <AccordionItem value={`item-${file.folder_id}`}>
+                      <AccordionTrigger>
+                        <h1 className="text-sm">{file.folder_name}</h1>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {folderFiles.map((doc) => (
+                          <p>{doc.doc_id}</p>
+                        ))}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </div>
               ))}
               <div className="flex justify-end">
@@ -671,7 +697,7 @@ function DialogueComponent({
                   archiveFolder();
                 }}
               >
-                Okay
+                Archive
               </button>
             </section>
           </div>
@@ -713,7 +739,7 @@ function DialogueComponent({
                   archiveFile();
                 }}
               >
-                Okay
+                Archive
               </button>
             </section>
           </div>
