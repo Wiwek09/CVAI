@@ -41,17 +41,18 @@ const SideNavBar = () => {
   const spinnerContext = useContext(SpinnerContext);
   const setApiData = context?.setApiData;
   const setUploading = spinnerContext?.setUploading;
+  const uploading = spinnerContext?.uploading;
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [updateFolderList, setUpdateFolderList] = useState(false);
   const [folderListData, setFolderListData] = useState<IFolderData[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
-  const [dialogOpen, setDialogueOpen] = useState(false);
+  const [dialogOpen, setDialogeOpen] = useState(false);
 
   const handleFolderCreated = () => {
     setUpdateFolderList((prev) => !prev);
   };
   const handleDialogue = (state) => {
-    setDialogueOpen(state);
+    setDialogeOpen(state);
   };
 
   useEffect(() => {
@@ -165,55 +166,47 @@ const SideNavBar = () => {
 
   return (
     <Sidebar className="h-[100vh]">
-      {/* <SidebarTrigger className='absolute top-1/2 border rounded-lg bg-white right-0'></SidebarTrigger> */}
-      <Card className="border  border-black h-[100vh] overflow-y-auto scrollbar-thin rounded-none flex flex-col items-center bg-black space-y-6 py-6">
+      <Card className="border border-black h-[100vh] overflow-y-auto scrollbar-thin rounded-none flex flex-col items-center bg-black space-y-6 py-6">
         {dialogOpen && (
           <DialogueComponent
             variant="archive"
             handleDialogue={handleDialogue}
           />
         )}
-        {/* {uploading && (
-          <DialogueComponent
-            variant="spinner"
-            openSpinner={uploading}
-            // handleDialogue={(open: boolean) => setUploading(open)}
-            // handleDialogue={han}
-          />
-        )} */}
         <SidebarHeader>
           <h1 className="text-2xl text-center w-full px-4 text-white">CV_AI</h1>
         </SidebarHeader>
-        <SidebarContent className="space-y-6 flex flex-col overflow-y-auto scrollbar-thinSide ">
+        <SidebarContent className="space-y-6 w-full flex flex-col overflow-y-auto scrollbar-thinSide ">
           <div className="w-full px-4">
             <div
               onDrop={handleDrop}
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
               onDragOver={handleDragOver}
-              className={`relative flex flex-col gap-2 items-center justify-center h-48 border-2 border-dashed border-gray-400 p-4 rounded-md  bg-black text-white transition-all duration-300 ease-in-out ${
+              onClick={() => document.getElementById("file-input").click()}
+              className={`relative flex flex-col gap-2 cursor-pointer items-center justify-center h-48 border-2 border-dashed border-gray-400 p-4 rounded-md  bg-black text-white transition-all duration-300 ease-in-out ${
                 isDragging ? "opacity-50 backdrop-blur-sm" : "opacity-100"
               }`}
             >
               <div className="flex flex-col items-center h-full w-full justify-center">
                 <IoIosCloudUpload size={40} className="text-gray-400" />
-                <p className="text-center">Drag and drop your files here</p>
-                <label
-                  // onClick={(e) => e.stopPropagation()}
+                <p className="text-center">Drop your files here</p>
+                {/* <label
                   className="cursor-pointer"
                 >
                   <span>Choose File</span>
-                  <input
-                    className="hidden"
-                    type="file"
-                    accept="application/pdf"
-                    onChange={handleFileSelect}
-                    multiple
-                    // disabled={uploading}
-                  />
-                </label>
+                </label> */}
               </div>
             </div>
+            <input
+              id="file-input"
+              className="hidden"
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileSelect}
+              multiple
+              disabled={uploading}
+            />
           </div>
 
           <div className="w-full px-4">
@@ -239,7 +232,7 @@ const SideNavBar = () => {
             <FolderCreation onFolderCreated={handleFolderCreated} />
           </div>
 
-          <div className="w-full px-4">
+          <div className="w-full px-4 flex-1">
             <FolderList updateFolderList={updateFolderList} />
             <button
               className="bg-inherit px-0 items-center py-1 flex justify-start hover:opacity-60 w-full text-white"

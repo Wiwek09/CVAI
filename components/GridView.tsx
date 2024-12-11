@@ -397,11 +397,12 @@ function GridView({ data, searchData }: GridViewProps) {
                 height={500}
                 width={700}
                 className="rounded-lg object-cover shadow-lg w-full h-auto"
-                loading="lazy"
+                // loading="lazy"
                 layout="responsive"
-                onError={(error) => {
-                  console.error("Image faile to load", error);
-                }}
+
+                // onError={(error) => {
+                //   console.error("Image faile to load", error);
+                // }}
               />
             </Link>
           </div>

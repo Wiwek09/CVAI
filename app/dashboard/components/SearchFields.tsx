@@ -131,12 +131,14 @@ const SearchFields = () => {
                   onKeyDown={handleKeyDown}
                 />
               </div>
-              <RxCrossCircled
-                color="red"
-                size="30px"
-                className="hover:cursor-pointer hover:opacity-50"
-                onClick={() => handleClear()}
-              />
+              <div>
+                <RxCrossCircled
+                  color="red"
+                  size="30px"
+                  className="hover:cursor-pointer hover:opacity-50"
+                  onClick={() => handleClear()}
+                />
+              </div>
               <Button
                 type="submit"
                 className=" bg-white ml-2 rounded-3xl group hover:bg-inherit"
