@@ -13,10 +13,10 @@ import { toast } from "sonner";
 import DialogueComponent from "./DialogueComponent";
 import { BsThreeDots } from "react-icons/bs";
 
-const FolderList = ({ updateFolderList }) => {
+const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
   const [folders, setFolders] = useState([]);
   const [openFolder, setOpenFolder] = useState([]);
-  const [files, setFiles] = useState([]);
+  // const [files, setFiles] = useState([]);
   const [folderContents, setFolderContents] = useState({});
   const [editingFolder, setEditingFolder] = useState(null);
   const [newFolderName, setNewFolderName] = useState("");
@@ -71,7 +71,6 @@ const FolderList = ({ updateFolderList }) => {
         );
 
         setFolderContents(contentsObject);
-        // console.log("ContentsObject", contentsObject);
       } catch (error) {
         console.error("Error fetching folders:", error);
       }
@@ -79,22 +78,6 @@ const FolderList = ({ updateFolderList }) => {
 
     fetchFoldersAndContents();
   }, [updateFolderList]);
-
-  // console.log("Data", folderContents);
-
-  // useEffect(() => {
-  //   const fetchFiles = async () => {
-  //     try {
-  //       const response = await axiosInstance.get(
-  //         `/folder/getFiles/${openFolder}`
-  //       );
-  //       setFiles(response.data);
-  //     } catch (e) {
-  //       console.error("Error:", e);
-  //     }
-  //   };
-  //   fetchFiles();
-  // }, [openFolder]);
 
   const handleDialogue = (state: boolean) => {
     setDialogueOpen(state);
@@ -108,21 +91,11 @@ const FolderList = ({ updateFolderList }) => {
   const toggleDropDown = async (folderId: string) => {
     setOpenFolder((prevOpenFolders) => {
       if (prevOpenFolders.includes(folderId)) {
-        // If folder is already open, close it
         return prevOpenFolders.filter((id) => id !== folderId);
       }
       // Open the folder
       return [...prevOpenFolders, folderId];
     });
-
-    // if(!folderContents[folderId]){
-    //   try {
-    //     const response = await axiosInstance.get(`/folder/getFiles/${folderId}`);
-
-    //   } catch (error) {
-
-    //   }
-    // }
   };
 
   const handleRename = async (folderId: string) => {
@@ -196,17 +169,23 @@ const FolderList = ({ updateFolderList }) => {
         to_folder: toFolderId,
         document_id: [file.doc_id],
       });
-      // Update local state: remove the file from the source folder
-      setFiles((prevFiles) =>
-        prevFiles.filter(
-          (f) => !(openFolder === fromFolderId && f.doc_id === file.doc_id)
-        )
-      );
 
-      // Update local state: add the file to the target folder if open
-      if (openFolder === toFolderId) {
-        setFiles((prevFiles) => [...prevFiles, file]);
-      }
+      // Update folderContents state
+      setFolderContents((prevFolderContents) => {
+        // Remove file from the source folder
+        const updatedFromFolder = prevFolderContents[fromFolderId].filter(
+          (f) => f.doc_id !== file.doc_id
+        );
+
+        // Add file to the target folder
+        const updatedToFolder = [...prevFolderContents[toFolderId], file];
+
+        return {
+          ...prevFolderContents,
+          [fromFolderId]: updatedFromFolder,
+          [toFolderId]: updatedToFolder,
+        };
+      });
       toast.success("File moved successfully!");
     } catch (error) {
       console.error("Error moving file:", error);
@@ -218,12 +197,14 @@ const FolderList = ({ updateFolderList }) => {
 
   return (
     <div className="text-white w-full">
+      {/* Dailogue on clikcing Select */}
       {dialogOpen && (
         <DialogueComponent
           folders={folders}
           id={selectedFolder}
           variant="selectMultiple"
           handleDialogue={handleDialogue}
+          setArchieveFiles={setFolderContents}
           name={name}
         />
       )}
@@ -234,14 +215,18 @@ const FolderList = ({ updateFolderList }) => {
           variant="alert"
           handleDialogue={handleAlert}
           id={selectedFolder}
+          setFolders={setFolders}
+          setUpdateFolderList={setUpdateFolderList}
         />
       )}
+
+      {/* Daiologue on clicking three dot icon of individual file */}
       {dialogAlertFile && (
         <DialogueComponent
           variant="alertFile"
           handleDialogue={handleAlertFile}
           id={selectedFile}
-          // setArchieveFiles={setFiles}
+          setArchieveFiles={setFolderContents}
         />
       )}
 
@@ -316,7 +301,6 @@ const FolderList = ({ updateFolderList }) => {
                         <button
                           onClick={() => {
                             handleAlert(true);
-                            // setEditingFolder(folder.folder_id);
                           }}
                           className="py-1 hover:opacity-50"
                         >

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-// import * as Dialog from "@radix-ui/react-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +17,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-// import ClipLoader from "react-spinners/ClipLoader";
 import axiosInstance from "@/utils/axiosConfig";
 import { toast } from "sonner";
 import { Check } from "lucide-react";
@@ -49,15 +47,19 @@ function DialogueComponent({
   id,
   folders,
   name,
-}: // setArchieveFiles,
-{
+  setArchieveFiles,
+  setFolders,
+  setUpdateFolderList,
+}: {
   variant: string;
   handleDialogue?: any;
   id?: any;
   folders?: any;
   name?: any;
   openSpinner?: any;
-  // setArchieveFiles?: any;
+  setArchieveFiles?: any;
+  setFolders?: any;
+  setUpdateFolderList?: any;
 }) {
   const [files, setFiles] = useState([]);
   const [filesArchieved, setFilesArchieved] = useState([]);
@@ -67,8 +69,9 @@ function DialogueComponent({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [folderId, setFolderId] = useState("");
-  const [openFolder, setOpenFolder] = useState(null);
   const [folderFiles, setFolderFiles] = useState([]);
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const [archieveFolderContents, setArchieveFolderContents] = useState({});
 
   // API's Call
   useEffect(() => {
@@ -98,7 +101,34 @@ function DialogueComponent({
           const response = await axiosInstance.get(
             "/folder/getArchivedFolders"
           );
-          setFiles(response.data);
+          const fetchedFolders = response.data;
+          setFiles(fetchedFolders);
+
+          const contentsPromises = fetchedFolders.map((folder) =>
+            axiosInstance
+              .get(
+                `/document/getArchivedDocumentsOfFolders/${folder.folder_id}`
+              )
+              .then((response) => ({
+                [folder.folder_id]: response.data || [],
+              }))
+              .catch((error) => {
+                console.error(
+                  `Error fetching contents for folder ${folder.folder_id}:`,
+                  error
+                );
+                return { [folder.folder_id]: [] };
+              })
+          );
+
+          const allContents = await Promise.all(contentsPromises);
+
+          const contentsObject = allContents.reduce(
+            (acc, content) => ({ ...acc, ...content }),
+            {}
+          );
+          setArchieveFolderContents(contentsObject);
+          console.log("DataArchieved", archieveFolderContents);
         } catch (error) {
           console.error("Failed to fetched Archive details", error);
         }
@@ -130,14 +160,13 @@ function DialogueComponent({
 
   const handleMultipleFolderArchive = async () => {
     try {
-      axiosInstance.post(`/folder/archiveFolder/`, {
+      const response = await axiosInstance.post(`/folder/archiveFolder/`, {
         folder_ids: selectedFiles,
       });
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-      toast("Successfully archived folders");
-      setRefresh(!refresh);
+      if (response.status == 200) {
+        setUpdateFolderList((prev) => !prev);
+        toast("Successfully archived folders");
+      }
     } catch (error) {
       toast(error.response.data.detail);
       console.error("Error archieving folder", error);
@@ -150,9 +179,28 @@ function DialogueComponent({
       toast.error("No File selected !!");
       return;
     }
+
     try {
       const response = await axiosInstance.post("/document/archive_document", {
         document_ids: selectedFiles,
+      });
+
+      setArchieveFiles((prevFolderContents) => {
+        const updatedFolderContents = { ...prevFolderContents };
+
+        selectedFiles.forEach((file_id) => {
+          const folderId = id;
+
+          const folderFiles = updatedFolderContents[folderId] || [];
+
+          const updatedFiles = folderFiles.filter(
+            (file) => file.doc_id !== file_id
+          );
+
+          updatedFolderContents[folderId] = updatedFiles;
+        });
+
+        return updatedFolderContents;
       });
       toast(response.data.message);
     } catch (error) {
@@ -186,8 +234,6 @@ function DialogueComponent({
     }
   };
 
-  // console.log("BibekSelected", selectedFiles);
-
   // Unarchieve Both Files and Folders:
   const handleUnarchive = async () => {
     if (selectedFiles.length === 0 && defaultselectedFiles.length === 0) {
@@ -209,7 +255,6 @@ function DialogueComponent({
       }
 
       handleDialogue(false);
-      // console.log("unarchive response", response);
       setTimeout(() => {
         location.reload();
       }, 1000);
@@ -235,24 +280,52 @@ function DialogueComponent({
       const response = await axiosInstance.post(`/folder/archiveFolder/`, {
         folder_ids: [id],
       });
-      toast(response.data.message);
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
+
+      if (response.status === 200) {
+        setFolders((prevFolder) => {
+          const newFolders = prevFolder.filter(
+            (folder) => folder.folder_id !== id
+          );
+          return newFolders;
+        });
+        setUpdateFolderList((prev) => !prev);
+        toast(response.data.message);
+      }
     } catch (error) {
-      toast(error.response.data.detail);
-      console.error(error);
+      toast.error("Error Archiving Folder");
+      console.error("Error Archiving Folder", error);
     }
   };
+  // Move multiple files to another folder
   const handleMove = async () => {
     if (selectedFiles.length > 0) {
-      if (!(folderId === null)) {
+      if (folderId !== null) {
         try {
           await axiosInstance.post(`/folder/moveFiles`, {
             from_folder: id,
             to_folder: folderId,
             document_id: selectedFiles,
           });
+
+          setArchieveFiles((prevFolderContents) => {
+            const updatedFromFolder = prevFolderContents[id].filter(
+              (file) => !selectedFiles.includes(file.doc_id)
+            );
+
+            const updatedToFolder = [
+              ...prevFolderContents[folderId],
+              ...prevFolderContents[id].filter((file) =>
+                selectedFiles.includes(file.doc_id)
+              ),
+            ];
+
+            return {
+              ...prevFolderContents,
+              [id]: updatedFromFolder,
+              [folderId]: updatedToFolder,
+            };
+          });
+
           toast("successfully moved files", {
             style: {
               backgroundColor: "black",
@@ -287,7 +360,16 @@ function DialogueComponent({
         document_ids: [id.file_id],
       });
 
-      // console.log(response);
+      setArchieveFiles((prevFolderContents) => {
+        const updatedFolder = prevFolderContents[id.folder_id].filter(
+          (file) => file.doc_id !== id.file_id
+        );
+
+        return {
+          ...prevFolderContents,
+          [id.folder_id]: updatedFolder,
+        };
+      });
       toast.success("File Archieve Successfully");
     } catch (error) {
       console.error("Error Archieving File", error);
@@ -297,15 +379,15 @@ function DialogueComponent({
 
   //For opening the files from archive folder
   const handleDropDown = async (folderId: string) => {
-    try {
-      const response = await axiosInstance.get(`/folder/getFiles/${folderId}`);
-      setFolderFiles(response.data);
-    } catch (error) {
-      console.error("Error Fetching Data", error);
+    if (openAccordion === folderId) {
+      setOpenAccordion(null); // Close the accordion if it's already open
+    } else {
+      setOpenAccordion(folderId); // Open the new accordion
     }
-  };
 
-  console.log("folderFiles", folderFiles);
+    // Set the files for specified folder;
+    setFolderFiles(archieveFolderContents[folderId]);
+  };
 
   //Opening Dailog on selecting select on folder
   if (variant === "selectMultiple") {
@@ -316,7 +398,7 @@ function DialogueComponent({
           handleDialogue(false);
         }}
       >
-        <DialogContent className=" py-4 max-h-[90%] overflow-y-scroll scrollbar-thin">
+        <DialogContent className="py-4 max-h-[90%] overflow-y-scroll scrollbar-thin">
           <DialogHeader>
             <div className=" flex flex-col w-full space-y-6  mb-8 mt-4">
               <h1 className="text-xl">{name}</h1>
@@ -350,7 +432,7 @@ function DialogueComponent({
                             handleDialogue(false);
                           }}
                         >
-                          Continue
+                          Archieve
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -364,11 +446,6 @@ function DialogueComponent({
                         aria-expanded={open}
                         className=" justify-between"
                       >
-                        {/* {value
-                          ? folders.find(
-                              (folder) => folder.folder_name === value
-                            )?.label
-                          : ""} */}
                         <BsFolderSymlink />
                       </Button>
                     </PopoverTrigger>
@@ -560,7 +637,6 @@ function DialogueComponent({
 
   // Dialog on clicking Archieve Folder
 
-  console.log("FilesDailog", files);
   if (variant === "archive") {
     return (
       <Dialog
@@ -581,12 +657,13 @@ function DialogueComponent({
             </section>
           </div>
 
-          {files ? (
+          {files && (
             <section className="w-full px-0 flex-col">
-              <div className="flex flex-row-reverse justify-between border-#CCCC pb-4">
+              <div className="flex justify-between border-#CCCC pb-4">
+                <h1 className="text-sm">Folders</h1>
                 {files.length > 0 && (
                   <div className="flex  items-center">
-                    <button className="text-sm">Select All </button>
+                    <button className="text-sm">Select All</button>
                     <Checkbox
                       onCheckedChange={() => {
                         handleSelectAll();
@@ -595,7 +672,6 @@ function DialogueComponent({
                     />
                   </div>
                 )}
-                <h1 className="text-sm ">Folders</h1>
               </div>
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
@@ -621,26 +697,39 @@ function DialogueComponent({
               </Accordion>
               {files.map((file) => (
                 <div key={file.folder_id} className="flex items-center">
-                  <Checkbox
-                    checked={selectedFiles.includes(file.folder_id)}
-                    onCheckedChange={() => handleFileSelect(file.folder_id)}
-                    id={`file-${file.folder_id}`}
-                    className="cursor-pointer mr-4 "
-                  />
                   <Accordion
-                    type="multiple"
-                    // collapsible
-                    className=" w-full"
+                    type="single"
+                    collapsible
+                    className="w-full"
+                    value={
+                      openAccordion === file.folder_id
+                        ? `item-${file.folder_id}`
+                        : ""
+                    }
                     onClick={() => handleDropDown(file.folder_id)}
                   >
                     <AccordionItem value={`item-${file.folder_id}`}>
                       <AccordionTrigger>
-                        <h1 className="text-sm">{file.folder_name}</h1>
+                        <div className="flex gap-2 items-center">
+                          <Checkbox
+                            checked={selectedFiles.includes(file.folder_id)}
+                            onCheckedChange={() =>
+                              handleFileSelect(file.folder_id)
+                            }
+                            id={`file-${file.folder_id}`}
+                            className="cursor-pointer mr-4 "
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <h1 className="text-md">{file.folder_name}</h1>
+                        </div>
                       </AccordionTrigger>
                       <AccordionContent>
-                        {folderFiles.map((doc) => (
-                          <p>{doc.doc_id}</p>
-                        ))}
+                        {folderFiles &&
+                          folderFiles.map((doc) => (
+                            <p className="text-sm text-gray-700 pl-9">
+                              {doc.doc_name}
+                            </p>
+                          ))}
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
@@ -657,10 +746,6 @@ function DialogueComponent({
                 </button>
               </div>
             </section>
-          ) : (
-            <div className="w-full px-5">
-              {/* <ListViewSkeleton variant='archive' /> */}
-            </div>
           )}
         </DialogContent>
       </Dialog>

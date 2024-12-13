@@ -43,8 +43,14 @@ function GridView({ data, searchData }: GridViewProps) {
 
   useEffect(() => {
     const getHoveredDetails = async () => {
-      const response = await axiosInstance.get(`/document/cv/${hoveredId}`);
-      setHoveredUser(response.data.parsed_cv);
+      try {
+        const response = await axiosInstance.get(`/document/cv/${hoveredId}`);
+        if (response.status === 200) {
+          setHoveredUser(response.data.parsed_cv);
+        }
+      } catch (error) {
+        console.error("Error parsing data:", error);
+      }
     };
     if (hoveredId) {
       getHoveredDetails();

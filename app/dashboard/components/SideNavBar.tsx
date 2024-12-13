@@ -92,14 +92,10 @@ const SideNavBar = () => {
         }
       );
       if (response.status === 200) {
-        // const selectedFolder = folderListData.find(
-        //   (folder) => folder.folder_id === selectedFolderId
-        // );
         setUpdateFolderList((prev) => !prev);
         toast("Uploaded successfully", {
           description: "The file has been uploaded successfully",
         });
-        // console.log("Data uploaded",)
         await fetchUpdatedApiData();
       } else {
         toast("Upload failed", {
@@ -229,11 +225,17 @@ const SideNavBar = () => {
           </div>
 
           <div className="w-full px-4">
-            <FolderCreation onFolderCreated={handleFolderCreated} />
+            <FolderCreation
+              onFolderCreated={handleFolderCreated}
+              setUpdateFolderList={setUpdateFolderList}
+            />
           </div>
 
           <div className="w-full px-4 flex-1">
-            <FolderList updateFolderList={updateFolderList} />
+            <FolderList
+              updateFolderList={updateFolderList}
+              setUpdateFolderList={setUpdateFolderList}
+            />
             <button
               className="bg-inherit px-0 items-center py-1 flex justify-start hover:opacity-60 w-full text-white"
               onClick={() => {

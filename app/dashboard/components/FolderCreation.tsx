@@ -13,7 +13,7 @@ import {
 import axiosInstance from "@/utils/axiosConfig";
 import DialogueComponent from "./DialogueComponent";
 
-function FolderCreation({ onFolderCreated }) {
+function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
   const [folderName, setFolderName] = useState("");
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
@@ -21,14 +21,6 @@ function FolderCreation({ onFolderCreated }) {
   const handleDialogue = (state: boolean) => {
     setDialogueOpen(state);
   };
-
-  // const checkedFolders = (fileid: string) => {
-  //   if (selectedFolders.includes(fileid)) {
-  //     return selectedFolders.filter((id) => id != fileid);
-  //   } else {
-  //     setSelectedFolders([...selectedFolders, fileid]);
-  //   }
-  // };
 
   const handleFolderCreate = async (
     event: React.FormEvent<HTMLFormElement>
@@ -75,6 +67,7 @@ function FolderCreation({ onFolderCreated }) {
         <DialogueComponent
           variant="selectMultipleFolders"
           handleDialogue={handleDialogue}
+          setUpdateFolderList={setUpdateFolderList}
         />
       )}
 
