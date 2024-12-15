@@ -9,7 +9,6 @@ import GridViewSkeleton from "./ui/Skeleton/GridViewSkeleton";
 import { IoCallOutline } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa";
 import { CiLinkedin } from "react-icons/ci";
-// import ListViewSkeleton from "./ui/Skeleton/ListViewSkeleton";
 
 interface GridViewProps {
   data: IDocumentData[];
@@ -398,7 +397,7 @@ function GridView({ data, searchData }: GridViewProps) {
               )}
               {/* Image */}
               <Image
-                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cv_images/${item.image_id}.webp`}
+                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cv_images/${item.img_id}.webp`}
                 alt={`Image ${index + 1}`}
                 height={500}
                 width={700}

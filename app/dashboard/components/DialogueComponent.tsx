@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { fetchUpdatedApiData } from "../utils/updatedInitialData";
+import { ApiDataContext } from "../context/ApiDataContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,13 +67,15 @@ function DialogueComponent({
   const [filesArchieved, setFilesArchieved] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [defaultselectedFiles, setDefaultSelectedFiles] = useState([]); // list of files in archieve folder
-  const [refresh, setRefresh] = useState(true);
+  const [, set] = useState(true);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [folderId, setFolderId] = useState("");
   const [folderFiles, setFolderFiles] = useState([]);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [archieveFolderContents, setArchieveFolderContents] = useState({});
+  const context = useContext(ApiDataContext);
+  const setApiData = context?.setApiData;
 
   // API's Call
   useEffect(() => {
@@ -91,7 +95,7 @@ function DialogueComponent({
           const response = await axiosInstance.get("/folder/getAllFolders");
           setFiles(response.data);
         } catch (error) {
-          toast(error.response.data.detail);
+          toast.error(error);
         }
       };
       fetchFolders();
@@ -146,7 +150,7 @@ function DialogueComponent({
       fetchArchiveFiles();
       fetchArchive();
     }
-  }, [id, variant, refresh]);
+  }, [id]);
 
   const handleFileSelect = (fileId: string) => {
     setSelectedFiles((prevSelectedFiles) => {
@@ -165,10 +169,15 @@ function DialogueComponent({
       });
       if (response.status == 200) {
         setUpdateFolderList((prev) => !prev);
-        toast("Successfully archived folders");
+        toast.success("Successfully archived folders");
+        if (setApiData) {
+          await fetchUpdatedApiData(setApiData);
+        } else {
+          console.warn("API Data context is not available.");
+        }
       }
     } catch (error) {
-      toast(error.response.data.detail);
+      toast.error(error);
       console.error("Error archieving folder", error);
     }
   };
@@ -184,7 +193,6 @@ function DialogueComponent({
       const response = await axiosInstance.post("/document/archive_document", {
         document_ids: selectedFiles,
       });
-
       setArchieveFiles((prevFolderContents) => {
         const updatedFolderContents = { ...prevFolderContents };
 
@@ -202,7 +210,12 @@ function DialogueComponent({
 
         return updatedFolderContents;
       });
-      toast(response.data.message);
+      toast.success(response.data.message);
+      if (setApiData) {
+        await fetchUpdatedApiData(setApiData);
+      } else {
+        console.warn("API Data context is not available.");
+      }
     } catch (error) {
       console.error("Error Archieving", error);
       toast.error(error);
@@ -242,35 +255,56 @@ function DialogueComponent({
     }
 
     try {
+      // Flags created to track whether both API calls were successful
+      let isFolderUnarchiveSuccess = false;
+      let isDocumentUnarchiveSuccess = false;
       if (selectedFiles.length > 0) {
-        await axiosInstance.post(`/folder/unarchiveFolder/`, {
+        const response = await axiosInstance.post(`/folder/unarchiveFolder/`, {
           folder_ids: selectedFiles,
         });
+        if (response.status === 200) {
+          isFolderUnarchiveSuccess = true;
+        }
       }
 
       if (defaultselectedFiles.length > 0) {
-        await axiosInstance.post(`/document/unarchive_document`, {
-          document_ids: defaultselectedFiles,
-        });
+        const response = await axiosInstance.post(
+          `/document/unarchive_document`,
+          {
+            document_ids: defaultselectedFiles,
+          }
+        );
+        if (response.status === 200) {
+          isDocumentUnarchiveSuccess = true;
+        }
       }
 
-      handleDialogue(false);
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-      toast("Successfully unarchived the files", {
-        style: {
-          backgroundColor: "black",
-          color: "white",
-        },
-      });
+      if (isFolderUnarchiveSuccess || isDocumentUnarchiveSuccess) {
+        handleDialogue(false);
+        setUpdateFolderList((prev) => !prev);
+
+        if (setApiData) {
+          await fetchUpdatedApiData(setApiData);
+        } else {
+          console.warn("API Data context is not available.");
+        }
+        toast.success("Successfully unarchived the files");
+      } else {
+        if (!isFolderUnarchiveSuccess) {
+          toast.error("Failed to unarchive folder.");
+        }
+        if (!isDocumentUnarchiveSuccess) {
+          toast.error("Failed to unarchive document.");
+        }
+      }
     } catch (error) {
-      toast(error.response.data.detail, {
-        style: {
-          backgroundColor: "black",
-          color: "white",
-        },
-      });
+      // toast(error, {
+      //   style: {
+      //     backgroundColor: "black",
+      //     color: "white",
+      //   },
+      // });
+      toast.error(error);
       console.error("Error occured", error);
     }
   };
@@ -289,7 +323,12 @@ function DialogueComponent({
           return newFolders;
         });
         setUpdateFolderList((prev) => !prev);
-        toast(response.data.message);
+        if (setApiData) {
+          await fetchUpdatedApiData(setApiData);
+        } else {
+          console.warn("API Data context is not available.");
+        }
+        toast.success(response.data.message);
       }
     } catch (error) {
       toast.error("Error Archiving Folder");
@@ -354,22 +393,31 @@ function DialogueComponent({
       });
     }
   };
+
   const archiveFile = async () => {
     try {
-      await axiosInstance.post(`/document/archive_document`, {
+      const response = await axiosInstance.post(`/document/archive_document`, {
         document_ids: [id.file_id],
       });
 
-      setArchieveFiles((prevFolderContents) => {
-        const updatedFolder = prevFolderContents[id.folder_id].filter(
-          (file) => file.doc_id !== id.file_id
-        );
+      if (response.status === 200) {
+        setArchieveFiles((prevFolderContents) => {
+          const updatedFolder = prevFolderContents[id.folder_id].filter(
+            (file) => file.doc_id !== id.file_id
+          );
 
-        return {
-          ...prevFolderContents,
-          [id.folder_id]: updatedFolder,
-        };
-      });
+          return {
+            ...prevFolderContents,
+            [id.folder_id]: updatedFolder,
+          };
+        });
+        if (setApiData) {
+          await fetchUpdatedApiData(setApiData);
+        } else {
+          console.warn("API Data context is not available.");
+        }
+      }
+
       toast.success("File Archieve Successfully");
     } catch (error) {
       console.error("Error Archieving File", error);

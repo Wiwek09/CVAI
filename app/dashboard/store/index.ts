@@ -1,12 +1,13 @@
-import {create} from "zustand";
+import { create } from "zustand";
 
-interface IStoreState{
-    isDataChanged: boolean;
-    setIsDataChanged: (value: boolean) => void;
+interface IStoreState {
+  isDataChanged: boolean;
+  setIsDataChanged: (value: boolean) => void;
 }
 
-const useStore= create<IStoreState>((set) => ({
-    isDataChanged: false;
+const useStore = create<IStoreState>((set) => ({
+  isDataChanged: false,
+  setIsDataChanged: (value: boolean) => set({ isDataChanged: value }),
+}));
 
-    setIsDataChanged: (value: boolean) => set({isDataChanged: value}),
-}))
+export default useStore;

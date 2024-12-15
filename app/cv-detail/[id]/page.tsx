@@ -20,12 +20,10 @@ const CVDetailPage = ({ params }: { params: string }) => {
   const fetchFullCV = async () => {
     try {
       const response = await axiosInstance.get(`/document/cv/${id}`);
-      // console.log("Detail-CV", response.data.parsed_cv);
       setData(response.data.parsed_cv);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching Data", error);
-      // setError(true);
       setLoading(false);
     }
   };
@@ -67,7 +65,9 @@ const CVDetailPage = ({ params }: { params: string }) => {
                       }
                       target="_blank"
                     >
-                      <span>{data?.linkedin_url}</span>
+                      <span className="text-gray-700 hover:opacity-50">
+                        {data?.linkedin_url}
+                      </span>
                     </Link>
                   )}
                 </p>
@@ -82,7 +82,9 @@ const CVDetailPage = ({ params }: { params: string }) => {
                       }
                       target="_blank"
                     >
-                      <span>{data?.git_url}</span>
+                      <span className="text-gray-700 hover:opacity-50">
+                        {data?.git_url}
+                      </span>
                     </Link>
                   )}
                 </p>
@@ -98,7 +100,9 @@ const CVDetailPage = ({ params }: { params: string }) => {
                       }
                       target="_blank"
                     >
-                      <span>{data?.website}</span>
+                      <span className="text-gray-700 hover:opacity-50">
+                        {data?.website}
+                      </span>
                     </Link>
                   )}
                 </p>
@@ -107,34 +111,33 @@ const CVDetailPage = ({ params }: { params: string }) => {
                   <span>Email:</span>
                   {data?.email && (
                     <Link href={`mailto:${data?.email}`} target="_blank">
-                      <span>{data?.email}</span>
+                      <span className="text-gray-700 hover:opacity-50">
+                        {data?.email}
+                      </span>
                     </Link>
                   )}
                 </p>
               </div>
 
               <div className="flex w-max-[40%] flex-wrap flex-col gap-2 justify-end">
-                {/* <div className="h-20 bg-white w-32 flex text-center justify-self-end self-end">
-                <Image
-                  className="bg-cover"
-                  src={"/assets/qr.jpg"}
-                  alt="QR Image"
-                  height={200}
-                  width={200}
-                />
-              </div> */}
                 <div>
                   <div className="flex flex-wrap gap-1">
                     <span>Phone Number:</span>
-                    <span className=" font-semibold">{data?.phone_number}</span>
+                    <span className=" font-semibold text-gray-700">
+                      {data?.phone_number}
+                    </span>
                   </div>
                   <div className="flex flex-1 gap-1">
                     <span>Address:</span>
-                    <span className="font-semibold">{data?.address}</span>
+                    <span className="font-semibold text-gray-700">
+                      {data?.address}
+                    </span>
                   </div>
                   <div className="flex flex-1 gap-1">
                     <span>Rating:</span>
-                    <span className="font-semibold">{data?.rating}</span>
+                    <span className="font-semibold text-gray-700">
+                      {data?.rating}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -144,6 +147,44 @@ const CVDetailPage = ({ params }: { params: string }) => {
 
           {/* Second Part (Scrollable) */}
           <div className="flex-grow flex-col space-y-3 overflow-y-auto scrollbar-thin">
+            {/* Skills */}
+            <div>
+              <span className="flex flex-col gap-1 pb-2">
+                <span className="font-semibold text-xl">Skills</span>
+                <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
+                  {data?.skills?.length > 0 &&
+                    data?.skills?.map((item: any, idx: number) => (
+                      <div key={idx}>
+                        <span className="flex shadow-md px-2 py-3 bg-[#f7f9fc] text-gray-700 font-sans rounded-md w-fit font-semibold">
+                          {item}
+                        </span>
+                      </div>
+                    ))}
+                </span>
+              </span>
+            </div>
+
+            {/* Programming Language */}
+            <div>
+              <span className="flex flex-col gap-1 pb-2">
+                <span className="font-semibold text-xl">
+                  Progamming Language
+                </span>
+                <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
+                  {data?.programming_languages?.length > 0 &&
+                    data?.programming_languages?.map(
+                      (item: any, idx: number) => (
+                        <div key={idx}>
+                          <span className="flex shadow-md px-2 py-3 text-gray-700 font-sans bg-[#f7f9fc] rounded-md w-fit font-semibold">
+                            {item}
+                          </span>
+                        </div>
+                      )
+                    )}
+                </span>
+              </span>
+            </div>
+
             {/* Experience */}
             <div className="flex flex-col gap-2">
               <p className="font-semibold text-xl flex gap-4 ">
@@ -175,36 +216,26 @@ const CVDetailPage = ({ params }: { params: string }) => {
                       </span>
                       <span className="flex flex-col text-sm max-w-3xl ">
                         {item.responsibilities.length > 0 &&
-                          item.responsibilities.map((el: any, idx: number) => (
-                            <div className="flex gap-1" key={idx}>
-                              <span className="mt-[1px]">
-                                <GoDotFill />
-                              </span>
-                              <span>{el}</span>
-                            </div>
-                          ))}
+                          item.responsibilities.map(
+                            (el: any, index: number) => (
+                              <div
+                                className="flex gap-1 text-gray-700"
+                                key={index}
+                              >
+                                <span className="mt-[1px]">
+                                  <GoDotFill />
+                                </span>
+                                <span>{el}</span>
+                              </div>
+                            )
+                          )}
                       </span>
                     </div>
                   ))}
               </div>
             </div>
 
-            {/* Skills */}
-            <div>
-              <span className="flex flex-col gap-1 pb-2">
-                <span className="font-semibold text-xl">Skills</span>
-                <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
-                  {data?.skills?.length > 0 &&
-                    data?.skills?.map((item: any, idx: number) => (
-                      <div key={idx}>
-                        <span className="flex shadow-md px-2 py-3 bg-[#f7f9fc] rounded-md w-fit font-semibold">
-                          {item}
-                        </span>
-                      </div>
-                    ))}
-                </span>
-              </span>
-            </div>
+            {/* Project */}
             <div>
               <span className="flex flex-col gap-1">
                 <span className="font-semibold text-xl">Projects</span>
@@ -212,7 +243,7 @@ const CVDetailPage = ({ params }: { params: string }) => {
                   {data?.technical_projects?.length > 0 &&
                     data?.technical_projects.map((data: any, index: number) => (
                       <div key={index}>
-                        <p className="font-semibold">
+                        <p className="text-gray-700 font-semibold">
                           {index + 1 + ". " + data.project_name}
                         </p>
                       </div>
@@ -231,7 +262,7 @@ const CVDetailPage = ({ params }: { params: string }) => {
                         <p className="font-semibold">
                           {index + 1 + ". " + el.degree}
                         </p>
-                        <div className="flex gap-1 items-center">
+                        <div className="flex gap-1 items-center text-gray-700">
                           <span>{el?.institution}</span>
                           <span className="text-sm">
                             {"(" + el?.start_date + " - " + el?.end_date + ")"}

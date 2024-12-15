@@ -79,7 +79,7 @@ function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
               <PiPlusCircleDuotone size={24} />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-[16rem]">
+          <PopoverContent className="w-[16rem] ml-60">
             <div className="grid gap-4">
               <div className="space-y-2">
                 <h4 className="font-semibold leading-none">Create Folder</h4>
@@ -127,7 +127,7 @@ function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
                 handleDialogue(true);
               }}
             >
-              Select
+              <span className="hover:opacity-50 ">Select</span>
             </button>
           </PopoverContent>
         </Popover>

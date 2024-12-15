@@ -7,16 +7,14 @@ import React, {
   useEffect,
 } from "react";
 import { Card } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
 import { ApiDataContext } from "../context/ApiDataContext";
 import { SpinnerContext } from "../context/SpinnerContext";
 import { IoIosCloudUpload } from "react-icons/io";
 import FolderCreation from "./FolderCreation";
 import FolderList from "./FolderList";
 import { IFolderData } from "@/interfaces/FolderData";
-
+import { fetchUpdatedApiData } from "../utils/updatedInitialData";
 import {
   Select,
   SelectContent,
@@ -34,10 +32,7 @@ import {
 import DialogueComponent from "./DialogueComponent";
 import { MdFolderZip } from "react-icons/md";
 const SideNavBar = () => {
-  // const [uploading, setUploading] = useState<boolean>(false);
-
   const context = useContext(ApiDataContext);
-  // const apiData = context?.apiData ?? null;
   const spinnerContext = useContext(SpinnerContext);
   const setApiData = context?.setApiData;
   const setUploading = spinnerContext?.setUploading;
@@ -96,7 +91,12 @@ const SideNavBar = () => {
         toast("Uploaded successfully", {
           description: "The file has been uploaded successfully",
         });
-        await fetchUpdatedApiData();
+        // Refectiing the initialRenderData API
+        if (setApiData) {
+          await fetchUpdatedApiData(setApiData);
+        } else {
+          console.warn("API Data context is not available");
+        }
       } else {
         toast("Upload failed", {
           description: "Failed to upload files ",
@@ -109,19 +109,6 @@ const SideNavBar = () => {
       });
     } finally {
       setUploading(false);
-    }
-  };
-
-  const fetchUpdatedApiData = async () => {
-    try {
-      const response = await axiosInstance.get("/document/all_document");
-      if (setApiData) {
-        setApiData(response.data);
-      } else {
-        console.warn("setApiData is undefined. Could not update the API data.");
-      }
-    } catch (error) {
-      console.error("Error fetching updated data:", error);
     }
   };
 
@@ -158,8 +145,6 @@ const SideNavBar = () => {
     }
   };
 
-  // console.log("Uploading", uploading);
-
   return (
     <Sidebar className="h-[100vh]">
       <Card className="border border-black h-[100vh] overflow-y-auto scrollbar-thin rounded-none flex flex-col items-center bg-black space-y-6 py-6">
@@ -167,6 +152,7 @@ const SideNavBar = () => {
           <DialogueComponent
             variant="archive"
             handleDialogue={handleDialogue}
+            setUpdateFolderList={setUpdateFolderList}
           />
         )}
         <SidebarHeader>
@@ -187,11 +173,6 @@ const SideNavBar = () => {
               <div className="flex flex-col items-center h-full w-full justify-center">
                 <IoIosCloudUpload size={40} className="text-gray-400" />
                 <p className="text-center">Drop your files here</p>
-                {/* <label
-                  className="cursor-pointer"
-                >
-                  <span>Choose File</span>
-                </label> */}
               </div>
             </div>
             <input

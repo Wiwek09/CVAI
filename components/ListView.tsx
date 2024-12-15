@@ -8,19 +8,6 @@ import { IDocumentData } from "@/interfaces/DocumentData";
 import axiosInstance from "@/utils/axiosConfig";
 import Link from "next/link";
 import { IFormInputData } from "@/interfaces/FormInputData";
-// import { RxCross2 } from 'react-icons/rx';
-// import { useToast } from "@/hooks/use-toast";
-// import {
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogHeader,
-//   AlertDialogTitle,
-//   AlertDialogTrigger,
-// } from '@/components/ui/alert-dialog';
 import ListViewSkeletion from "./ui/Skeleton/ListViewSkeleton";
 
 interface ListViewProps {

@@ -9,14 +9,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { toast } from "sonner";
-
 import DialogueComponent from "./DialogueComponent";
 import { BsThreeDots } from "react-icons/bs";
 
 const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
   const [folders, setFolders] = useState([]);
   const [openFolder, setOpenFolder] = useState([]);
-  // const [files, setFiles] = useState([]);
   const [folderContents, setFolderContents] = useState({});
   const [editingFolder, setEditingFolder] = useState(null);
   const [newFolderName, setNewFolderName] = useState("");
@@ -27,7 +25,7 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
   const [selectedFile, setSelectedFile] = useState({
     folder_id: "",
     file_id: "",
-  }); //
+  });
   const [selectedFolder, setSelectedFolder] = useState("");
   const [name, setName] = useState("");
   const [dialogAlertFile, setDialogueAlertFile] = useState(false);
@@ -276,7 +274,7 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
                           <RxHamburgerMenu />
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-32 p-1 text-center cursor-pointer">
+                      <PopoverContent className="w-32 p-1 text-center cursor-pointer ml-5">
                         <p
                           className="py-1 hover:opacity-50"
                           onClick={() => {

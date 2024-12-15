@@ -12,21 +12,45 @@ interface ApiDataContextType {
 // Create the context
 export const ApiDataContext = createContext<ApiDataContextType | null>(null);
 
+export const initialData = {
+  address: "",
+  programming_language: [""],
+  prompt: "",
+  skill: [""],
+  foldersToSearch: [""],
+};
+
 // Context Provider to fetch and provide the data
 export const ApiDataProvider = ({ children }: { children: ReactNode }) => {
   const [apiData, setApiData] = useState<IDocumentData[] | null>(null);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axiosInstance.get("/document/all_document");
+  //       setApiData(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching API data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosInstance.get("/document/all_document");
+        const response = await axiosInstance.post(
+          "document/search_by_query",
+          initialData
+        );
         setApiData(response.data);
       } catch (error) {
         console.error("Error fetching API data:", error);
       }
     };
-
     fetchData();
+    console.log("SearchData", setApiData);
   }, []);
 
   return (

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 
 const SearchFields = () => {
   const searchContext = useContext(SearchContext);
+  const { setSearchData } = searchContext;
   const viewContext = useContext(ViewContext);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
@@ -32,8 +33,6 @@ const SearchFields = () => {
   if (!viewContext) {
     throw new Error("ViewContext must be used within a ViewProvider");
   }
-
-  const { setSearchData } = searchContext;
 
   useEffect(() => {
     if (tagsOpen && inputRefs.current) {
