@@ -149,30 +149,31 @@ const CVDetailPage = ({ params }: { params: string }) => {
           <div className="flex-grow flex-col space-y-3 overflow-y-auto scrollbar-thin">
             {/* Skills */}
             <div>
-              <span className="flex flex-col gap-1 pb-2">
-                <span className="font-semibold text-xl">Skills</span>
-                <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
-                  {data?.skills?.length > 0 &&
-                    data?.skills?.map((item: any, idx: number) => (
-                      <div key={idx}>
+              {data?.skills?.length > 0 && (
+                <span className="flex flex-col gap-1 pb-2">
+                  <span className="font-semibold text-xl">Skills</span>
+                  <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
+                    {data?.skills?.map((item: any, index: number) => (
+                      <div key={index}>
                         <span className="flex shadow-md px-2 py-3 bg-[#f7f9fc] text-gray-700 font-sans rounded-md w-fit font-semibold">
                           {item}
                         </span>
                       </div>
                     ))}
+                  </span>
                 </span>
-              </span>
+              )}
             </div>
 
             {/* Programming Language */}
             <div>
-              <span className="flex flex-col gap-1 pb-2">
-                <span className="font-semibold text-xl">
-                  Progamming Language
-                </span>
-                <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
-                  {data?.programming_languages?.length > 0 &&
-                    data?.programming_languages?.map(
+              {data?.programming_languages?.length > 0 && (
+                <span className="flex flex-col gap-1 pb-2">
+                  <span className="font-semibold text-xl">
+                    Progamming Language
+                  </span>
+                  <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
+                    {data?.programming_languages?.map(
                       (item: any, idx: number) => (
                         <div key={idx}>
                           <span className="flex shadow-md px-2 py-3 text-gray-700 font-sans bg-[#f7f9fc] rounded-md w-fit font-semibold">
@@ -181,8 +182,9 @@ const CVDetailPage = ({ params }: { params: string }) => {
                         </div>
                       )
                     )}
+                  </span>
                 </span>
-              </span>
+              )}
             </div>
 
             {/* Experience */}
@@ -237,19 +239,23 @@ const CVDetailPage = ({ params }: { params: string }) => {
 
             {/* Project */}
             <div>
-              <span className="flex flex-col gap-1">
-                <span className="font-semibold text-xl">Projects</span>
-                <span className="flex gap-2 flex-col">
-                  {data?.technical_projects?.length > 0 &&
-                    data?.technical_projects.map((data: any, index: number) => (
-                      <div key={index}>
-                        <p className="text-gray-700 font-semibold">
-                          {index + 1 + ". " + data.project_name}
-                        </p>
-                      </div>
-                    ))}
+              {data?.technical_projects?.length > 0 && (
+                <span className="flex flex-col gap-1">
+                  <span className="font-semibold text-xl">Projects</span>
+                  <span className="flex gap-2 flex-col">
+                    {data?.technical_projects?.length > 0 &&
+                      data?.technical_projects.map(
+                        (data: any, index: number) => (
+                          <div key={index}>
+                            <p className="text-gray-700 font-semibold">
+                              {index + 1 + ". " + data.project_name}
+                            </p>
+                          </div>
+                        )
+                      )}
+                  </span>
                 </span>
-              </span>
+              )}
             </div>
             {/* Education */}
             <div>
