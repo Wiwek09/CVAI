@@ -67,7 +67,6 @@ function DialogueComponent({
   const [filesArchieved, setFilesArchieved] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [defaultselectedFiles, setDefaultSelectedFiles] = useState([]); // list of files in archieve folder
-  const [, set] = useState(true);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [folderId, setFolderId] = useState("");
@@ -774,7 +773,10 @@ function DialogueComponent({
                       <AccordionContent>
                         {folderFiles &&
                           folderFiles.map((doc) => (
-                            <p className="text-sm text-gray-700 pl-9">
+                            <p
+                              key={doc.doc_id}
+                              className="text-sm text-gray-700 pl-9"
+                            >
                               {doc.doc_name}
                             </p>
                           ))}
