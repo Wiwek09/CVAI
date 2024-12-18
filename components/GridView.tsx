@@ -101,11 +101,7 @@ function GridView({ data, searchData }: GridViewProps) {
     setHoveredId(null);
   };
 
-  // For Opening the email,linkedin, website link :
-  const handleEmailCLick = (event, email) => {
-    event.stopPropagation();
-    window.open(`mailto:${email}`, "_blank");
-  };
+  // For Opening the linkedin
 
   const handleLinkedin = (event, linkedinUrl) => {
     event.stopPropagation();
@@ -145,7 +141,7 @@ function GridView({ data, searchData }: GridViewProps) {
           imageDataID.map((item, index) => (
             <div
               key={item.doc_id}
-              className={`mb-6 cursor-pointer transition-transform duration-300 relative ${
+              className={`mb-6 cursor-pointer transition-transform duration-300 h-auto relative ${
                 hoveredId === item.doc_id ? "z-20" : "z-0"
               }`}
               onMouseOver={() => handleMouseOver(item.doc_id)}
@@ -162,7 +158,7 @@ function GridView({ data, searchData }: GridViewProps) {
                     }`}
                   >
                     {hoveredUser && Object.keys(hoveredUser).length > 0 && (
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 h-auto">
                         <h1 className="font-bold text-xl pt-5">
                           {hoveredUser?.name?.toUpperCase()}
                         </h1>
@@ -172,12 +168,14 @@ function GridView({ data, searchData }: GridViewProps) {
                           </h2>
                         )}
                         <div className="mt-2 flex flex-col space-y-5">
-                          <section className="flex space-x-4 items-center">
-                            <button className="bg-gray-600 p-[4px] rounded-full">
-                              <IoCallOutline color="white" />
-                            </button>
-                            <h1>{hoveredUser?.phone_number}</h1>
-                          </section>
+                          {hoveredUser?.phone_number && (
+                            <section className="flex space-x-4 items-center">
+                              <button className="bg-gray-600 p-[4px] rounded-full">
+                                <IoCallOutline color="white" />
+                              </button>
+                              <span>{hoveredUser?.phone_number}</span>
+                            </section>
+                          )}
 
                           <section className="flex items-center">
                             {hoveredUser?.linkedin_url ? (
@@ -192,9 +190,6 @@ function GridView({ data, searchData }: GridViewProps) {
                                       hoveredUser.linkedin_url
                                     )
                                   }
-                                  // href={hoveredUser.linkedin_url}
-                                  // target="_blank"
-                                  // rel="noopener noreferrer"
                                   className="text-blue-600 hover:underline"
                                 >
                                   <span>{hoveredUser.linkedin_url}</span>
@@ -309,12 +304,14 @@ function GridView({ data, searchData }: GridViewProps) {
                         </h2>
                       )}
                       <div className="mt-2 flex flex-col space-y-5 ">
-                        <section className="flex space-x-4 items-center">
-                          <div className="bg-gray-600 p-[4px] rounded-full">
-                            <IoCallOutline color="white" />
-                          </div>
-                          <h1>{hoveredUser?.phone_number}</h1>
-                        </section>
+                        {hoveredUser?.phone_number && (
+                          <section className="flex space-x-4 items-center">
+                            <div className="bg-gray-600 p-[4px] rounded-full">
+                              <IoCallOutline color="white" />
+                            </div>
+                            <h1>{hoveredUser?.phone_number}</h1>
+                          </section>
+                        )}
 
                         <section className="flex items-center">
                           {hoveredUser?.linkedin_url ? (
