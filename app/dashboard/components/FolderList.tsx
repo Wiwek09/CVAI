@@ -274,7 +274,7 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
                           <RxHamburgerMenu />
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-32 p-1 text-center cursor-pointer ml-5">
+                      <PopoverContent className="w-32 p-1 text-center cursor-pointer ml-9">
                         <p
                           className="py-1 hover:opacity-50"
                           onClick={() => {

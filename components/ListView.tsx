@@ -21,53 +21,58 @@ const ListView = ({ data, searchData }: ListViewProps) => {
   const [isSearching, setIsSearching] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // const { toast } = useToast();
-
   const fetchAllData = async () => {
     const fetchedData: any[] = [];
     setLoading(true);
 
-    try {
-      if (data.length > 0) {
-        for (const item of data) {
-          try {
-            const response = await axiosInstance.get(
-              `/document/cv/${item.doc_id}`
-            );
-            if (response.status === 200) {
-              fetchedData.push(response.data);
-            }
-          } catch (error) {
-            // Stop fetching if an error occurs
-            console.error("Error fetching document:", error);
-            break;
-          }
-        }
-        setAllData(fetchedData);
-      }
-    } catch (error) {
-      // setErrorData(true);
-      console.error("General error in fetching data:", error);
-    } finally {
+    const cachedData = sessionStorage.getItem("allData");
+    if (cachedData) {
+      setAllData(JSON.parse(cachedData));
       setLoading(false);
+    } else {
+      try {
+        if (data.length > 0) {
+          for (const item of data) {
+            try {
+              const response = await axiosInstance.get(
+                `/document/cv/${item.doc_id}`
+              );
+              if (response.status === 200) {
+                fetchedData.push(response.data);
+              }
+            } catch (error) {
+              console.error("Error fetching document:", error);
+              break;
+            }
+          }
+          sessionStorage.setItem("allData", JSON.stringify(fetchedData));
+          setAllData(fetchedData);
+        }
+      } catch (error) {
+        console.error("General error in fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    if (!isSearching) {
+    if (!isSearching && data.length >= 0) {
       fetchAllData();
     }
-  }, [data, isSearching]);
+  }, [data]);
 
   useEffect(() => {
     if (searchData) {
       setIsSearching(true);
+      setLoading(true);
       fetchSearchData(searchData);
+    } else {
+      setIsSearching(false);
     }
   }, [searchData]);
 
   const fetchSearchData = async (searchData: IFormInputData) => {
-    // setLoading(true);
     try {
       const response = await axiosInstance.post(
         `/document/search_by_query`,
@@ -80,22 +85,49 @@ const ListView = ({ data, searchData }: ListViewProps) => {
       );
 
       if (response.status === 200) {
+        const fetchedData: any[] = [];
         const searchIds = response.data;
-        const fetchedData = await Promise.all(
-          searchIds?.map(async (item: any) => {
-            const response = await axiosInstance.get(
-              `/document/cv/${item.doc_id}`
-            );
-            return response.data;
-          })
-        );
-        setSearchResults(fetchedData.filter((item) => item !== null));
+        const cachedData = sessionStorage.getItem("searchData");
+        if (cachedData) {
+          setSearchResults(JSON.parse(cachedData));
+          setLoading(false);
+        } else {
+          for (const item of searchIds) {
+            try {
+              const searchResponse = await axiosInstance.get(
+                `/document/cv/${item.doc_id}`
+              );
+              if (searchResponse.status == 200) {
+                fetchedData.push(searchResponse.data);
+              }
+            } catch (error) {
+              console.error("Error fetching document:", error);
+              break;
+            }
+            sessionStorage.setItem("searchData", JSON.stringify(fetchedData));
+            setSearchResults(fetchedData);
+          }
+        }
       }
     } catch (error) {
       console.error("Error fetching", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // For Opening the email,linkedin, website link :
+  const handleEmailCLick = (event, email) => {
+    event.stopPropagation();
+    window.open(`mailto:${email}`, "_blank");
+  };
+
+  const handleLinkedin = (event, linkedinUrl) => {
+    event.stopPropagation();
+    const newLinkedinUrl = linkedinUrl.startsWith("http")
+      ? linkedinUrl
+      : `https://${linkedinUrl}`;
+    window.open(newLinkedinUrl, "_blank");
   };
 
   const displayedData = isSearching ? searchResults : allData;
@@ -111,7 +143,12 @@ const ListView = ({ data, searchData }: ListViewProps) => {
         <p>No Document Available</p>
       ) : (
         displayedData?.map((item: any) => (
-          <Link key={item._id} href={`/cv-detail/${item._id}`} target="_blank">
+          <Link
+            legacyBehavior={false}
+            key={item._id}
+            href={`/cv-detail/${item._id}`}
+            target="_blank"
+          >
             <Card
               key={item._id}
               className="px-5 py-8 flex justify-between  shadow-lg transform mb-3 hover:scale-x-[1.01] hover:scale-y-[1.02] hover:cursor-pointer overflow-clip transition duration-500 ease-in-out "
@@ -146,45 +183,51 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                 </p>
                 <p className="">
                   {item?.parsed_cv.phone_number && (
-                    <div className="flex item-center gap-2">
+                    <span className="flex item-center gap-2">
                       <span>
                         <FaPhoneAlt className="text-sm" />
                       </span>
                       <span className="text-gray-500 text-sm">
                         {item?.parsed_cv.phone_number}
                       </span>
-                    </div>
+                    </span>
                   )}
                 </p>
-                <p className="">
+                <section className="">
                   {item?.parsed_cv.email && (
                     <div className="flex items-center gap-2">
                       <span>
                         <MdEmail className="text-base  hover:opacity-60" />
                       </span>
                       <span>
-                        <a
-                          href={`mailto:${item?.parsed_cv.email}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <span
+                          // href={`mailto:${item?.parsed_cv.email}`}
+                          onClick={(event) =>
+                            handleEmailCLick(event, item?.parsed_cv.email)
+                          }
+                          // target="_blank"
+                          // rel="noopener noreferrer"
                           className="text-gray-500  hover:opacity-60"
                         >
-                          {item?.parsed_cv.email}
-                        </a>
+                          <span>{item?.parsed_cv.email}</span>
+                        </span>
                       </span>
                     </div>
                   )}
-                </p>
-                <p className="flex gap-2">
+                </section>
+                <div className="flex gap-2">
                   {item?.parsed_cv.linkedin_url && (
                     <div>
-                      <Link
-                        href={
-                          item.parsed_cv.linkedin_url.startsWith("http")
-                            ? item.parsed_cv.linkedin_url
-                            : `https://${item.parsed_cv.linkedin_url}`
+                      <span
+                        // href={
+                        //   item.parsed_cv.linkedin_url.startsWith("http")
+                        //     ? item.parsed_cv.linkedin_url
+                        //     : `https://${item.parsed_cv.linkedin_url}`
+                        // }
+                        onClick={(event) =>
+                          handleLinkedin(event, item?.parsed_cv.linkedin_url)
                         }
-                        target="_blank"
+                        // target="_blank"
                         className="flex gap-2 "
                       >
                         <span>
@@ -193,10 +236,10 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                         <span className="text-gray-500 text-sm hover:opacity-75">
                           {item?.parsed_cv?.linkedin_url}
                         </span>
-                      </Link>
+                      </span>
                     </div>
                   )}
-                </p>
+                </div>
 
                 <p>
                   {item?.parsed_cv.github_url && (
@@ -207,6 +250,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                             ? item.parsed_cv.github_url
                             : `https://${item.parsed_cv.github_url}`
                         }
+                        onClick={(e) => e.stopPropagation()}
                         target="_blank"
                         className="flex gap-2"
                       >
@@ -324,42 +368,6 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                     </div>
                   </div>
                 </div>
-
-                {/* <div className='flex self-end'>
-                <Button className='rounded-3xl'>
-                  <Link href={`/cv-detail/${item._id}`} target='_blank'>
-                    View CV
-                  </Link>
-                </Button>
-              </div> */}
-
-                {/* <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <div className="cursor-pointer absolute right-0 text-2xl text-red-700 hover:scale-125 ease-in-out transition duration-500 ">
-                    <RxCross2 />
-                  </div>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      the data.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-red-700 hover:bg-red-500"
-                      onClick={() => deleteCV(item?._id)}
-                    >
-                      Continue
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog> */}
               </div>
             </Card>
           </Link>

@@ -9,7 +9,6 @@ import { SearchContext } from "./context/SearchContext";
 function Dashboard() {
   const apiContext = useContext(ApiDataContext);
   const apiData = apiContext?.apiData ?? [];
-  // const setApiData = apiContext?.setApiData;
 
   const searchContext = useContext(SearchContext);
 

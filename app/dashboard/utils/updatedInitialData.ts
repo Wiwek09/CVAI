@@ -8,6 +8,7 @@ export const fetchUpdatedApiData = async (setApiData?: (data: any) => void) => {
     );
     if (response.status === 200) {
       if (setApiData) {
+        sessionStorage.removeItem("allData");
         setApiData(response.data);
       } else {
         console.warn("setApiData is undefined. Could not update the API data.");

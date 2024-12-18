@@ -146,7 +146,7 @@ const SideNavBar = () => {
   };
 
   return (
-    <Sidebar className="h-[100vh]">
+    <Sidebar className="h-[100vh] w-1/5">
       <Card className="border border-black h-[100vh] overflow-y-auto scrollbar-thin rounded-none flex flex-col items-center bg-black space-y-6 py-6">
         {dialogOpen && (
           <DialogueComponent

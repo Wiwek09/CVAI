@@ -131,7 +131,6 @@ function DialogueComponent({
             {}
           );
           setArchieveFolderContents(contentsObject);
-          console.log("DataArchieved", archieveFolderContents);
         } catch (error) {
           console.error("Failed to fetched Archive details", error);
         }

@@ -1,16 +1,16 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { use, useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { GoDotFill } from "react-icons/go";
 import DetailViewSkeleton from "@/components/ui/Skeleton/DetailViewSkeleton";
 import axiosInstance from "@/utils/axiosConfig";
 
-const CVDetailPage = ({ params }: { params: string }) => {
+const CVDetailPage = ({ params }: { params: any }) => {
   const [data, setData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
   // const [error, setError] = useState<boolean>(false);
-  const { id }: any = params;
+  const { id }: any = use(params);
   const pdfUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/cv/${id}.pdf`;
 
   useEffect(() => {

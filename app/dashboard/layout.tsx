@@ -27,7 +27,7 @@ export default function DashboardLayout({
                 </div>
                 <SidebarInset className="w-[80%]">
                   <header className="flex pt-2 justify-start shrink-0 items-center gap-2 "></header>
-                  <div className="px-6 flex flex-col space-y-8">
+                  <div className="pr-6 flex flex-col space-y-8">
                     <SearchFields />
                     <ToogleView />
                     <div>{children}</div>

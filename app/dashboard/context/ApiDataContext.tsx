@@ -50,7 +50,6 @@ export const ApiDataProvider = ({ children }: { children: ReactNode }) => {
       }
     };
     fetchData();
-    console.log("SearchData", setApiData);
   }, []);
 
   return (

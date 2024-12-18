@@ -101,6 +101,28 @@ function GridView({ data, searchData }: GridViewProps) {
     setHoveredId(null);
   };
 
+  // For Opening the email,linkedin, website link :
+  const handleEmailCLick = (event, email) => {
+    event.stopPropagation();
+    window.open(`mailto:${email}`, "_blank");
+  };
+
+  const handleLinkedin = (event, linkedinUrl) => {
+    event.stopPropagation();
+    const newLinkedinUrl = linkedinUrl.startsWith("http")
+      ? linkedinUrl
+      : `https://${linkedinUrl}`;
+    window.open(newLinkedinUrl, "_blank");
+  };
+
+  const handleGithub = (event, githubUrl) => {
+    event.stopPropagation();
+    const newGithubUrl = githubUrl.startsWith("http")
+      ? githubUrl
+      : `https://${githubUrl}`;
+    window.open(newGithubUrl, "_blank");
+  };
+
   return (
     <div className="masonry-container overflow-clip max-w-[100vw]">
       {hoveredId && (
@@ -163,30 +185,34 @@ function GridView({ data, searchData }: GridViewProps) {
                                 <button className="bg-gray-600 p-[4px] rounded-full">
                                   <CiLinkedin color="white" />
                                 </button>
-                                <a
-                                  onClick={(e) => e.stopPropagation()}
-                                  href={hoveredUser.linkedin_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
+                                <span
+                                  onClick={(event) =>
+                                    handleLinkedin(
+                                      event,
+                                      hoveredUser.linkedin_url
+                                    )
+                                  }
+                                  // href={hoveredUser.linkedin_url}
+                                  // target="_blank"
+                                  // rel="noopener noreferrer"
                                   className="text-blue-600 hover:underline"
                                 >
-                                  <h1>{hoveredUser.linkedin_url}</h1>
-                                </a>
+                                  <span>{hoveredUser.linkedin_url}</span>
+                                </span>
                               </div>
                             ) : hoveredUser?.git_url ? (
                               <div className="truncate">
-                                <a
-                                  onClick={(e) => e.stopPropagation()}
-                                  href={hoveredUser.git_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
+                                <span
+                                  onClick={(event) =>
+                                    handleGithub(event, hoveredUser.git_url)
+                                  }
                                   className="text-blue-600 flex space-x-4 hover:underline"
                                 >
                                   <button className="bg-gray-600 p-[4px] rounded-full">
                                     <FaGithub color="white" />
                                   </button>
-                                  <h1>{hoveredUser.git_url}</h1>
-                                </a>
+                                  <span>{hoveredUser.git_url}</span>
+                                </span>
                               </div>
                             ) : null}
                           </section>
@@ -225,22 +251,6 @@ function GridView({ data, searchData }: GridViewProps) {
                                 </h3>
                               ))}
                           </section>
-
-                          {/* <section>
-                              <h1 className="text-lg font-semibold">
-                                Education
-                              </h1>
-                              {hoveredUser.education
-                                ?.slice(0, 3)
-                                .map((ed, index) => (
-                                  <h3
-                                    key={index}
-                                    className="text-gray-600 ml-3"
-                                  >
-                                    {ed.degree}
-                                  </h3>
-                                ))}
-                            </section> */}
                         </div>
                       </div>
                     )}
@@ -288,111 +298,94 @@ function GridView({ data, searchData }: GridViewProps) {
                       : "opacity-0 translate-y-5"
                   }`}
                 >
-                  {
-                    hoveredUser && Object?.keys(hoveredUser)?.length > 0 && (
-                      <div className="flex flex-col gap-1">
-                        <h1 className="font-bold text-xl pt-5">
-                          {hoveredUser.name?.toUpperCase()}
-                        </h1>
-                        {hoveredUser?.position && (
-                          <h2 className="font-semibold text-md underline mb-2">
-                            {hoveredUser?.position.toUpperCase()}
-                          </h2>
-                        )}
-                        <div className="mt-2 flex flex-col space-y-5 ">
-                          <section className="flex space-x-4 items-center">
-                            <div className="bg-gray-600 p-[4px] rounded-full">
-                              <IoCallOutline color="white" />
+                  {hoveredUser && Object?.keys(hoveredUser)?.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                      <h1 className="font-bold text-xl pt-5">
+                        {hoveredUser.name?.toUpperCase()}
+                      </h1>
+                      {hoveredUser?.position && (
+                        <h2 className="font-semibold text-md underline mb-2">
+                          {hoveredUser?.position.toUpperCase()}
+                        </h2>
+                      )}
+                      <div className="mt-2 flex flex-col space-y-5 ">
+                        <section className="flex space-x-4 items-center">
+                          <div className="bg-gray-600 p-[4px] rounded-full">
+                            <IoCallOutline color="white" />
+                          </div>
+                          <h1>{hoveredUser?.phone_number}</h1>
+                        </section>
+
+                        <section className="flex items-center">
+                          {hoveredUser?.linkedin_url ? (
+                            <div className="flex space-x-4 truncate">
+                              <button className="bg-gray-600 p-[4px] rounded-full">
+                                <CiLinkedin color="white" />
+                              </button>
+                              <span
+                                onClick={(event) =>
+                                  handleLinkedin(
+                                    event,
+                                    hoveredUser.linkedin_url
+                                  )
+                                }
+                                className="text-blue-600 hover:underline"
+                              >
+                                <span>{hoveredUser.linkedin_url}</span>
+                              </span>
                             </div>
-                            <h1>{hoveredUser?.phone_number}</h1>
-                          </section>
-
-                          <section className="flex items-center">
-                            {hoveredUser?.linkedin_url ? (
-                              <div className="flex space-x-4 truncate">
+                          ) : hoveredUser?.git_url ? (
+                            <div className="truncate">
+                              <span
+                                onClick={(event) =>
+                                  handleGithub(event, hoveredUser.git_url)
+                                }
+                                rel="noopener noreferrer"
+                                className="text-blue-600 flex space-x-4 hover:underline"
+                              >
                                 <button className="bg-gray-600 p-[4px] rounded-full">
-                                  <CiLinkedin color="white" />
+                                  <FaGithub color="white" />
                                 </button>
-                                <a
-                                  onClick={(e) => e.stopPropagation()}
-                                  href={hoveredUser.linkedin_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:underline"
-                                >
-                                  <h1>{hoveredUser.linkedin_url}</h1>
-                                </a>
-                              </div>
-                            ) : hoveredUser?.git_url ? (
-                              <div className="truncate">
-                                <a
-                                  onClick={(e) => e.stopPropagation()}
-                                  href={hoveredUser.git_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 flex space-x-4 hover:underline"
-                                >
-                                  <button className="bg-gray-600 p-[4px] rounded-full">
-                                    <FaGithub color="white" />
-                                  </button>
-                                  <h1>{hoveredUser.git_url}</h1>
-                                </a>
-                              </div>
-                            ) : null}
-                          </section>
+                                <span>{hoveredUser.git_url}</span>
+                              </span>
+                            </div>
+                          ) : null}
+                        </section>
 
-                          <section>
-                            <h1 className="text-lg font-semibold">
-                              Experience
-                            </h1>
-                            {hoveredUser?.work_experience?.length > 0 && (
-                              <div key={index} className="flex flex-col">
-                                <h2 className="text-gray-900 font-semibold text-[16px] ml-3">
-                                  {hoveredUser?.work_experience[0].job_title}
-                                </h2>
-                                <h3 className="text-gray-600 ml-3">
-                                  {hoveredUser?.work_experience[0].company_name}
-                                </h3>
-                                {hoveredUser?.work_experience[0].start_date && (
-                                  <span className="text-gray-600 ml-3">
-                                    {hoveredUser?.work_experience[0]
-                                      .start_date +
-                                      "-" +
-                                      hoveredUser?.work_experience[0].end_date}
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                          </section>
+                        <section>
+                          <h1 className="text-lg font-semibold">Experience</h1>
+                          {hoveredUser?.work_experience?.length > 0 && (
+                            <div key={index} className="flex flex-col">
+                              <h2 className="text-gray-900 font-semibold text-[16px] ml-3">
+                                {hoveredUser?.work_experience[0].job_title}
+                              </h2>
+                              <h3 className="text-gray-600 ml-3">
+                                {hoveredUser?.work_experience[0].company_name}
+                              </h3>
+                              {hoveredUser?.work_experience[0].start_date && (
+                                <span className="text-gray-600 ml-3">
+                                  {hoveredUser?.work_experience[0].start_date +
+                                    "-" +
+                                    hoveredUser?.work_experience[0].end_date}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </section>
 
-                          <section>
-                            <h1 className="text-lg font-semibold">Skills</h1>
-                            {hoveredUser.skills
-                              ?.slice(0, 3)
-                              .map((skill, index) => (
-                                <h3 key={index} className="text-gray-600 ml-3">
-                                  {skill}
-                                </h3>
-                              ))}
-                          </section>
-
-                          {/* <section>
-                          <h1 className="text-lg font-semibold">Education</h1>
-                          {hoveredUser.education
+                        <section>
+                          <h1 className="text-lg font-semibold">Skills</h1>
+                          {hoveredUser.skills
                             ?.slice(0, 3)
-                            .map((ed, index) => (
+                            .map((skill, index) => (
                               <h3 key={index} className="text-gray-600 ml-3">
-                                {ed.degree}
+                                {skill}
                               </h3>
                             ))}
-                        </section> */}
-                        </div>
+                        </section>
                       </div>
-                    )
-                    // : (
-                    //   <ListViewSkeleton variant="hover" />
-                    // )
-                  }
+                    </div>
+                  )}
                 </div>
               )}
               {/* Image */}
@@ -404,10 +397,6 @@ function GridView({ data, searchData }: GridViewProps) {
                 className="rounded-lg object-cover shadow-lg w-full h-auto"
                 // loading="lazy"
                 layout="responsive"
-
-                // onError={(error) => {
-                //   console.error("Image faile to load", error);
-                // }}
               />
             </Link>
           </div>
