@@ -9,6 +9,7 @@ import axiosInstance from "@/utils/axiosConfig";
 import Link from "next/link";
 import { IFormInputData } from "@/interfaces/FormInputData";
 import ListViewSkeletion from "./ui/Skeleton/ListViewSkeleton";
+import { folderSelectStore } from "@/app/dashboard/store";
 
 interface ListViewProps {
   data: IDocumentData[] | any;
@@ -20,6 +21,8 @@ const ListView = ({ data, searchData }: ListViewProps) => {
   const [searchResults, setSearchResults] = useState<any>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const { selectFolderId, setSelectFolderId } = folderSelectStore();
 
   const fetchAllData = async () => {
     const fetchedData: any[] = [];

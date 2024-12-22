@@ -91,6 +91,7 @@ function GridView({ data, searchData }: GridViewProps) {
 
     setTimeoutId(newTimeoutId);
   };
+
   const handleMouseLeave = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
@@ -101,7 +102,7 @@ function GridView({ data, searchData }: GridViewProps) {
     setHoveredId(null);
   };
 
-  // For Opening the linkedin
+  // For Opening the linkedin and github
 
   const handleLinkedin = (event, linkedinUrl) => {
     event.stopPropagation();
@@ -151,7 +152,7 @@ function GridView({ data, searchData }: GridViewProps) {
                 {/* Hover Data */}
                 {hoveredId === item.doc_id && (
                   <div
-                    className={`absolute flex rounded-md pl-9 pr-9 py-2 flex-col bg-white w-full h-full z-50 transition-opacity duration-500 ease-in-out ${
+                    className={`absolute flex rounded-md pl-9 pr-9 pb-2 flex-col bg-white w-full h-full z-50 transition-opacity duration-500 ease-in-out ${
                       hoveredUser && Object?.keys(hoveredUser)?.length > 0
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 translate-y-5"
@@ -287,14 +288,14 @@ function GridView({ data, searchData }: GridViewProps) {
               {/* Hover Data */}
               {hoveredId === item.doc_id && (
                 <div
-                  className={`absolute flex rounded-md pl-9 pr-9 py-2 flex-col bg-white w-full h-full z-50 transition-opacity duration-500 ease-in-out ${
+                  className={`absolute flex rounded-md pl-9 pr-9 pb-2 flex-col bg-white w-full h-full z-50 transition-opacity duration-500 ease-in-out ${
                     hoveredUser && Object?.keys(hoveredUser)?.length > 0
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 translate-y-5"
                   }`}
                 >
                   {hoveredUser && Object?.keys(hoveredUser)?.length > 0 && (
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1 h-auto">
                       <h1 className="font-bold text-xl pt-5">
                         {hoveredUser.name?.toUpperCase()}
                       </h1>

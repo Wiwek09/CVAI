@@ -75,11 +75,11 @@ function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
         {/* folder creation icon */}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <button aria-label="Add Folder" className="text-white">
+            <button aria-label="Add Folder" className="text-white relative">
               <PiPlusCircleDuotone size={24} />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-[16rem] ml-56">
+          <PopoverContent className="w-[16rem]  absolute">
             <div className="grid gap-4">
               <div className="space-y-2">
                 <h4 className="font-semibold leading-none">Create Folder</h4>

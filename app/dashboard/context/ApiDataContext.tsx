@@ -24,19 +24,6 @@ export const initialData = {
 export const ApiDataProvider = ({ children }: { children: ReactNode }) => {
   const [apiData, setApiData] = useState<IDocumentData[] | null>(null);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axiosInstance.get("/document/all_document");
-  //       setApiData(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching API data:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
   useEffect(() => {
     const fetchData = async () => {
       try {

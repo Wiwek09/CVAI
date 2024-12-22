@@ -100,7 +100,7 @@ const SearchFields = () => {
                 }}
                 className="flex items-center "
               >
-                <h1 className="font-medium text-2xl">Suggested tags Open:</h1>
+                <h1 className="font-medium text-2xl">Suggested tags :</h1>
                 <PiPlusCircleThin className="h-10 mt-1 hover:cursor-pointer ml-2 w-10" />
               </section>
             )}

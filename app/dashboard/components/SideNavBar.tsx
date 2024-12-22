@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/sidebar";
 import DialogueComponent from "./DialogueComponent";
 import { MdFolderZip } from "react-icons/md";
+import { folderSelectStore } from "../store";
+
 const SideNavBar = () => {
   const context = useContext(ApiDataContext);
   const spinnerContext = useContext(SpinnerContext);
@@ -41,7 +43,14 @@ const SideNavBar = () => {
   const [updateFolderList, setUpdateFolderList] = useState(false);
   const [folderListData, setFolderListData] = useState<IFolderData[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  // const [displayedFolderName, setDisplayedFolderName] =
+  //   useState<string>("Uploading to....");
+
   const [dialogOpen, setDialogeOpen] = useState(false);
+  const { selectFolderId } = folderSelectStore();
+  const [localFolderId, setLocalFolderId] = useState<string | null>(
+    selectFolderId
+  );
 
   const handleFolderCreated = () => {
     setUpdateFolderList((prev) => !prev);
@@ -49,6 +58,26 @@ const SideNavBar = () => {
   const handleDialogue = (state) => {
     setDialogeOpen(state);
   };
+
+  console.log("SelectFolderId", selectFolderId);
+  console.log("SecondSelectFOlderId", selectedFolderId);
+
+  useEffect(() => {
+    // Sync local state with external `selectFolderId` when it changes
+    setLocalFolderId(selectFolderId);
+    setSelectedFolderId(selectFolderId);
+  }, [selectFolderId]);
+
+  const handleValueChange = (value: string) => {
+    setLocalFolderId(value);
+    setSelectedFolderId(value); // Update the local state to reflect manual selection
+    // setSelectFolderId(value); // Update the external state
+  };
+
+  const displayedFolderName =
+    localFolderId &&
+    folderListData.find((item: any) => item.folder_id === localFolderId)
+      ?.folder_name;
 
   useEffect(() => {
     const folderList = async () => {
@@ -187,9 +216,14 @@ const SideNavBar = () => {
           </div>
 
           <div className="w-full px-4">
-            <Select onValueChange={(value) => setSelectedFolderId(value)}>
+            <Select
+              value={localFolderId || ""}
+              onValueChange={handleValueChange}
+            >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Uploading to ...." />
+                <SelectValue placeholder="Uploading to ....">
+                  {displayedFolderName || "Uploading to...."}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
