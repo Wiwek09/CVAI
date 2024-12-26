@@ -59,9 +59,6 @@ const SideNavBar = () => {
     setDialogeOpen(state);
   };
 
-  console.log("SelectFolderId", selectFolderId);
-  console.log("SecondSelectFOlderId", selectedFolderId);
-
   useEffect(() => {
     // Sync local state with external `selectFolderId` when it changes
     setLocalFolderId(selectFolderId);
