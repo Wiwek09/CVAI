@@ -114,6 +114,9 @@ function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
           </PopoverContent>
         </Popover>
 
+        {/* <div>
+        </div> */}
+
         {/* three dot icons */}
         <Popover>
           <PopoverTrigger asChild>
