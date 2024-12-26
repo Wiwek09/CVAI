@@ -9,6 +9,7 @@ import LinearTagsInput from "./SearchInput/LinearTagsInput";
 import { RxCrossCircled } from "react-icons/rx";
 import { PiPlusCircleThin } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
+import { folderSelectStore } from "../store";
 
 const SearchFields = () => {
   const searchContext = useContext(SearchContext);
@@ -17,6 +18,7 @@ const SearchFields = () => {
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const inputRefs = useRef(null);
+  const addressRef = useRef(null);
   const [formData, setFormData] = useState<IFormInputData>({
     prompt: "",
     programming_language: [""],
@@ -24,6 +26,8 @@ const SearchFields = () => {
     address: "",
     foldersToSearch: [""],
   });
+
+  const { selectFolderId } = folderSelectStore();
   if (!searchContext) {
     throw new Error(
       "SearchContext must be used within a SearchContext.Provider"
@@ -47,20 +51,29 @@ const SearchFields = () => {
     }));
   }, [tags]);
 
+  // SideEffect to update the folderToSearch
+  useEffect(() => {
+    setFormData((prevData) => ({
+      ...prevData,
+      foldersToSearch: selectFolderId ? [selectFolderId] : [""],
+    }));
+    // Reset other search fields when switching folders
+    handleClear();
+  }, [selectFolderId]);
+
   const handleClear = () => {
     setFormData({
       prompt: "",
       programming_language: [""],
       skill: [""],
       address: "",
-      foldersToSearch: [""],
+      foldersToSearch: selectFolderId ? [selectFolderId] : [""],
     });
     setTags([]);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // console.log("SUbbmited");
     setSearchData(formData);
   };
 
@@ -76,6 +89,9 @@ const SearchFields = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
+      if (e.currentTarget.name === "prompt" && addressRef.current) {
+        addressRef.current.focus(); // Move focus to address field
+      }
     }
   };
 
@@ -128,6 +144,7 @@ const SearchFields = () => {
                   onChange={handleChange}
                   placeholder="Location"
                   onKeyDown={handleKeyDown}
+                  ref={addressRef} // Assign the ref to the Input component
                 />
               </div>
               <div>
