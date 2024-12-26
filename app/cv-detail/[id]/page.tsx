@@ -9,7 +9,6 @@ import axiosInstance from "@/utils/axiosConfig";
 const CVDetailPage = ({ params }: { params: any }) => {
   const [data, setData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
-  // const [error, setError] = useState<boolean>(false);
   const { id }: any = use(params);
   const pdfUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/cv/${id}.pdf`;
 
@@ -64,8 +63,9 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           : `https://${data?.linkedin_url}`
                       }
                       target="_blank"
+                      className="max-w-48 truncate"
                     >
-                      <span className="text-gray-700 hover:opacity-50">
+                      <span className="text-gray-700 hover:opacity-50 ">
                         {data?.linkedin_url}
                       </span>
                     </Link>
@@ -81,8 +81,9 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           : `https://${data?.git_url}`
                       }
                       target="_blank"
+                      className="max-w-48 truncate"
                     >
-                      <span className="text-gray-700 hover:opacity-50">
+                      <span className="text-gray-700 hover:opacity-50 truncate">
                         {data?.git_url}
                       </span>
                     </Link>
@@ -99,6 +100,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           : `https://${data?.website}`
                       }
                       target="_blank"
+                      className="max-w-48 truncate"
                     >
                       <span className="text-gray-700 hover:opacity-50">
                         {data?.website}
