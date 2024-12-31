@@ -4,21 +4,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PiPlusCircleDuotone } from "react-icons/pi";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import axiosInstance from "@/utils/axiosConfig";
+import DialogueComponent from "./DialogueComponent";
 
-function FolderCreation({ onFolderCreated }) {
+function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
   const [folderName, setFolderName] = useState("");
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
-
-  const { toast } = useToast();
+  const [dialogOpen, setDialogueOpen] = useState(false);
+  const handleDialogue = (state: boolean) => {
+    setDialogueOpen(state);
+  };
 
   const handleFolderCreate = async (
     event: React.FormEvent<HTMLFormElement>
@@ -37,21 +39,22 @@ function FolderCreation({ onFolderCreated }) {
       );
 
       if (response.status === 200) {
-        toast({
-          title: "Folder Name Added Successfully",
-          action: <ToastAction altText="OK">OK</ToastAction>,
-          className: "bg-[#7bf772]",
+        toast("Folder created", {
+          description: "Folder created successfully",
         });
+
         onFolderCreated();
       } else {
-        toast({
-          title: "Operation failed",
-          variant: "destructive",
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
+        toast.error("failed to create a file");
       }
     } catch (error) {
       console.error("Error creating folder", error);
+      toast(error.response.data.detail, {
+        style: {
+          background: "black",
+          color: "white",
+        },
+      });
     }
     setFolderName("");
     setOpen(false);
@@ -60,16 +63,23 @@ function FolderCreation({ onFolderCreated }) {
   return (
     <div className="flex justify-between items-center">
       <div className="text-lg font-semibold flex-1 text-white">Folder</div>
+      {dialogOpen && (
+        <DialogueComponent
+          variant="selectMultipleFolders"
+          handleDialogue={handleDialogue}
+          setUpdateFolderList={setUpdateFolderList}
+        />
+      )}
 
       <div className="flex items-center gap-4">
         {/* folder creation icon */}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <button aria-label="Add Folder" className="text-white">
+            <button aria-label="Add Folder" className="text-white relative">
               <PiPlusCircleDuotone size={24} />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-[16rem]">
+          <PopoverContent className="w-[16rem]  absolute">
             <div className="grid gap-4">
               <div className="space-y-2">
                 <h4 className="font-semibold leading-none">Create Folder</h4>
@@ -104,6 +114,9 @@ function FolderCreation({ onFolderCreated }) {
           </PopoverContent>
         </Popover>
 
+        {/* <div>
+        </div> */}
+
         {/* three dot icons */}
         {/* <Popover>
           <PopoverTrigger asChild>
@@ -111,9 +124,14 @@ function FolderCreation({ onFolderCreated }) {
               <BsThreeDotsVertical />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-22 flex flex-col gap-3 ">
-            <Button>Select All</Button>
-            <Button>Archieve</Button>
+          <PopoverContent className="w-auto p-2 flex flex-col gap-3 ">
+            <button
+              onClick={() => {
+                handleDialogue(true);
+              }}
+            >
+              <span className="hover:opacity-50 ">Select</span>
+            </button>
           </PopoverContent>
         </Popover> */}
       </div>
