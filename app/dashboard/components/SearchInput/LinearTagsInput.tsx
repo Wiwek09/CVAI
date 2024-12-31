@@ -74,7 +74,7 @@ const LinearTagsInput = ({ tags, setTags }) => {
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           className="flex-1 outline-none bg-transparent min-w-[120px]"
-          placeholder={tags.length === 0 ? "Add tags..." : ""}
+          placeholder={tags.length === 0 ? "Add tags to search..." : ""}
         />
       </div>
     </div>

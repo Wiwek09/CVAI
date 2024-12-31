@@ -139,9 +139,7 @@ const SideNavBar = () => {
   };
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      handleFileUpload(event.target.files);
-    }
+    if (event.target.files) handleFileUpload(event.target.files);
   };
 
   const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import { RxHamburgerMenu } from "react-icons/rx";
+import MoveToFolderPopover from "./SideNavBar/MoveToFolderPopover";
 import axiosInstance from "@/utils/axiosConfig";
+import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import {
   Popover,
@@ -14,6 +15,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { folderSelectStore } from "../store";
 
+const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
 const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
   const [folders, setFolders] = useState([]);
   // const [openFolder, setOpenFolder] = useState("");
@@ -55,6 +57,7 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
             .get(`/folder/getFiles/${folder.folder_id}`)
             .then((response) => ({
               [folder.folder_id]: response.data || [],
+              [folder.folder_id]: response.data || [],
             }))
             .catch((error) => {
               console.error(
@@ -62,12 +65,15 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
                 error
               );
               return { [folder.folder_id]: [] };
+              return { [folder.folder_id]: [] };
             })
         );
 
         const allContents = await Promise.all(contentsPromises);
 
+        // Merge all folder content objects into one
         const contentsObject = allContents.reduce(
+          (acc, content) => ({ ...acc, ...content }),
           (acc, content) => ({ ...acc, ...content }),
           {}
         );
@@ -104,6 +110,7 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
     }
     try {
       await axiosInstance.put(`/folderrenameFolder/${folderId}`, {
+      await axiosInstance.put(`/folderrenameFolder/${folderId}`, {
         folder_id: folderId,
         new_name: newFolderName,
       });
@@ -115,7 +122,6 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
         )
       );
 
-      // Reset editing state
       setEditingFolder(null);
       setNewFolderName("");
       toast("Successfully edited the folder", {
@@ -349,6 +355,8 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
                     <Link
                       key={file.doc_id}
                       href={`/cv-detail/${file.doc_id}`}
+                      key={file.doc_id}
+                      href={`/cv-detail/${file.doc_id}`}
                       target="_blank"
                       className="truncate"
                       draggable
@@ -395,6 +403,38 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
           )}
         </div>
       ))}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Archive {archiveType === "folder" ? "Folder" : "Document"}
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to archive{" "}
+              {archiveType === "folder" ? (
+                <strong>{archiveTarget?.folder_name}</strong>
+              ) : (
+                <strong>{archiveTarget?.doc_name}</strong>
+              )}
+              ?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              className="px-4 py-2 bg-gray-500 text-white rounded-md"
+              onClick={closeArchiveDialog}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 bg-red-500 text-white rounded-md"
+              onClick={handleArchive}
+            >
+              Confirm
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
