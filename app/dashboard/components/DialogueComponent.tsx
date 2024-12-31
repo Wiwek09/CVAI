@@ -73,6 +73,7 @@ function DialogueComponent({
   const [folderFiles, setFolderFiles] = useState([]);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [archieveFolderContents, setArchieveFolderContents] = useState({});
+  const [searchTerm, setSearchTerm] = useState(""); //State to store search query
   const context = useContext(ApiDataContext);
   const setApiData = context?.setApiData;
 
@@ -431,7 +432,7 @@ function DialogueComponent({
       setOpenAccordion(folderId); // Open the new accordion
     }
 
-    // Set the files for specified folder;
+    // Set the files for specified folder:
     setFolderFiles(archieveFolderContents[folderId]);
   };
 
@@ -453,6 +454,8 @@ function DialogueComponent({
                   type="text"
                   className="rounded-md border border-#CCCC px-2 py-1"
                   placeholder="Search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <article className="space-x-2">
                   <AlertDialog>
@@ -561,21 +564,32 @@ function DialogueComponent({
 
                     <h1 className="text-sm">Folders</h1>
                   </div>
-                  <div className="">
-                    {files.map((file) => (
-                      <section
-                        key={file.doc_id}
-                        className="flex pb-4 border-b border-#CCCC mt-4 items-center "
-                      >
-                        <Checkbox
-                          checked={selectedFiles.includes(file.doc_id)}
-                          onCheckedChange={() => handleFileSelect(file.doc_id)}
-                          id={`file-${file.doc_id}`}
-                          className="cursor-pointer mr-4"
-                        />
-                        <h1 className="text-sm font-light">{file.doc_name}</h1>
-                      </section>
-                    ))}
+                  <div>
+                    {/* Filtering and displaying folder files */}
+                    {files
+                      .filter((file) =>
+                        file.doc_name
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase())
+                      )
+                      .map((file) => (
+                        <section
+                          key={file.doc_id}
+                          className="flex pb-4 border-b border-#CCCC mt-4 items-center "
+                        >
+                          <Checkbox
+                            checked={selectedFiles.includes(file.doc_id)}
+                            onCheckedChange={() =>
+                              handleFileSelect(file.doc_id)
+                            }
+                            id={`file-${file.doc_id}`}
+                            className="cursor-pointer mr-4"
+                          />
+                          <h1 className="text-sm font-light">
+                            {file.doc_name}
+                          </h1>
+                        </section>
+                      ))}
                   </div>
                 </section>
               ) : (
@@ -606,12 +620,14 @@ function DialogueComponent({
                     type="text"
                     className="rounded-md border border-#CCCC px-2 py-1"
                     placeholder="Search"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </section>
               </section>
             </div>
             <div className="space-y-5">
-              {files ? (
+              {files && (
                 <section className="w-full  flex-col">
                   <div className="flex flex-row-reverse justify-between border-#CCCC pb-4">
                     <article className="flex  items-center">
@@ -626,23 +642,59 @@ function DialogueComponent({
 
                     <h1 className="text-sm ">Folders</h1>
                   </div>
-                  {files.map((file) => (
-                    <section
-                      key={file.folder_id}
-                      className="flex border-b border-#CCCC pb-4  mt-4 items-center "
-                    >
-                      <Checkbox
-                        checked={selectedFiles.includes(file.folder_id)}
-                        onCheckedChange={() => handleFileSelect(file.folder_id)}
-                        id={`file-${file.folder_id}`}
-                        className="cursor-pointer mr-4"
-                      />
-                      <h1 className="text-sm">{file.folder_name}</h1>
-                    </section>
-                  ))}
+                  {/* Filtering and displaying folder files */}
+                  {files
+                    .filter((file) =>
+                      file.folder_name
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase())
+                    )
+                    .map((file) => (
+                      <div key={file.folder_id} className="flex items-center">
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="w-full"
+                          value={
+                            openAccordion === file.folder_id
+                              ? `item-${file.folder_id}`
+                              : ""
+                          }
+                          onClick={() => handleDropDown(file.folder_id)}
+                        >
+                          <AccordionItem value={`item-${file.folder_id}`}>
+                            <AccordionTrigger>
+                              <div className="flex gap-2 items-center">
+                                <Checkbox
+                                  checked={selectedFiles.includes(
+                                    file.folder_id
+                                  )}
+                                  onCheckedChange={() =>
+                                    handleFileSelect(file.folder_id)
+                                  }
+                                  id={`file-${file.folder_id}`}
+                                  className="cursor-pointer mr-4"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <h1 className="text-md">{file.folder_name}</h1>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {folderFiles &&
+                                folderFiles.map((doc) => (
+                                  <p
+                                    key={doc.doc_id}
+                                    className="text-sm text-gray-700 pl-9"
+                                  >
+                                    {doc.doc_name}
+                                  </p>
+                                ))}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </div>
+                    ))}
                 </section>
-              ) : (
-                ""
               )}
               <div className="flex justify-end">
                 <AlertDialog>
@@ -699,6 +751,8 @@ function DialogueComponent({
                 type="text"
                 className="rounded-md border border-#CCCC px-2 py-1"
                 placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </section>
           </div>
@@ -741,49 +795,56 @@ function DialogueComponent({
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-              {files.map((file) => (
-                <div key={file.folder_id} className="flex items-center">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="w-full"
-                    value={
-                      openAccordion === file.folder_id
-                        ? `item-${file.folder_id}`
-                        : ""
-                    }
-                    onClick={() => handleDropDown(file.folder_id)}
-                  >
-                    <AccordionItem value={`item-${file.folder_id}`}>
-                      <AccordionTrigger>
-                        <div className="flex gap-2 items-center">
-                          <Checkbox
-                            checked={selectedFiles.includes(file.folder_id)}
-                            onCheckedChange={() =>
-                              handleFileSelect(file.folder_id)
-                            }
-                            id={`file-${file.folder_id}`}
-                            className="cursor-pointer mr-4 "
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <h1 className="text-md">{file.folder_name}</h1>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        {folderFiles &&
-                          folderFiles.map((doc) => (
-                            <p
-                              key={doc.doc_id}
-                              className="text-sm text-gray-700 pl-9"
-                            >
-                              {doc.doc_name}
-                            </p>
-                          ))}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              ))}
+              {/* Filtering and displaying folder files */}
+              {files
+                .filter((file) =>
+                  file.folder_name
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+                )
+                .map((file) => (
+                  <div key={file.folder_id} className="flex items-center">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="w-full"
+                      value={
+                        openAccordion === file.folder_id
+                          ? `item-${file.folder_id}`
+                          : ""
+                      }
+                      onClick={() => handleDropDown(file.folder_id)}
+                    >
+                      <AccordionItem value={`item-${file.folder_id}`}>
+                        <AccordionTrigger>
+                          <div className="flex gap-2 items-center">
+                            <Checkbox
+                              checked={selectedFiles.includes(file.folder_id)}
+                              onCheckedChange={() =>
+                                handleFileSelect(file.folder_id)
+                              }
+                              id={`file-${file.folder_id}`}
+                              className="cursor-pointer mr-4"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <h1 className="text-md">{file.folder_name}</h1>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          {folderFiles &&
+                            folderFiles.map((doc) => (
+                              <p
+                                key={doc.doc_id}
+                                className="text-sm text-gray-700 pl-9"
+                              >
+                                {doc.doc_name}
+                              </p>
+                            ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                ))}
               <div className="flex justify-end">
                 <button
                   className="px-5 py-2 border border-#CCCC bg-black text-gray-100 mt-10 rounded-lg"

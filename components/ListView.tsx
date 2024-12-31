@@ -93,7 +93,6 @@ const ListView = ({ data, searchData }: ListViewProps) => {
 
   const fetchFolderFiles = async () => {
     if (!selectFolderId) return;
-
     try {
       setLoading(true);
       const response = await axiosInstance.get(
@@ -110,9 +109,8 @@ const ListView = ({ data, searchData }: ListViewProps) => {
         const filteredData = cachedData?.filter((item: any) =>
           docIds.includes(item._id)
         );
-
-        // console.log("Bibek", filteredData);
-        setFolderFilteredData(filteredData);
+        setLoading(true);
+        await setFolderFilteredData(filteredData);
       }
     } catch (error) {
       console.error("Error fetching folder files:", error);
@@ -124,7 +122,6 @@ const ListView = ({ data, searchData }: ListViewProps) => {
   const fetchSearchData = async (searchData: IFormInputData) => {
     try {
       setLoading(true);
-
       // Fetch search IDs based on the query
       const response = await axiosInstance.post(
         `/document/search_by_query`,

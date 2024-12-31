@@ -255,7 +255,7 @@ const SideNavBar = () => {
               }}
             >
               <MdFolderZip className="text-gray-300 opacity-70" />
-              <h1 className="ml-6 "> Archive </h1>
+              <h1 className="ml-6 ">Archive</h1>
             </button>
           </div>
         </SidebarContent>
