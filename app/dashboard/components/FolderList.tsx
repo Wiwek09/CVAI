@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import MoveToFolderPopover from "./SideNavBar/MoveToFolderPopover";
+import { RxHamburgerMenu } from "react-icons/rx";
 import axiosInstance from "@/utils/axiosConfig";
-import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import {
   Popover,
@@ -71,7 +70,6 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
 
         const allContents = await Promise.all(contentsPromises);
 
-        // Merge all folder content objects into one
         const contentsObject = allContents.reduce(
           (acc, content) => ({ ...acc, ...content }),
           (acc, content) => ({ ...acc, ...content }),
@@ -122,6 +120,7 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
         )
       );
 
+      // Reset editing state
       setEditingFolder(null);
       setNewFolderName("");
       toast("Successfully edited the folder", {
@@ -403,38 +402,6 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
           )}
         </div>
       ))}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Archive {archiveType === "folder" ? "Folder" : "Document"}
-            </DialogTitle>
-            <DialogDescription>
-              Are you sure you want to archive{" "}
-              {archiveType === "folder" ? (
-                <strong>{archiveTarget?.folder_name}</strong>
-              ) : (
-                <strong>{archiveTarget?.doc_name}</strong>
-              )}
-              ?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <button
-              className="px-4 py-2 bg-gray-500 text-white rounded-md"
-              onClick={closeArchiveDialog}
-            >
-              Cancel
-            </button>
-            <button
-              className="px-4 py-2 bg-red-500 text-white rounded-md"
-              onClick={handleArchive}
-            >
-              Confirm
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

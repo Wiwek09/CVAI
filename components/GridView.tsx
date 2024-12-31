@@ -12,6 +12,12 @@ import { CiLinkedin } from "react-icons/ci";
 import Masonry from "react-masonry-css";
 import { folderSelectStore } from "@/app/dashboard/store";
 import { useSearchContext } from "@/app/dashboard/context/SearchContext";
+import { IoCallOutline } from "react-icons/io5";
+import { FaGithub } from "react-icons/fa";
+import { CiLinkedin } from "react-icons/ci";
+import Masonry from "react-masonry-css";
+import { folderSelectStore } from "@/app/dashboard/store";
+import { useSearchContext } from "@/app/dashboard/context/SearchContext";
 
 interface GridViewProps {
   data: IDocumentData[];
@@ -21,8 +27,17 @@ interface GridViewProps {
 function GridView({ data, searchData }: GridViewProps) {
   const [searchResultsGridView, setSearchResultsGridView] = useState<any[]>([]);
 
+  const [searchResultsGridView, setSearchResultsGridView] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [hoveredId, setHoveredId] = useState<any | null>(null);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [folderFilteredData, setFolderFilteredData] = useState<any[]>([]);
+  const [hoveredUser, setHoveredUser] = useState<any>(null);
+
+  const { resetSearch } = useSearchContext();
+  const { selectFolderId } = folderSelectStore();
   const [hoveredId, setHoveredId] = useState<any | null>(null);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [folderFilteredData, setFolderFilteredData] = useState<any[]>([]);
@@ -40,6 +55,7 @@ function GridView({ data, searchData }: GridViewProps) {
     }
   }, [data, searchData]);
 
+  // Handle search data and view changes
   useEffect(() => {
     if (searchData) {
       setLoading(true);
@@ -49,17 +65,6 @@ function GridView({ data, searchData }: GridViewProps) {
       resetSearch();
     }
   }, [searchData]);
-
-  // Handle search data and view changes
-  // useEffect(() => {
-  //   if (searchData) {
-  //     setLoading(true);
-  //     getFullImageData(searchData);
-  //   } else if (data?.length === 0) {
-  //     setImageDataID([]);
-  //     setLoading(false);
-  //   }
-  // }, [searchData]);
 
   useEffect(() => {
     const getHoveredDetails = async () => {
@@ -344,9 +349,6 @@ function GridView({ data, searchData }: GridViewProps) {
           ))}
         </Masonry>
       ) : (
-        <div className="text-center text-gray-600 mt-4">
-          No Data Available...
-        </div>
         <div className="text-center text-gray-600 mt-4">
           No Data Available...
         </div>
