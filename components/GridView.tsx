@@ -33,13 +33,13 @@ function GridView({ data, searchData }: GridViewProps) {
 
   useEffect(() => {
     if (!searchData) {
-    if (!searchData) {
       setLoading(false);
       setIsSearching(false);
       // setFolderFilteredData()
     }
   }, [data, searchData]);
 
+  // Handle search data and view changes
   useEffect(() => {
     if (searchData) {
       setLoading(true);
@@ -49,17 +49,6 @@ function GridView({ data, searchData }: GridViewProps) {
       resetSearch();
     }
   }, [searchData]);
-
-  // Handle search data and view changes
-  // useEffect(() => {
-  //   if (searchData) {
-  //     setLoading(true);
-  //     getFullImageData(searchData);
-  //   } else if (data?.length === 0) {
-  //     setImageDataID([]);
-  //     setLoading(false);
-  //   }
-  // }, [searchData]);
 
   useEffect(() => {
     const getHoveredDetails = async () => {
@@ -344,9 +333,6 @@ function GridView({ data, searchData }: GridViewProps) {
           ))}
         </Masonry>
       ) : (
-        <div className="text-center text-gray-600 mt-4">
-          No Data Available...
-        </div>
         <div className="text-center text-gray-600 mt-4">
           No Data Available...
         </div>
