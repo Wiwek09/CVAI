@@ -7,28 +7,14 @@ import React, {
   useEffect,
 } from "react";
 import { Card } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { toast } from "sonner";
 import { ApiDataContext } from "../context/ApiDataContext";
+import { SpinnerContext } from "../context/SpinnerContext";
 import { IoIosCloudUpload } from "react-icons/io";
 import FolderCreation from "./FolderCreation";
 import FolderList from "./FolderList";
 import { IFolderData } from "@/interfaces/FolderData";
-
-// import {
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogHeader,
-//   AlertDialogTitle,
-//   AlertDialogTrigger,
-// } from "@/components/ui/alert-dialog";
-
+import { fetchUpdatedApiData } from "../utils/updatedInitialData";
 import {
   Select,
   SelectContent,
@@ -38,21 +24,57 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import axiosInstance from "../../../utils/axiosConfig";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+} from "@/components/ui/sidebar";
+import DialogueComponent from "./DialogueComponent";
+import { MdFolderZip } from "react-icons/md";
+import { folderSelectStore } from "../store";
 
 const SideNavBar = () => {
-  const [uploading, setUploading] = useState<boolean>(false);
-  const { toast } = useToast();
   const context = useContext(ApiDataContext);
-  // const apiData = context?.apiData ?? null;
+  const spinnerContext = useContext(SpinnerContext);
   const setApiData = context?.setApiData;
+  const setUploading = spinnerContext?.setUploading;
+  const uploading = spinnerContext?.uploading;
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [updateFolderList, setUpdateFolderList] = useState(false);
   const [folderListData, setFolderListData] = useState<IFolderData[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  // const [displayedFolderName, setDisplayedFolderName] =
+  //   useState<string>("Uploading to....");
+
+  const [dialogOpen, setDialogeOpen] = useState(false);
+  const { selectFolderId } = folderSelectStore();
+  const [localFolderId, setLocalFolderId] = useState<string | null>(
+    selectFolderId
+  );
 
   const handleFolderCreated = () => {
     setUpdateFolderList((prev) => !prev);
   };
+  const handleDialogue = (state) => {
+    setDialogeOpen(state);
+  };
+
+  useEffect(() => {
+    // Sync local state with external `selectFolderId` when it changes
+    setLocalFolderId(selectFolderId);
+    setSelectedFolderId(selectFolderId);
+  }, [selectFolderId]);
+
+  const handleValueChange = (value: string) => {
+    setLocalFolderId(value);
+    setSelectedFolderId(value); // Update the local state to reflect manual selection
+    // setSelectFolderId(value); // Update the external state
+  };
+
+  const displayedFolderName =
+    localFolderId &&
+    folderListData.find((item: any) => item.folder_id === localFolderId)
+      ?.folder_name;
 
   useEffect(() => {
     const folderList = async () => {
@@ -74,17 +96,14 @@ const SideNavBar = () => {
       formData.append("files", file);
     });
 
-    setUploading(true);
-
     try {
       if (!selectedFolderId) {
-        toast({
-          title: "Folder Not Selected",
-          description: "Please select a folder before uploading files.",
-          variant: "destructive",
+        toast("No files selected", {
+          description: "Please select a file first and then upload files",
         });
         return;
       }
+      setUploading(true);
 
       const response = await axiosInstance.post(
         `/document/document?folder_id=${selectedFolderId}`,
@@ -94,76 +113,30 @@ const SideNavBar = () => {
         }
       );
       if (response.status === 200) {
-        const selectedFolder = folderListData.find(
-          (folder) => folder.folder_id === selectedFolderId
-        );
         setUpdateFolderList((prev) => !prev);
-        toast({
-          title: "Upload Successful",
-          description: `Your files have been uploaded to the folder "${selectedFolder?.folder_name}".`,
-          action: <ToastAction altText="OK">OK</ToastAction>,
-          className: "bg-[#7bf772]",
+        toast("Uploaded successfully", {
+          description: "The file has been uploaded successfully",
         });
-        // console.log("Data uploaded",)
-        await fetchUpdatedApiData();
+        // Refectiing the initialRenderData API
+        if (setApiData) {
+          await fetchUpdatedApiData(setApiData);
+        } else {
+          console.warn("API Data context is not available");
+        }
       } else {
-        toast({
-          title: "Upload failed",
-          variant: "destructive",
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        toast("Upload failed", {
+          description: "Failed to upload files ",
         });
       }
     } catch (error) {
       console.error("Error uploading files:", error);
-      toast({
-        title: "Error",
-        variant: "destructive",
-        description: "An error occurred during file upload.",
+      toast("Upload failed", {
+        description: error.response.data.detail,
       });
     } finally {
       setUploading(false);
     }
   };
-
-  const fetchUpdatedApiData = async () => {
-    try {
-      const response = await axiosInstance.get("/document/all_document");
-      if (setApiData) {
-        setApiData(response.data);
-      } else {
-        console.warn("setApiData is undefined. Could not update the API data.");
-      }
-    } catch (error) {
-      console.error("Error fetching updated data:", error);
-    }
-  };
-
-  // const deleteAllCV = async () => {
-  //   try {
-  //     const response = await axiosInstance.delete(`/document/all_document`);
-  //     if (response.status === 200 && apiData && apiData?.length > 0) {
-  //       setApiData([]);
-  //       toast({
-  //         title: "Deletion Successful",
-  //         description: "All files have been deleted successfully.",
-  //         className: "bg-[#7bf772]",
-  //       });
-  //     } else {
-  //       toast({
-  //         title: "No files",
-  //         variant: "destructive",
-  //         description: "Data is Empty",
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error Deleting Data", error);
-  //     toast({
-  //       variant: "destructive",
-  //       title: "An error occurred",
-  //       description: "Could not delete files.",
-  //     });
-  //   }
-  // };
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) handleFileUpload(event.target.files);
@@ -197,96 +170,95 @@ const SideNavBar = () => {
   };
 
   return (
-    <Card className="border border-black h-[100vh] rounded-none flex flex-col items-center bg-black space-y-6 py-6">
-      <h1 className="text-2xl text-center w-full px-4 text-white">CV_AI</h1>
-      <div className="w-full max-w-sm px-4">
-        <div
-          onDrop={handleDrop}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          className={`relative flex flex-col gap-2 items-center justify-center h-52 w-full border-2 border-dashed border-gray-400 p-4 rounded-md  bg-black text-white transition-all duration-300 ease-in-out ${
-            isDragging ? "opacity-50 backdrop-blur-sm" : "opacity-100"
-          }`}
-        >
-          {uploading ? (
-            <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center pointer-events-none bg-black bg-opacity-50 ">
-              {/* Loader for uploading state */}
-              <svg
-                className="animate-spin h-10 w-10 text-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                ></path>
-              </svg>
-              <p className="text-gray-400 mt-2">Uploading...</p>
+    <Sidebar className="h-[100vh] w-1/5">
+      <Card className="border border-black h-[100vh] overflow-y-auto scrollbar-thin rounded-none flex flex-col items-center bg-black space-y-6 py-6">
+        {dialogOpen && (
+          <DialogueComponent
+            variant="archive"
+            handleDialogue={handleDialogue}
+            setUpdateFolderList={setUpdateFolderList}
+          />
+        )}
+        <SidebarHeader>
+          <h1 className="text-2xl text-center w-full px-4 text-white">CV_AI</h1>
+        </SidebarHeader>
+        <SidebarContent className="space-y-6 w-full flex flex-col overflow-y-auto scrollbar-thinSide ">
+          <div className="w-full px-4">
+            <div
+              onDrop={handleDrop}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onClick={() => document.getElementById("file-input").click()}
+              className={`relative flex flex-col gap-2 cursor-pointer items-center justify-center h-48 border-2 border-dashed border-gray-400 p-4 rounded-md  bg-black text-white transition-all duration-300 ease-in-out ${
+                isDragging ? "opacity-50 backdrop-blur-sm" : "opacity-100"
+              }`}
+            >
+              <div className="flex flex-col items-center h-full w-full justify-center">
+                <IoIosCloudUpload size={40} className="text-gray-400" />
+                <p className="text-center">Drop your files here</p>
+              </div>
             </div>
-          ) : (
-            <div className="flex flex-col items-center h-full w-full justify-center">
-              <IoIosCloudUpload size={40} className="text-gray-400" />
-              <p className="text-center">Drag and drop your files here</p>
-              <label
-                // onClick={(e) => e.stopPropagation()}
-                className="cursor-pointer"
-              >
-                <span>Choose File</span>
-                <input
-                  className="hidden"
-                  type="file"
-                  accept="application/pdf"
-                  onChange={handleFileSelect}
-                  multiple
-                  disabled={uploading}
-                />
-              </label>
-            </div>
-          )}
-        </div>
-      </div>
+            <input
+              id="file-input"
+              className="hidden"
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileSelect}
+              multiple
+              disabled={uploading}
+            />
+          </div>
 
-      <div className="w-full px-4">
-        <Select onValueChange={(value) => setSelectedFolderId(value)}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Uploading to ...." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              {folderListData.map((item: any, index) => (
-                <div key={index} className="">
-                  <SelectItem value={item.folder_id}>
-                    {item.folder_name}
-                  </SelectItem>
-                </div>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+          <div className="w-full px-4">
+            <Select
+              value={localFolderId || ""}
+              onValueChange={handleValueChange}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Uploading to ....">
+                  {displayedFolderName || "Uploading to...."}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {folderListData.map((item: any, index) => (
+                    <div key={index} className="">
+                      <SelectItem value={item.folder_id}>
+                        {item.folder_name}
+                      </SelectItem>
+                    </div>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
 
-      <div className="w-full px-4">
-        <FolderCreation onFolderCreated={handleFolderCreated} />
-      </div>
+          <div className="w-full px-4">
+            <FolderCreation
+              onFolderCreated={handleFolderCreated}
+              setUpdateFolderList={setUpdateFolderList}
+            />
+          </div>
 
-      <div className="w-full px-4">
-        <FolderList
-          updateFolderList={updateFolderList}
-          setUpdateFolderList={setUpdateFolderList}
-        />
-      </div>
-    </Card>
+          <div className="w-full px-4 flex-1">
+            <FolderList
+              updateFolderList={updateFolderList}
+              setUpdateFolderList={setUpdateFolderList}
+            />
+            <button
+              className="bg-inherit px-0 items-center py-1 flex justify-start hover:opacity-60 w-full text-white"
+              onClick={() => {
+                handleDialogue(true);
+              }}
+            >
+              <MdFolderZip className="text-gray-300 opacity-70" />
+              <h1 className="ml-6 ">Archive</h1>
+            </button>
+          </div>
+        </SidebarContent>
+      </Card>
+    </Sidebar>
   );
 };
 
