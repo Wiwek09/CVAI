@@ -6,7 +6,7 @@ import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
-  AlertDialogContent,
+  AlertDialogContent, 
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
@@ -76,6 +76,7 @@ function DialogueComponent({
   const [searchTerm, setSearchTerm] = useState(""); //State to store search query
   const context = useContext(ApiDataContext);
   const setApiData = context?.setApiData;
+  const apiData = context?.apiData;
 
   // API's Call
   useEffect(() => {
