@@ -339,7 +339,7 @@ const FolderList = ({ updateFolderList, setUpdateFolderList }) => {
           </div>
 
           {selectFolderId === folder.folder_id && (
-            <div className="mt-2 ml-6  border-l  border-gray-600 pl-4 w-52 max-w-52 truncate">
+            <div className="mt-2 ml-6  border-l  border-gray-600 pl-4 max-w-full truncate">
               {folderContents[folder.folder_id]?.length ? (
                 folderContents[folder.folder_id].map((file) => (
                   <div

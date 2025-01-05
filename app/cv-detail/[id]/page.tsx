@@ -5,6 +5,7 @@ import Link from "next/link";
 import { GoDotFill } from "react-icons/go";
 import DetailViewSkeleton from "@/components/ui/Skeleton/DetailViewSkeleton";
 import axiosInstance from "@/utils/axiosConfig";
+import { SquareArrowOutUpRight } from "lucide-react";
 
 const CVDetailPage = ({ params }: { params: any }) => {
   const [data, setData] = useState<any>();
@@ -83,7 +84,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                       target="_blank"
                       className="max-w-48 truncate"
                     >
-                      <span className="text-gray-700 hover:opacity-50 truncate">
+                      <span className="text-gray-700 hover:opacity-50 ">
                         {data?.git_url}
                       </span>
                     </Link>
@@ -112,8 +113,12 @@ const CVDetailPage = ({ params }: { params: any }) => {
                 <p className="flex gap-2">
                   <span>Email:</span>
                   {data?.email && (
-                    <Link href={`mailto:${data?.email}`} target="_blank">
-                      <span className="text-gray-700 hover:opacity-50">
+                    <Link
+                      href={`mailto:${data?.email}`}
+                      target="_blank"
+                      className="max-w-48  truncate"
+                    >
+                      <span className="text-gray-700 hover:opacity-50 ">
                         {data?.email}
                       </span>
                     </Link>
@@ -156,11 +161,11 @@ const CVDetailPage = ({ params }: { params: any }) => {
                   <span className="font-semibold text-xl">Skills</span>
                   <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
                     {data?.skills?.map((item: any, index: number) => (
-                      <div key={index}>
+                      <span key={index}>
                         <span className="flex shadow-md px-2 py-3 bg-[#f7f9fc] text-gray-700 font-sans rounded-md w-fit font-semibold">
                           {item}
                         </span>
-                      </div>
+                      </span>
                     ))}
                   </span>
                 </span>
@@ -177,11 +182,11 @@ const CVDetailPage = ({ params }: { params: any }) => {
                   <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
                     {data?.programming_languages?.map(
                       (item: any, idx: number) => (
-                        <div key={idx}>
+                        <span key={idx}>
                           <span className="flex shadow-md px-2 py-3 text-gray-700 font-sans bg-[#f7f9fc] rounded-md w-fit font-semibold">
                             {item}
                           </span>
-                        </div>
+                        </span>
                       )
                     )}
                   </span>
@@ -222,7 +227,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                         {item.responsibilities.length > 0 &&
                           item.responsibilities.map(
                             (el: any, index: number) => (
-                              <div
+                              <span
                                 className="flex gap-1 text-gray-700"
                                 key={index}
                               >
@@ -230,7 +235,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                                   <GoDotFill />
                                 </span>
                                 <span>{el}</span>
-                              </div>
+                              </span>
                             )
                           )}
                       </span>
@@ -242,21 +247,53 @@ const CVDetailPage = ({ params }: { params: any }) => {
             {/* Project */}
             <div>
               {data?.technical_projects?.length > 0 && (
-                <span className="flex flex-col gap-1">
-                  <span className="font-semibold text-xl">Projects</span>
-                  <span className="flex gap-2 flex-col">
+                <div className="flex flex-col gap-1">
+                  <p className="font-semibold text-xl">Projects</p>
+                  <div className="flex gap-4 flex-col">
                     {data?.technical_projects?.length > 0 &&
                       data?.technical_projects.map(
                         (data: any, index: number) => (
                           <div key={index}>
-                            <p className="text-gray-700 font-semibold">
-                              {index + 1 + ". " + data.project_name}
-                            </p>
+                            <div className="flex flex-col gap-2 text-gray-700">
+                              <div className="flex justify-between">
+                                <div className="text-gray-700 font-semibold">
+                                  {index + 1 + ". " + data.project_name}
+                                </div>
+                                {data.project_link && (
+                                  <Link
+                                    href={data.project_link}
+                                    target="_blank"
+                                    className=" mr-4"
+                                  >
+                                    <SquareArrowOutUpRight size={22} />
+                                  </Link>
+                                )}
+                              </div>
+                              {data.programming_language?.length > 0 && (
+                                <div className="flex gap-3 items-center text-sm mr-4 ">
+                                  {/* <p>Technology Used : </p> */}
+                                  {data.programming_language.map(
+                                    (el, index) => (
+                                      <div key={index}>
+                                        <p className="shadow-md px-2 py-3 bg-[#f7f9fc]  font-sans rounded-md w-fit font-semibold">
+                                          {el}
+                                        </p>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              )}
+                              {data.description && (
+                                <p className="text-sm mr-4">
+                                  {data.description}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         )
                       )}
-                  </span>
-                </span>
+                  </div>
+                </div>
               )}
             </div>
             {/* Education */}
