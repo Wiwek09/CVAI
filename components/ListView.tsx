@@ -247,17 +247,21 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                   </p>
                 </div>
 
-                <p className="flex items-center gap-2 mt-0  ">
-                  <span>
-                    <FaUser className="text-sm" />
-                  </span>
-                  <span className="text-gray-500 font-normal text-sm">
-                    {item?.parsed_cv?.name}
-                  </span>
+                <p className="">
+                  {item?.parsed_cv?.name && (
+                    <div className="flex items-center gap-2 mt-0">
+                      <span>
+                        <FaUser className="text-sm" />
+                      </span>
+                      <span className="text-gray-500 font-normal text-sm">
+                        {item?.parsed_cv?.name}
+                      </span>
+                    </div>
+                  )}
                 </p>
                 <p className="">
                   {item?.parsed_cv?.phone_number && (
-                    <span className="flex item-center gap-2">
+                    <span className="flex items-center gap-2">
                       <span>
                         <FaPhoneAlt className="text-sm" />
                       </span>

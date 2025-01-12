@@ -7,15 +7,15 @@ const nextConfig = {
   },
   reactStrictMode: false,
   // Production
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "cvai.rebuzzpos.com",
-        pathname: "/cv_images/**",
-      },
-    ],
-  },
+  // images: {
+  //   remotePatterns: [
+  //     {
+  //       protocol: "https",
+  //       hostname: "cvai.rebuzzpos.com",
+  //       pathname: "/cv_images/**",
+  //     },
+  //   ],
+  // },
   // Local
   // images: {
   //   remotePatterns: [
@@ -26,6 +26,17 @@ const nextConfig = {
   //     },
   //   ],
   // },
+  // Vs Code
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "8000",
+        pathname: "/cv_images/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

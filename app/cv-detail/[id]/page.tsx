@@ -6,15 +6,76 @@ import { GoDotFill } from "react-icons/go";
 import DetailViewSkeleton from "@/components/ui/Skeleton/DetailViewSkeleton";
 import axiosInstance from "@/utils/axiosConfig";
 import { SquareArrowOutUpRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Star } from "lucide-react";
+import { FaLinkedin, FaGithub } from "react-icons/fa";
+import { PiGlobeLight } from "react-icons/pi";
+import { MdEmail } from "react-icons/md";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { IAvailability } from "@/interfaces/Availability";
+import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  // SelectLabel,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const CVDetailPage = ({ params }: { params: any }) => {
   const [data, setData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [loader, setLoader] = useState<boolean>(false);
+
+  // For Star
+  // const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [userChoice, setUserChoice] = useState(null);
+
+  // State for API data and user input
+  const [inputData, setInputData] = useState<IAvailability>({
+    document_id: "",
+    availability: null,
+    time_of_day: null,
+    star_rating: null,
+    current_salary: null,
+    estimated_salary: null,
+    votes: null,
+  });
+
   const { id }: any = use(params);
   const pdfUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/cv/${id}.pdf`;
 
   useEffect(() => {
     fetchFullCV();
+  }, []);
+
+  // For displaying initial availability
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(
+          `/document/getAvailability/${id}`
+        );
+        setInputData(response.data);
+        // Set the userChoice based on the 'votes' value from the API response
+        if (response.data.votes === true) {
+          setUserChoice("like");
+        } else if (response.data.votes === false) {
+          setUserChoice("dislike");
+        } else {
+          setUserChoice(null);
+        }
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+    fetchData();
   }, []);
 
   const fetchFullCV = async () => {
@@ -25,6 +86,98 @@ const CVDetailPage = ({ params }: { params: any }) => {
     } catch (error) {
       console.error("Error fetching Data", error);
       setLoading(false);
+    }
+  };
+
+  function validatePositiveNumber(event, field) {
+    let value = event.target.value;
+
+    // Remove any characters that aren't numbers or decimal point
+    const sanitizedValue = value.replace(/[^\d.]/g, "");
+
+    // Only allow one decimal point
+    const decimalCount = (sanitizedValue.match(/\./g) || []).length;
+    if (decimalCount > 1) {
+      return;
+    }
+
+    // Add leading zero if input starts with decimal
+    let finalValue = sanitizedValue;
+    if (finalValue.startsWith(".")) {
+      finalValue = `0${finalValue}`;
+    }
+
+    // Allow empty input, numbers, and properly formatted decimals
+    if (finalValue === "" || /^\d*\.?\d*$/.test(finalValue)) {
+      setInputData((prevData) => ({
+        ...prevData,
+        [field]: finalValue === "" ? null : finalValue,
+      }));
+    }
+  }
+
+  const handleMouseEnter = (index) => {
+    setHoveredRating(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredRating(0);
+  };
+
+  const handleClick = (index) => {
+    // setRating(index);
+    setInputData({ ...inputData, star_rating: index });
+  };
+
+  // const handleLike = () => {
+  //   if (userChoice === "like") {
+  //     // Undo like
+  //     setUserChoice(null);
+  //   } else {
+  //     setUserChoice("like");
+  //   }
+  // };
+
+  // const handleDislike = () => {
+  //   if (userChoice === "dislike") {
+  //     setUserChoice(null);
+  //   } else {
+  //     setUserChoice("dislike");
+  //   }
+  // };
+
+  const handleChoice = (choice: string) => {
+    setUserChoice((prevChoice) => (prevChoice === choice ? null : choice));
+  };
+
+  const handleSave = async () => {
+    const vote =
+      userChoice === "like" ? true : userChoice === "dislike" ? false : null;
+    const body = {
+      document_id: id,
+      availability: inputData.availability || "",
+      time_of_day: inputData.time_of_day || "",
+      star_rating: inputData.star_rating || "",
+      current_salary: inputData.current_salary || "",
+      estimated_salary: inputData.estimated_salary || "",
+      vote: vote,
+    };
+
+    try {
+      setLoader(true);
+      await axiosInstance.put(`/document/updateAvailability`, body);
+      toast("Successfully Updated Data", {
+        style: {
+          background: "black",
+          color: "white",
+        },
+        duration: 1000,
+      });
+    } catch (error) {
+      console.error("Error saving data", error);
+      toast.error("Error Occured !!", { duration: 1000 });
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -47,292 +200,527 @@ const CVDetailPage = ({ params }: { params: any }) => {
           <DetailViewSkeleton />
         </div>
       ) : (
-        <Card className="px-3 py-5  w-[40%] h-full bg-gray-100 flex flex-col gap-3">
-          {/* First Part */}
-          <div className="py-5 sticky top-0 bg-gray-100 z-10">
-            <div className="flex justify-between w-[100%] items-start">
-              <div className="flex flex-col w-max-[60%] flex-wrap pr-3 ">
-                <h1 className="font-bold text-2xl">{data?.name}</h1>
-                <p className="font-semibold">{data?.position}</p>
-                <p className="flex gap-2 ">
-                  <span>Linkedin:</span>
-                  {data?.linkedin_url && (
-                    <Link
-                      href={
-                        data?.linkedin_url.startsWith("http")
-                          ? data?.linkedin_url
-                          : `https://${data?.linkedin_url}`
-                      }
-                      target="_blank"
-                      className="max-w-48 truncate"
-                    >
-                      <span className="text-gray-700 hover:opacity-50 ">
-                        {data?.linkedin_url}
-                      </span>
-                    </Link>
-                  )}
-                </p>
-                <p className="flex gap-2">
-                  <span>Github:</span>
-                  {data?.git_url && (
-                    <Link
-                      href={
-                        data?.git_url.startsWith("http")
-                          ? data?.git_url
-                          : `https://${data?.git_url}`
-                      }
-                      target="_blank"
-                      className="max-w-48 truncate"
-                    >
-                      <span className="text-gray-700 hover:opacity-50 ">
-                        {data?.git_url}
-                      </span>
-                    </Link>
-                  )}
-                </p>
+        <Card className="px-3 py-3 w-[40%] h-full bg-gray-100 flex flex-col gap-3">
+          {/* Scrollable */}
+          <div className="pb-3 overflow-y-auto scrollbar-thin flex flex-col gap-3">
+            {/* First Part */}
+            <div className=" top-0 bg-gray-100">
+              <div className="flex justify-between w-[100%] items-start">
+                <div className="flex flex-col w-max-[60%] flex-wrap pr-3 ">
+                  <h1 className="font-bold text-xl">
+                    {data?.name?.toUpperCase()}
+                  </h1>
 
-                <p className="flex gap-2 max-w-sm truncate">
-                  <span>Website:</span>
-                  {data?.website && (
-                    <Link
-                      href={
-                        data?.website.startsWith("http")
-                          ? data?.website
-                          : `https://${data?.website}`
-                      }
-                      target="_blank"
-                      className="max-w-48 truncate"
-                    >
-                      <span className="text-gray-700 hover:opacity-50">
-                        {data?.website}
-                      </span>
-                    </Link>
-                  )}
-                </p>
+                  <p className="font-semibold underline">
+                    {data?.position?.toUpperCase()}
+                  </p>
+                  <p className="flex gap-2 items-center">
+                    {data?.linkedin_url && (
+                      <>
+                        <span>
+                          <FaLinkedin />
+                        </span>
+                        <Link
+                          href={
+                            data.linkedin_url.startsWith("http")
+                              ? data.linkedin_url
+                              : `https://${data.linkedin_url}`
+                          }
+                          target="_blank"
+                          className="max-w-48 truncate"
+                        >
+                          <span className="text-gray-700 hover:opacity-50 text-sm">
+                            {data.linkedin_url}
+                          </span>
+                        </Link>
+                      </>
+                    )}
+                  </p>
 
-                <p className="flex gap-2">
-                  <span>Email:</span>
-                  {data?.email && (
-                    <Link
-                      href={`mailto:${data?.email}`}
-                      target="_blank"
-                      className="max-w-48  truncate"
-                    >
-                      <span className="text-gray-700 hover:opacity-50 ">
-                        {data?.email}
-                      </span>
-                    </Link>
-                  )}
-                </p>
-              </div>
+                  <p className="flex gap-2 items-center">
+                    {data?.git_url && (
+                      <>
+                        <span>
+                          <FaGithub />
+                        </span>
+                        <Link
+                          href={
+                            data?.git_url.startsWith("http")
+                              ? data?.git_url
+                              : `https://${data?.git_url}`
+                          }
+                          target="_blank"
+                          className="max-w-48 truncate"
+                        >
+                          <span className="text-gray-700 hover:opacity-50 text-sm ">
+                            {data?.git_url}
+                          </span>
+                        </Link>
+                      </>
+                    )}
+                  </p>
 
-              <div className="flex w-max-[40%] flex-wrap flex-col gap-2 justify-end">
-                <div>
-                  <div className="flex flex-wrap gap-1">
-                    <span>Phone Number:</span>
-                    <span className=" font-semibold text-gray-700">
-                      {data?.phone_number}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 gap-1">
-                    <span>Address:</span>
-                    <span className="font-semibold text-gray-700">
-                      {data?.address}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 gap-1">
-                    <span>Rating:</span>
-                    <span className="font-semibold text-gray-700">
-                      {data?.rating}
-                    </span>
-                  </div>
+                  <p className="flex gap-2 max-w-sm truncate items-center">
+                    {data?.website && (
+                      <>
+                        <span>
+                          <PiGlobeLight size={18} />
+                        </span>
+                        <Link
+                          href={
+                            data?.website.startsWith("http")
+                              ? data?.website
+                              : `https://${data?.website}`
+                          }
+                          target="_blank"
+                          className="max-w-48 truncate"
+                        >
+                          <span className="text-gray-700 hover:opacity-50 text-sm">
+                            {data?.website}
+                          </span>
+                        </Link>
+                      </>
+                    )}
+                  </p>
+
+                  <p className="flex gap-2 items-center">
+                    {data?.email && (
+                      <>
+                        <span>
+                          <MdEmail />
+                        </span>
+
+                        <Link
+                          href={`mailto:${data?.email}`}
+                          target="_blank"
+                          className="max-w-48  truncate"
+                        >
+                          <span className="text-gray-700 hover:opacity-50 text-sm ">
+                            {data?.email}
+                          </span>
+                        </Link>
+                      </>
+                    )}
+                  </p>
+
+                  <p>
+                    {data?.phone_number && (
+                      <>
+                        <span className=" font-semibold text-gray-700 text-sm">
+                          {data?.phone_number}
+                        </span>
+                      </>
+                    )}
+                  </p>
+
+                  <p>
+                    {data?.address && (
+                      <>
+                        <span className="font-semibold text-gray-700 text-sm">
+                          {data?.address}
+                        </span>
+                      </>
+                    )}
+                  </p>
+                </div>
+
+                <div className="flex w-max-[40%] flex-wrap flex-col gap-2 justify-end">
+                  {/* <div>
+                    <div className="flex flex-wrap gap-1">
+                      <span>Phone Number:</span>
+                      <span className=" font-semibold text-gray-700">
+                        {data?.phone_number}
+                      </span>
+                    </div>
+                    <div className="flex flex-1 gap-1">
+                      <span>Address:</span>
+                      <span className="font-semibold text-gray-700">
+                        {data?.address}
+                      </span>
+                    </div>
+                    <div className="flex flex-1 gap-1">
+                      <span>Rating:</span>
+                      <span className="font-semibold text-gray-700">
+                        {data?.rating}
+                      </span>
+                    </div>
+                  </div> */}
                 </div>
               </div>
-            </div>
-            <hr className="bg-slate-500 h-1 mt-3" />
-          </div>
-
-          {/* Second Part (Scrollable) */}
-          <div className="flex-grow flex-col space-y-3 overflow-y-auto scrollbar-thin">
-            {/* Skills */}
-            <div>
-              {data?.skills?.length > 0 && (
-                <span className="flex flex-col gap-1 pb-2">
-                  <span className="font-semibold text-xl">Skills</span>
-                  <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
-                    {data?.skills?.map((item: any, index: number) => (
-                      <span key={index}>
-                        <span className="flex shadow-md px-2 py-3 bg-[#f7f9fc] text-gray-700 font-sans rounded-md w-fit font-semibold">
-                          {item}
-                        </span>
-                      </span>
-                    ))}
-                  </span>
-                </span>
-              )}
+              {/* <hr className="bg-slate-500 h-1 mt-3" /> */}
             </div>
 
-            {/* Programming Language */}
-            <div>
-              {data?.programming_languages?.length > 0 && (
-                <span className="flex flex-col gap-1 pb-2">
-                  <span className="font-semibold text-xl">
-                    Progamming Language
-                  </span>
-                  <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
-                    {data?.programming_languages?.map(
-                      (item: any, idx: number) => (
-                        <span key={idx}>
-                          <span className="flex shadow-md px-2 py-3 text-gray-700 font-sans bg-[#f7f9fc] rounded-md w-fit font-semibold">
+            {/* Second Part*/}
+            <div className="flex-grow flex-col space-y-3">
+              {/* Skills */}
+              <div>
+                {data?.skills?.length > 0 && (
+                  <span className="flex flex-col gap-1 pb-2">
+                    <span className="font-semibold">Skills</span>
+                    <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
+                      {data?.skills?.map((item: any, index: number) => (
+                        <span key={index}>
+                          <span className="flex shadow-md px-2 py-3 bg-[#f7f9fc] text-gray-700 font-sans rounded-md w-fit font-semibold">
                             {item}
                           </span>
                         </span>
-                      )
-                    )}
+                      ))}
+                    </span>
+                  </span>
+                )}
+              </div>
+
+              {/* Programming Language */}
+              <div>
+                {data?.programming_languages?.length > 0 && (
+                  <span className="flex flex-col gap-1 pb-2">
+                    <span className="font-semibold">Progamming Language</span>
+                    <span className="flex flex-wrap gap-2 text-sm max-w-3xl">
+                      {data?.programming_languages?.map(
+                        (item: any, idx: number) => (
+                          <span key={idx}>
+                            <span className="flex shadow-md px-2 py-3 text-gray-700 font-sans bg-[#f7f9fc] rounded-md w-fit font-semibold">
+                              {item}
+                            </span>
+                          </span>
+                        )
+                      )}
+                    </span>
+                  </span>
+                )}
+              </div>
+              {/* Experience */}
+              <div className="flex flex-col gap-2">
+                <p className="font-semibold flex items-center gap-4 ">
+                  Experiences
+                  <span className="text-sm">
+                    {data?.years_of_experience
+                      ? "(" + data?.years_of_experience + "years" + ")"
+                      : ""}
+                  </span>
+                </p>
+                <div className="flex flex-col gap-3">
+                  {data?.work_experience.length > 0 &&
+                    data?.work_experience.map((item: any, index: number) => (
+                      <div key={index}>
+                        <span className="font-semibold">
+                          {index + 1 + ". " + item?.job_title}
+                        </span>
+                        <span className="flex items-center gap-3">
+                          <span className="font-semibold">
+                            {item?.company_name}
+                          </span>
+                          <span className="text-sm">
+                            {"(" +
+                              item?.start_date +
+                              " - " +
+                              item?.end_date +
+                              ")"}
+                          </span>
+                        </span>
+                        <span className="flex flex-col text-sm max-w-3xl mr-4 ">
+                          {item.responsibilities.length > 0 &&
+                            item.responsibilities.map(
+                              (el: any, index: number) => (
+                                <span
+                                  className="flex gap-1 text-gray-700 "
+                                  key={index}
+                                >
+                                  <span className="mt-[1px]">
+                                    <GoDotFill />
+                                  </span>
+                                  <span>{el}</span>
+                                </span>
+                              )
+                            )}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Project */}
+              <div>
+                {data?.technical_projects?.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    <p className="font-semibold ">Projects</p>
+                    <div className="flex gap-4 flex-col">
+                      {data?.technical_projects?.length > 0 &&
+                        data?.technical_projects.map(
+                          (data: any, index: number) => (
+                            <div key={index}>
+                              <div className="flex flex-col gap-2 text-gray-700">
+                                <div className="flex justify-between items-center">
+                                  <div className="text-gray-700 font-semibold">
+                                    {index + 1 + ". " + data.project_name}
+                                  </div>
+                                  {data.project_link && (
+                                    <Link
+                                      href={data.project_link}
+                                      target="_blank"
+                                      className=" mr-4 hover:opacity-50"
+                                    >
+                                      <SquareArrowOutUpRight size={16} />
+                                    </Link>
+                                  )}
+                                </div>
+                                {data.programming_language?.length > 0 && (
+                                  <div className="flex gap-3 items-center text-sm mr-4 ">
+                                    {/* <p>Technology Used : </p> */}
+                                    {data.programming_language.map(
+                                      (el, index) => (
+                                        <div key={index}>
+                                          <p className="shadow-md px-2 py-3 bg-[#f7f9fc]  font-sans rounded-md w-fit font-semibold">
+                                            {el}
+                                          </p>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                )}
+                                {data.description && (
+                                  <p className="text-sm mr-4">
+                                    {data.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Education */}
+              <div>
+                <span className="flex flex-col gap-1">
+                  <span className="font-semibold">Education</span>
+                  <span className="flex gap-2 flex-col">
+                    {data?.education?.length > 0 &&
+                      data?.education.map((el: any, index: number) => (
+                        <div key={index}>
+                          <p className="font-semibold">
+                            {index + 1 + ". " + el.degree}
+                          </p>
+                          <div className="flex gap-1 items-center text-gray-700 text-sm">
+                            <span>{el?.institution}</span>
+                            <span>
+                              {"(" +
+                                el?.start_date +
+                                " - " +
+                                el?.end_date +
+                                ")"}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                   </span>
                 </span>
-              )}
-            </div>
+              </div>
 
-            {/* Experience */}
-            <div className="flex flex-col gap-2">
-              <p className="font-semibold text-xl flex gap-4 ">
-                Experiences
-                <span>
-                  {data?.years_of_experience
-                    ? "(" + data?.years_of_experience + "years" + ")"
-                    : ""}
-                </span>
-              </p>
-              <div className="flex flex-col gap-3">
-                {data?.work_experience.length > 0 &&
-                  data?.work_experience.map((item: any, index: number) => (
-                    <div key={index}>
-                      <span className="font-semibold">
-                        {index + 1 + ". " + item?.job_title}
-                      </span>
-                      <span className="flex items-center gap-3">
-                        <span className="font-semibold">
-                          {item?.company_name}
-                        </span>
-                        <span className="text-sm">
-                          {"(" +
-                            item?.start_date +
-                            " - " +
-                            item?.end_date +
-                            ")"}
-                        </span>
-                      </span>
-                      <span className="flex flex-col text-sm max-w-3xl ">
-                        {item.responsibilities.length > 0 &&
-                          item.responsibilities.map(
-                            (el: any, index: number) => (
-                              <span
-                                className="flex gap-1 text-gray-700"
-                                key={index}
-                              >
-                                <span className="mt-[1px]">
-                                  <GoDotFill />
-                                </span>
-                                <span>{el}</span>
-                              </span>
-                            )
-                          )}
-                      </span>
-                    </div>
-                  ))}
+              {/* Certificate */}
+              <div>
+                {data?.certifications?.length > 0 && (
+                  <>
+                    <p className="font-semibold text-xl">Certification</p>
+                    {data.certifications.map((el: any, index: number) => (
+                      <div className="flex flex-col" key={index}>
+                        <p className="text-sm flex">
+                          {index + 1 + ". " + el?.certification_name}
+                        </p>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Availability Section */}
+          <div className="sticky z-10 border-t-2 rounded-md border-slate-700 py-3 flex flex-col gap-3">
+            {/* Availability & TIme */}
+            <div className="flex justify-between">
+              {/* Availability */}
+              <div>
+                <Select
+                  value={inputData.availability || ""}
+                  onValueChange={(value) =>
+                    setInputData({ ...inputData, availability: value })
+                  }
+                >
+                  <SelectTrigger className="w-[120px] text-xs">
+                    <SelectValue
+                      className="text-xs"
+                      placeholder="Availability"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {/* <SelectLabel>Availability</SelectLabel> */}
+                      <SelectItem value="remote" className="text-xs">
+                        Remote
+                      </SelectItem>
+                      <SelectItem value="onsite" className="text-xs">
+                        Onsite
+                      </SelectItem>
+                      <SelectItem value="hybrid" className="text-xs">
+                        Hybrid
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* stars */}
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((index) => (
+                  <button
+                    key={index}
+                    className="p-1 hover:scale-110 transition-transform"
+                    onMouseEnter={() => handleMouseEnter(index)}
+                    onMouseLeave={handleMouseLeave}
+                    onClick={() => handleClick(index)}
+                  >
+                    <Star
+                      size={14}
+                      fill={
+                        index <= (hoveredRating || inputData.star_rating)
+                          ? "#f59e0b"
+                          : "none"
+                      }
+                      stroke={
+                        index <= (hoveredRating || inputData.star_rating)
+                          ? "#f59e0b"
+                          : "#4b5563"
+                      }
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <div>
+                <Select
+                  value={inputData.time_of_day || ""}
+                  onValueChange={(value) =>
+                    setInputData({ ...inputData, time_of_day: value })
+                  }
+                >
+                  <SelectTrigger className="w-[120px] text-xs">
+                    <SelectValue placeholder="Time" className="text-xs" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {/* <SelectLabel>Time</SelectLabel> */}
+                      <SelectItem value="day" className="text-xs">
+                        Day
+                      </SelectItem>
+                      <SelectItem value="night" className="text-xs">
+                        Night
+                      </SelectItem>
+                      <SelectItem value="flexible" className="text-xs">
+                        Flexible
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            {/* Project */}
-            <div>
-              {data?.technical_projects?.length > 0 && (
-                <div className="flex flex-col gap-1">
-                  <p className="font-semibold text-xl">Projects</p>
-                  <div className="flex gap-4 flex-col">
-                    {data?.technical_projects?.length > 0 &&
-                      data?.technical_projects.map(
-                        (data: any, index: number) => (
-                          <div key={index}>
-                            <div className="flex flex-col gap-2 text-gray-700">
-                              <div className="flex justify-between">
-                                <div className="text-gray-700 font-semibold">
-                                  {index + 1 + ". " + data.project_name}
-                                </div>
-                                {data.project_link && (
-                                  <Link
-                                    href={data.project_link}
-                                    target="_blank"
-                                    className=" mr-4"
-                                  >
-                                    <SquareArrowOutUpRight size={22} />
-                                  </Link>
-                                )}
-                              </div>
-                              {data.programming_language?.length > 0 && (
-                                <div className="flex gap-3 items-center text-sm mr-4 ">
-                                  {/* <p>Technology Used : </p> */}
-                                  {data.programming_language.map(
-                                    (el, index) => (
-                                      <div key={index}>
-                                        <p className="shadow-md px-2 py-3 bg-[#f7f9fc]  font-sans rounded-md w-fit font-semibold">
-                                          {el}
-                                        </p>
-                                      </div>
-                                    )
-                                  )}
-                                </div>
-                              )}
-                              {data.description && (
-                                <p className="text-sm mr-4">
-                                  {data.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      )}
-                  </div>
+            {/* Salary */}
+            <div className="flex justify-between">
+              {/* Current Salary */}
+              <div>
+                <div className="w-40">
+                  <Input
+                    type="text"
+                    id="currentSalary"
+                    className="text-xs"
+                    placeholder="Current Salary (USD)"
+                    value={
+                      inputData.current_salary !== null
+                        ? inputData.current_salary.toString()
+                        : ""
+                    }
+                    onChange={(event) =>
+                      validatePositiveNumber(event, "current_salary")
+                    }
+                  />
                 </div>
-              )}
-            </div>
-            {/* Education */}
-            <div>
-              <span className="flex flex-col gap-1">
-                <span className="font-semibold text-xl">Education</span>
-                <span className="flex gap-2 flex-col">
-                  {data?.education?.length > 0 &&
-                    data?.education.map((el: any, index: number) => (
-                      <div key={index}>
-                        <p className="font-semibold">
-                          {index + 1 + ". " + el.degree}
-                        </p>
-                        <div className="flex gap-1 items-center text-gray-700">
-                          <span>{el?.institution}</span>
-                          <span className="text-sm">
-                            {"(" + el?.start_date + " - " + el?.end_date + ")"}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                </span>
-              </span>
+              </div>
+              {/* Estimated Salary */}
+              <div>
+                <div className="w-44">
+                  <Input
+                    type="text"
+                    id="estimatedSalary"
+                    className="text-xs"
+                    placeholder="Estimated Salary (USD)"
+                    value={
+                      inputData.estimated_salary !== null
+                        ? inputData.estimated_salary.toString()
+                        : ""
+                    }
+                    onChange={(event) =>
+                      validatePositiveNumber(event, "estimated_salary")
+                    }
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Certificate */}
-            <div>
-              {data?.certifications?.length > 0 && (
-                <>
-                  <p className="font-semibold text-xl">Certification</p>
-                  {data.certifications.map((el: any, index: number) => (
-                    <div className="flex flex-col" key={index}>
-                      <p className="text-sm flex">
-                        {index + 1 + ". " + el?.certification_name}
-                      </p>
-                    </div>
-                  ))}
-                </>
-              )}
+            {/* Like DisLike & Save */}
+            <div className="flex justify-between">
+              <div>
+                <div className="flex items-center">
+                  <button
+                    // onClick={handleLike}
+                    onClick={() => handleChoice("like")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all
+                    ${
+                      userChoice === "like"
+                        ? "bg-blue-100 text-blue-600"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    <ThumbsUp
+                      size={20}
+                      fill={userChoice === "like" ? "currentColor" : "none"}
+                    />
+                  </button>
+
+                  <button
+                    // onClick={handleDislike}
+                    onClick={() => handleChoice("dislike")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all
+                    ${
+                      userChoice === "dislike"
+                        ? "bg-red-100 text-red-600"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    <ThumbsDown
+                      size={20}
+                      fill={userChoice === "dislike" ? "currentColor" : "none"}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <Button
+                  className="w-22 h-8"
+                  onClick={handleSave}
+                  disabled={loader}
+                >
+                  <span className="flex items-center justify-center w-full">
+                    {loader ? (
+                      <LoaderCircle className="h-4 animate-spin" />
+                    ) : (
+                      <span className="text-xs h-4">Save</span>
+                    )}
+                  </span>
+                </Button>
+              </div>
             </div>
           </div>
         </Card>
