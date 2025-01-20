@@ -21,7 +21,6 @@ import {
   Select,
   SelectContent,
   SelectGroup,
-  // SelectLabel,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -60,7 +59,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
     const fetchData = async () => {
       try {
         const response = await axiosInstance.get(
-          `/document/getAvailability/${id}`
+          `/cv_document/getAvailability/${id}`
         );
         setInputData(response.data);
         // Set the userChoice based on the 'votes' value from the API response
@@ -165,7 +164,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
 
     try {
       setLoader(true);
-      await axiosInstance.put(`/document/updateAvailability`, body);
+      await axiosInstance.put(`/cv_document/updateAvailability`, body);
       toast("Successfully Updated Data", {
         style: {
           background: "black",
@@ -220,19 +219,20 @@ const CVDetailPage = ({ params }: { params: any }) => {
                         <span>
                           <FaLinkedin />
                         </span>
-                        <Link
+                        <a
                           href={
                             data.linkedin_url.startsWith("http")
                               ? data.linkedin_url
                               : `https://${data.linkedin_url}`
                           }
                           target="_blank"
+                          rel="noopener noreferrer"
                           className="max-w-48 truncate"
                         >
                           <span className="text-gray-700 hover:opacity-50 text-sm">
                             {data.linkedin_url}
                           </span>
-                        </Link>
+                        </a>
                       </>
                     )}
                   </p>
@@ -456,7 +456,11 @@ const CVDetailPage = ({ params }: { params: any }) => {
                                   </div>
                                   {data.project_link && (
                                     <Link
-                                      href={data.project_link}
+                                      href={
+                                        data.project_link.startsWith("http")
+                                          ? data.project_link
+                                          : `https://${data.project_link}`
+                                      }
                                       target="_blank"
                                       className=" mr-4 hover:opacity-50"
                                     >
@@ -537,7 +541,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
           </div>
 
           {/* Availability Section */}
-          <div className="sticky z-10 border-t-2 rounded-md border-slate-700 py-3 flex flex-col gap-3">
+          <div className="sticky z-10 border-t-2 rounded-md border-slate-700 pt-3 flex flex-col gap-3">
             {/* Availability & TIme */}
             <div className="flex justify-between">
               {/* Availability */}
@@ -548,7 +552,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                     setInputData({ ...inputData, availability: value })
                   }
                 >
-                  <SelectTrigger className="w-[120px] text-xs">
+                  <SelectTrigger className="w-[120px] h-[34px] text-xs">
                     <SelectValue
                       className="text-xs"
                       placeholder="Availability"
@@ -605,7 +609,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                     setInputData({ ...inputData, time_of_day: value })
                   }
                 >
-                  <SelectTrigger className="w-[120px] text-xs">
+                  <SelectTrigger className="w-[120px] text-xs h-[34px]">
                     <SelectValue placeholder="Time" className="text-xs" />
                   </SelectTrigger>
                   <SelectContent>
@@ -627,34 +631,54 @@ const CVDetailPage = ({ params }: { params: any }) => {
             </div>
 
             {/* Salary */}
-            <div className="flex justify-between">
+            <div className="flex mt-1 justify-between">
               {/* Current Salary */}
-              <div>
-                <div className="w-40">
-                  <Input
-                    type="text"
-                    id="currentSalary"
-                    className="text-xs"
-                    placeholder="Current Salary (USD)"
-                    value={
-                      inputData.current_salary !== null
-                        ? inputData.current_salary.toString()
-                        : ""
-                    }
-                    onChange={(event) =>
-                      validatePositiveNumber(event, "current_salary")
-                    }
-                  />
-                </div>
+              <div className="w-40 relative">
+                {/* Label */}
+                <label
+                  htmlFor="currentSalary"
+                  className={`absolute left-3 px-1 text-xs font-medium text-gray-700 ${
+                    inputData.current_salary
+                      ? "-top-2 bg-white"
+                      : "top-2.5 text-gray-500"
+                  }`}
+                >
+                  Current Salary (USD)
+                </label>
+                {/* Input Field */}
+                <input
+                  type="text"
+                  id="currentSalary"
+                  className=" peer block w-full rounded-md border border-gray-300 transition-all duration-100 bg-white py-2 px-3 text-xs shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                  value={
+                    inputData.current_salary !== null
+                      ? inputData.current_salary.toString()
+                      : ""
+                  }
+                  onChange={(event) =>
+                    validatePositiveNumber(event, "current_salary")
+                  }
+                />
               </div>
               {/* Estimated Salary */}
               <div>
-                <div className="w-44">
-                  <Input
+                <div className="w-40 relative">
+                  {/* Label */}
+                  <label
+                    htmlFor="estimatedSalary"
+                    className={`absolute left-3 px-1 text-xs font-medium transition-all duration-100 text-gray-700 ${
+                      inputData.estimated_salary
+                        ? "-top-2 bg-white"
+                        : "top-2.5 text-gray-500"
+                    }`}
+                  >
+                    Estimated Salary (USD)
+                  </label>
+                  {/* Input Field */}
+                  <input
                     type="text"
                     id="estimatedSalary"
-                    className="text-xs"
-                    placeholder="Estimated Salary (USD)"
+                    className="block w-full rounded-md border border-gray-300 bg-white py-2 px-3 text-xs shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                     value={
                       inputData.estimated_salary !== null
                         ? inputData.estimated_salary.toString()
