@@ -10,6 +10,7 @@ import { RxCrossCircled } from "react-icons/rx";
 import { PiPlusCircleThin } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { folderSelectStore } from "../store";
+import ToogleView from "./ToogleView";
 
 const SearchFields = () => {
   const searchContext = useContext(SearchContext);
@@ -20,11 +21,11 @@ const SearchFields = () => {
   const inputRefs = useRef(null);
   const addressRef = useRef(null);
   const [formData, setFormData] = useState<IFormInputData>({
-    prompt: "",
-    programming_language: [""],
-    skill: [""],
     address: "",
+    attribute: [""],
+    prompt: "",
     foldersToSearch: [""],
+    sort_order: "",
   });
 
   const { selectFolderId } = folderSelectStore();
@@ -63,10 +64,10 @@ const SearchFields = () => {
 
   const handleClear = () => {
     setFormData({
-      prompt: "",
-      programming_language: [""],
-      skill: [""],
       address: "",
+      attribute: [""],
+      prompt: "",
+      sort_order: formData.sort_order,
       foldersToSearch: selectFolderId ? [selectFolderId] : [""],
     });
     setTags([]);
@@ -169,27 +170,36 @@ const SearchFields = () => {
         </div>
       </form>
       {/* sorting search */}
-      {/* <div className="flex items-center ">
-        <div className="font-semibold">
+      <div className="flex items-center justify-between ">
+        {/* <div className="font-semibold">
           <p>Availability : &nbsp;</p>
-        </div>
+        </div> */}
 
         <div className="">
-          <Select>
+          <Select
+            value={formData.sort_order || ""}
+            onValueChange={(value) => {
+              setFormData({ ...formData, sort_order: value });
+              setSearchData(formData);
+            }}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
 
             <SelectContent className="w-[180px]">
               <SelectGroup>
-                <SelectItem value="recent">Recent</SelectItem>
-                <SelectItem value="oldest">Oldest</SelectItem>
-                <SelectItem value="random">Random</SelectItem>
+                <SelectItem value="a">Ascending</SelectItem>
+                <SelectItem value="d">Descending</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
         </div>
-      </div> */}
+
+        <div>
+          <ToogleView />
+        </div>
+      </div>
     </div>
   );
 };
