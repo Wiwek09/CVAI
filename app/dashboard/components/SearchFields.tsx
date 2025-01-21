@@ -11,6 +11,14 @@ import { PiPlusCircleThin } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { folderSelectStore } from "../store";
 import ToogleView from "./ToogleView";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const SearchFields = () => {
   const searchContext = useContext(SearchContext);
