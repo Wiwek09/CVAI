@@ -6,7 +6,6 @@ import { GoDotFill } from "react-icons/go";
 import DetailViewSkeleton from "@/components/ui/Skeleton/DetailViewSkeleton";
 import axiosInstance from "@/utils/axiosConfig";
 import { SquareArrowOutUpRight } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Star } from "lucide-react";
 import { FaLinkedin, FaGithub } from "react-icons/fa";
 import { PiGlobeLight } from "react-icons/pi";
@@ -89,7 +88,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
   };
 
   function validatePositiveNumber(event, field) {
-    let value = event.target.value;
+    const value = event.target.value;
 
     // Remove any characters that aren't numbers or decimal point
     const sanitizedValue = value.replace(/[^\d.]/g, "");
