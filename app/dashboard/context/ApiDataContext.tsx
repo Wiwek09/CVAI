@@ -14,10 +14,10 @@ export const ApiDataContext = createContext<ApiDataContextType | null>(null);
 
 export const initialData = {
   address: "",
-  programming_language: [""],
+  attribute: [""],
   prompt: "",
-  skill: [""],
   foldersToSearch: [""],
+  sort_order: "",
 };
 
 // Context Provider to fetch and provide the data
