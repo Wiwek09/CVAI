@@ -105,7 +105,9 @@ const ListView = ({ data, searchData }: ListViewProps) => {
         const cachedData = JSON.parse(sessionStorage.getItem("allData"));
 
         // Filter data based on folder doc_id
-
+        if (!cachedData) {
+          await fetchAllData();
+        }
         const filteredData = cachedData?.filter((item: any) =>
           docIds.includes(item._id)
         );
@@ -134,39 +136,27 @@ const ListView = ({ data, searchData }: ListViewProps) => {
       );
 
       if (response.status === 200) {
-        const searchIds = response.data.map((item) => item.doc_id); // Extract IDs from the response
-        const cachedData = sessionStorage.getItem("allData");
+        const fetchedData: any[] = [];
 
-        if (cachedData) {
-          const allData = JSON.parse(cachedData);
-          const results = allData.filter((doc: any) =>
-            searchIds.includes(doc._id)
-          );
-          setSearchResultsListView(results);
-
-          // Cache the filtered results for this specific query
-          sessionStorage.setItem("searchData", JSON.stringify(results));
-        } else {
-          // If no cached data is available, fetch each document by ID
-          const fetchedData = [];
-          for (const docId of searchIds) {
-            try {
-              const searchResponse = await axiosInstance.get(
-                `/document/cv/${docId}`
-              );
-              if (searchResponse.status === 200) {
-                fetchedData.push(searchResponse.data);
-              }
-            } catch (error) {
-              console.error(`Error fetching document with ID ${docId}:`, error);
-              break;
+        for (const docId of response.data) {
+          try {
+            const searchResponse = await axiosInstance.get(
+              `/document/cv/${docId.doc_id}`
+            );
+            if (searchResponse.status === 200) {
+              fetchedData.push(searchResponse.data);
             }
+          } catch (error) {
+            console.error(
+              `Error fetching document with ID ${docId.doc_id}:`,
+              error
+            );
           }
-
-          // Update state with the fetched data and cache it
-          setSearchResultsListView(fetchedData);
-          sessionStorage.setItem("searchData", JSON.stringify(fetchedData));
         }
+
+        // Update state with the fetched data and cache it
+        setSearchResultsListView(fetchedData);
+        sessionStorage.setItem("searchData", JSON.stringify(fetchedData));
       }
     } catch (error) {
       console.error("Error fetching search data:", error);
@@ -199,12 +189,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
       ? searchResultsListView
       : allData;
 
-  // const displayedData =
-  //   searchData && selectFolderId
-  //     ? searchResults
-  //     : selectFolderId
-  //     ? folderFilteredData
-  //     : allData;
+  console.log("displayedData", displayedData);
 
   return (
     <div className="flex flex-col max-w-[100vw] px-4 py-4 overflow-clip rounded-md space-y-5">
@@ -376,19 +361,6 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                       </span>
                     </span>
                   </p>
-                  {/* <p className='flex gap-[5px] items-start justify-start text-sm '>
-                    <span className='mt-[2px] text-gray-800'>
-                      <GoDotFill />
-                    </span>
-                    <span className=' text-gray-500'>
-                      {item?.parsed_cv.work_experience?.length > 0
-                        ? item?.parsed_cv.work_experience[0]?.responsibilities[0]?.slice(
-                            0,
-                            150
-                          )
-                        : ''}
-                    </span>
-                  </p> */}
                 </div>
               </div>
 

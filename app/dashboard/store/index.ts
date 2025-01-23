@@ -9,3 +9,4 @@ export const folderSelectStore = create<FolderSelectStore>((set) => ({
   selectFolderId: null,
   setSelectFolderId: (id) => set({ selectFolderId: id }),
 }));
+

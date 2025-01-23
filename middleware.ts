@@ -6,9 +6,8 @@ export function middleware(request: NextRequest) {
 
   // Check if the user is at the root route
   if (url.pathname === "/") {
-    // Redirect to /dashboard
-    // url.pathname = "/cv-detail/12";
-    url.pathname = "/auth/register";
+    url.pathname = "/dashboard";
+    // url.pathname = "/auth/register";
     return NextResponse.redirect(url);
   }
 

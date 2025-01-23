@@ -13,23 +13,31 @@ export const SearchContext = createContext<{
 
 export const SearchProvider = ({ children }: { children: React.ReactNode }) => {
   const [searchData, setSearchData] = useState<IFormInputData | null>(null);
-  // const [searchResults, setSearchResults] = useState<any[]>([]);
-  const { selectFolderId } = folderSelectStore();
 
-  // useEffect(() => {
-  //   sessionStorage.removeItem("searchData");
-  // }, [searchData]);
+  console.log("SearchData", searchData?.sort_order);
+  const [previousSortOrder, setPreviousSortOrder] = useState(
+    searchData?.sort_order
+  );
+
+  const { selectFolderId } = folderSelectStore();
 
   // Reset search data and results when folder changes
   useEffect(() => {
     setSearchData(null);
-    // setSearchResults([]);
     sessionStorage.removeItem("searchData");
   }, [selectFolderId]);
 
+  useEffect(() => {
+    // Check if sort_order has changed
+    if (searchData?.sort_order !== previousSortOrder) {
+      sessionStorage.removeItem("allData");
+      sessionStorage.removeItem("searchData");
+      setPreviousSortOrder(searchData?.sort_order);
+    }
+  }, [searchData?.sort_order, previousSortOrder]);
+
   const resetSearch = () => {
     setSearchData(null);
-    // setSearchResults([]);
     sessionStorage.removeItem("searchData");
   };
 

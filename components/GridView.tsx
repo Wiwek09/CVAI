@@ -264,16 +264,16 @@ function GridView({ data, searchData }: GridViewProps) {
                                 </span>
                               </div>
                             ) : hoveredUser?.git_url ? (
-                              <div className="truncate">
+                              <div className="flex space-x-4 truncate">
+                                <button className="bg-gray-600 p-[4px] rounded-full">
+                                  <FaGithub color="white" />
+                                </button>
                                 <span
                                   onClick={(event) =>
                                     handleGithub(event, hoveredUser.git_url)
                                   }
                                   className="text-blue-600 flex space-x-4 hover:underline"
                                 >
-                                  <button className="bg-gray-600 p-[4px] rounded-full">
-                                    <FaGithub color="white" />
-                                  </button>
                                   {hoveredUser.git_url}
                                 </span>
                               </div>
