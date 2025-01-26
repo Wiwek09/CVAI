@@ -155,9 +155,9 @@ const CVDetailPage = ({ params }: { params: any }) => {
       document_id: id,
       availability: inputData.availability || "",
       time_of_day: inputData.time_of_day || "",
-      star_rating: inputData.star_rating || "",
-      current_salary: inputData.current_salary || "",
-      estimated_salary: inputData.estimated_salary || "",
+      star_rating: inputData.star_rating,
+      current_salary: inputData.current_salary,
+      estimated_salary: inputData.estimated_salary,
       vote: vote,
     };
 
