@@ -26,7 +26,7 @@ function GridView({ data, searchData }: GridViewProps) {
   const [hoveredId, setHoveredId] = useState<any | null>(null);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [folderFilteredData, setFolderFilteredData] = useState<any[]>([]);
-  const [hoveredUser, setHoveredUser] = useState<any>(null);
+  // const [hoveredUser, setHoveredUser] = useState<any>(null);
 
   const { resetSearch } = useSearchContext();
   const { selectFolderId } = folderSelectStore();
@@ -50,21 +50,21 @@ function GridView({ data, searchData }: GridViewProps) {
     }
   }, [searchData]);
 
-  useEffect(() => {
-    const getHoveredDetails = async () => {
-      try {
-        const response = await axiosInstance.get(`/document/cv/${hoveredId}`);
-        if (response.status === 200) {
-          setHoveredUser(response.data.parsed_cv);
-        }
-      } catch (error) {
-        console.error("Error parsing data:", error);
-      }
-    };
-    if (hoveredId) {
-      getHoveredDetails();
-    }
-  }, [hoveredId]);
+  // useEffect(() => {
+  //   const getHoveredDetails = async () => {
+  //     try {
+  //       const response = await axiosInstance.get(`/document/cv/${hoveredId}`);
+  //       if (response.status === 200) {
+  //         setHoveredUser(response.data.parsed_cv);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error parsing data:", error);
+  //     }
+  //   };
+  //   if (hoveredId) {
+  //     getHoveredDetails();
+  //   }
+  // }, [hoveredId]);
 
   useEffect(() => {
     if (selectFolderId && searchData) {
@@ -123,45 +123,45 @@ function GridView({ data, searchData }: GridViewProps) {
     }
   };
 
-  const handleMouseOver = (id: any) => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
+  // const handleMouseOver = (id: any) => {
+  //   if (timeoutId) {
+  //     clearTimeout(timeoutId);
+  //   }
 
-    const newTimeoutId = setTimeout(() => {
-      setHoveredId(id);
-    }, 800);
+  //   const newTimeoutId = setTimeout(() => {
+  //     setHoveredId(id);
+  //   }, 800);
 
-    setTimeoutId(newTimeoutId);
-  };
+  //   setTimeoutId(newTimeoutId);
+  // };
 
-  const handleMouseLeave = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      setHoveredId(null);
-      setHoveredUser([]);
-    }
-    setHoveredUser([]);
-    setHoveredId(null);
-  };
+  // const handleMouseLeave = () => {
+  //   if (timeoutId) {
+  //     clearTimeout(timeoutId);
+  //     setHoveredId(null);
+  //     setHoveredUser([]);
+  //   }
+  //   setHoveredUser([]);
+  //   setHoveredId(null);
+  // };
 
   // For Opening the linkedin and github
 
-  const handleLinkedin = (event, linkedinUrl) => {
-    event.stopPropagation();
-    const newLinkedinUrl = linkedinUrl.startsWith("http")
-      ? linkedinUrl
-      : `https://${linkedinUrl}`;
-    window.open(newLinkedinUrl, "_blank");
-  };
+  // const handleLinkedin = (event, linkedinUrl) => {
+  //   event.stopPropagation();
+  //   const newLinkedinUrl = linkedinUrl.startsWith("http")
+  //     ? linkedinUrl
+  //     : `https://${linkedinUrl}`;
+  //   window.open(newLinkedinUrl, "_blank");
+  // };
 
-  const handleGithub = (event, githubUrl) => {
-    event.stopPropagation();
-    const newGithubUrl = githubUrl.startsWith("http")
-      ? githubUrl
-      : `https://${githubUrl}`;
-    window.open(newGithubUrl, "_blank");
-  };
+  // const handleGithub = (event, githubUrl) => {
+  //   event.stopPropagation();
+  //   const newGithubUrl = githubUrl.startsWith("http")
+  //     ? githubUrl
+  //     : `https://${githubUrl}`;
+  //   window.open(newGithubUrl, "_blank");
+  // };
 
   const breakpointColumnsObj = {
     default: 3,
@@ -188,12 +188,12 @@ function GridView({ data, searchData }: GridViewProps) {
 
   return (
     <div className="masonry-container overflow-clip max-w-[100vw] p-4">
-      {hoveredId && (
+{/*       {hoveredId && (
         <div
           className="fixed inset-0 bg-black opacity-80 z-10"
           style={{ filter: "brightness(0)", pointerEvents: "none" }}
         ></div>
-      )}
+      )} */}
 
       {loading ? (
         <div>
@@ -207,7 +207,7 @@ function GridView({ data, searchData }: GridViewProps) {
           className="masonry-grid"
           columnClassName="masonry-grid_column"
         >
-          {displayedData.map((item, index) => (
+{/*           {displayedData.map((item, index) => (
             <div
               key={item.doc_id}
               className={`masonry-item mb-6 cursor-pointer transition-transform duration-300 relative ${
@@ -318,7 +318,7 @@ function GridView({ data, searchData }: GridViewProps) {
                       </div>
                     )}
                   </div>
-                )}
+                )} */}
                 <Image
                   src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cv_images/${item.image_id}.webp`}
                   alt={`Image ${index + 1}`}
