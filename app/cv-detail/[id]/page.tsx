@@ -15,7 +15,16 @@ import { Button } from "@/components/ui/button";
 import { IAvailability } from "@/interfaces/Availability";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { FaNoteSticky } from "react-icons/fa6";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -24,6 +33,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const CVDetailPage = ({ params }: { params: any }) => {
   const [data, setData] = useState<any>();
@@ -43,6 +62,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
     star_rating: null,
     current_salary: null,
     estimated_salary: null,
+    // paid_by: null,
     votes: null,
   });
 
@@ -155,9 +175,9 @@ const CVDetailPage = ({ params }: { params: any }) => {
       document_id: id,
       availability: inputData.availability || "",
       time_of_day: inputData.time_of_day || "",
-      star_rating: inputData.star_rating || "",
-      current_salary: inputData.current_salary || "",
-      estimated_salary: inputData.estimated_salary || "",
+      star_rating: inputData.star_rating,
+      current_salary: inputData.current_salary,
+      estimated_salary: inputData.estimated_salary,
       vote: vote,
     };
 
@@ -541,39 +561,8 @@ const CVDetailPage = ({ params }: { params: any }) => {
 
           {/* Availability Section */}
           <div className="sticky z-10 border-t-2 rounded-md border-slate-700 pt-3 flex flex-col gap-3">
-            {/* Availability & TIme */}
-            <div className="flex justify-between">
-              {/* Availability */}
-              <div>
-                <Select
-                  value={inputData.availability || ""}
-                  onValueChange={(value) =>
-                    setInputData({ ...inputData, availability: value })
-                  }
-                >
-                  <SelectTrigger className="w-[120px] h-[34px] text-xs">
-                    <SelectValue
-                      className="text-xs"
-                      placeholder="Availability"
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {/* <SelectLabel>Availability</SelectLabel> */}
-                      <SelectItem value="remote" className="text-xs">
-                        Remote
-                      </SelectItem>
-                      <SelectItem value="onsite" className="text-xs">
-                        Onsite
-                      </SelectItem>
-                      <SelectItem value="hybrid" className="text-xs">
-                        Hybrid
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-
+            {/* Stars & Like / DisLike */}
+            <div className="flex justify-between items-center">
               {/* stars */}
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((index) => (
@@ -602,6 +591,126 @@ const CVDetailPage = ({ params }: { params: any }) => {
               </div>
 
               <div>
+                <Sheet>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="cursor-pointer shadow-2xl">
+                          <SheetTrigger asChild>
+                            <FaNoteSticky
+                              size={20}
+                              className="text-black font-bold"
+                            />
+                          </SheetTrigger>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>notes</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Edit profile</SheetTitle>
+                      <SheetDescription>
+                        Make changes to your profile here. Click save when
+                        you're done.
+                      </SheetDescription>
+                    </SheetHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">
+                          Name
+                        </Label>
+                        <Input id="name" className="col-span-3" />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="username" className="text-right">
+                          Username
+                        </Label>
+                        <Input id="username" className="col-span-3" />
+                      </div>
+                    </div>
+                    <SheetFooter>
+                      <SheetClose asChild>
+                        <Button type="submit">Save changes</Button>
+                      </SheetClose>
+                    </SheetFooter>
+                  </SheetContent>
+                </Sheet>
+              </div>
+
+              {/* Like / DisLike */}
+              <div>
+                <div className="flex items-center">
+                  <button
+                    // onClick={handleLike}
+                    onClick={() => handleChoice("like")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all
+                    ${
+                      userChoice === "like"
+                        ? "bg-blue-100 text-blue-600"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    <ThumbsUp
+                      size={16}
+                      fill={userChoice === "like" ? "currentColor" : "none"}
+                    />
+                  </button>
+
+                  <button
+                    // onClick={handleDislike}
+                    onClick={() => handleChoice("dislike")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all
+                    ${
+                      userChoice === "dislike"
+                        ? "bg-red-100 text-red-600"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    <ThumbsDown
+                      size={16}
+                      fill={userChoice === "dislike" ? "currentColor" : "none"}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Availability */}
+            <div className="flex justify-between items-center">
+              <div>
+                <Select
+                  value={inputData.availability || ""}
+                  onValueChange={(value) =>
+                    setInputData({ ...inputData, availability: value })
+                  }
+                >
+                  <SelectTrigger className="w-[120px] h-[34px] text-xs">
+                    <SelectValue
+                      className="text-xs"
+                      placeholder="Availability"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="remote" className="text-xs">
+                        Remote
+                      </SelectItem>
+                      <SelectItem value="onsite" className="text-xs">
+                        Onsite
+                      </SelectItem>
+                      <SelectItem value="hybrid" className="text-xs">
+                        Hybrid
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Select
                   value={inputData.time_of_day || ""}
                   onValueChange={(value) =>
@@ -613,7 +722,6 @@ const CVDetailPage = ({ params }: { params: any }) => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      {/* <SelectLabel>Time</SelectLabel> */}
                       <SelectItem value="day" className="text-xs">
                         Day
                       </SelectItem>
@@ -694,41 +802,36 @@ const CVDetailPage = ({ params }: { params: any }) => {
             {/* Like DisLike & Save */}
             <div className="flex justify-between">
               <div>
-                <div className="flex items-center">
-                  <button
-                    // onClick={handleLike}
-                    onClick={() => handleChoice("like")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all
-                    ${
-                      userChoice === "like"
-                        ? "bg-blue-100 text-blue-600"
-                        : "hover:bg-gray-100"
-                    }`}
+                <div>
+                  <Select
+                  // value={inputData.availability || ""}
+                  // onValueChange={(value) =>
+                  //   setInputData({ ...inputData, availability: value })
+                  // }
                   >
-                    <ThumbsUp
-                      size={20}
-                      fill={userChoice === "like" ? "currentColor" : "none"}
-                    />
-                  </button>
-
-                  <button
-                    // onClick={handleDislike}
-                    onClick={() => handleChoice("dislike")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all
-                    ${
-                      userChoice === "dislike"
-                        ? "bg-red-100 text-red-600"
-                        : "hover:bg-gray-100"
-                    }`}
-                  >
-                    <ThumbsDown
-                      size={20}
-                      fill={userChoice === "dislike" ? "currentColor" : "none"}
-                    />
-                  </button>
+                    <SelectTrigger className="w-[120px] h-[34px] text-xs">
+                      <SelectValue
+                        className="text-xs"
+                        placeholder="Salary Based"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {/* <SelectLabel>Availability</SelectLabel> */}
+                        <SelectItem value="remote" className="text-xs">
+                          Hourly
+                        </SelectItem>
+                        <SelectItem value="onsite" className="text-xs">
+                          Monthly
+                        </SelectItem>
+                        <SelectItem value="hybrid" className="text-xs">
+                          Annually
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-
               <div>
                 <Button
                   className="w-22 h-8"
