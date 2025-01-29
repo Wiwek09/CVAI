@@ -15,16 +15,6 @@ import { Button } from "@/components/ui/button";
 import { IAvailability } from "@/interfaces/Availability";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { FaNoteSticky } from "react-icons/fa6";
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -33,16 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 
 const CVDetailPage = ({ params }: { params: any }) => {
   const [data, setData] = useState<any>();
