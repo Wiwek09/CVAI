@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, ReactNode, useState } from "react";
+import React, { createContext, ReactNode, useState, useEffect } from "react";
 
 type ViewType = "grid" | "list";
 
@@ -14,7 +14,17 @@ export const ViewContext = createContext<ViewContextType | null>(null);
 
 // Create a provider component to wrap around the layout
 export const ViewProvider = ({ children }: { children: ReactNode }) => {
-  const [view, setView] = useState<ViewType>("grid");
+  const [view, setView] = useState<ViewType>(() => {
+    const savedView = localStorage.getItem("view");
+    if (savedView === "grid" || savedView === "list") {
+      return savedView;
+    }
+    return "grid";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("view", view);
+  }, [view]);
   return (
     <ViewContext.Provider value={{ view, setView }}>
       {children}
