@@ -15,11 +15,13 @@ export const ViewContext = createContext<ViewContextType | null>(null);
 // Create a provider component to wrap around the layout
 export const ViewProvider = ({ children }: { children: ReactNode }) => {
   const [view, setView] = useState<ViewType>(() => {
-    const savedView = localStorage.getItem("view");
-    if (savedView === "grid" || savedView === "list") {
-      return savedView;
+    if (typeof window !== "undefined") {
+      const savedView = localStorage.getItem("view");
+      if (savedView === "grid" || savedView === "list") {
+        return savedView;
+      }
+      return "grid";
     }
-    return "grid";
   });
 
   useEffect(() => {
