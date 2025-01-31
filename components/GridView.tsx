@@ -6,9 +6,9 @@ import { IDocumentData } from "@/interfaces/DocumentData";
 import Link from "next/link";
 import axiosInstance from "@/utils/axiosConfig";
 import GridViewSkeleton from "./ui/Skeleton/GridViewSkeleton";
-import { IoCallOutline } from "react-icons/io5";
-import { FaGithub } from "react-icons/fa";
-import { CiLinkedin } from "react-icons/ci";
+// import { IoCallOutline } from "react-icons/io5";
+// import { FaGithub } from "react-icons/fa";
+// import { CiLinkedin } from "react-icons/ci";
 import Masonry from "react-masonry-css";
 import { folderSelectStore } from "@/app/dashboard/store";
 import { useSearchContext } from "@/app/dashboard/context/SearchContext";
@@ -23,8 +23,8 @@ function GridView({ data, searchData }: GridViewProps) {
 
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
-  const [hoveredId, setHoveredId] = useState<any | null>(null);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  // const [hoveredId, setHoveredId] = useState<any | null>(null);
+  // const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [folderFilteredData, setFolderFilteredData] = useState<any[]>([]);
   // const [hoveredUser, setHoveredUser] = useState<any>(null);
 
@@ -188,13 +188,6 @@ function GridView({ data, searchData }: GridViewProps) {
 
   return (
     <div className="masonry-container overflow-clip max-w-[100vw] p-4">
-{/*       {hoveredId && (
-        <div
-          className="fixed inset-0 bg-black opacity-80 z-10"
-          style={{ filter: "brightness(0)", pointerEvents: "none" }}
-        ></div>
-      )} */}
-
       {loading ? (
         <div>
           {Array.from({ length: 1 }).map((_, index) => (
@@ -207,118 +200,12 @@ function GridView({ data, searchData }: GridViewProps) {
           className="masonry-grid"
           columnClassName="masonry-grid_column"
         >
-{/*           {displayedData.map((item, index) => (
+          {displayedData.map((item, index) => (
             <div
               key={item.doc_id}
-              className={`masonry-item mb-6 cursor-pointer transition-transform duration-300 relative ${
-                hoveredId === item.doc_id ? "z-20" : "z-0"
-              }`}
-              onMouseOver={() => handleMouseOver(item.doc_id)}
-              onMouseLeave={handleMouseLeave}
+              className="masonry-item mb-6 cursor-pointer transition-transform duration-300 relative"
             >
               <Link href={`/cv-detail/${item.doc_id}`} target="_blank">
-                {hoveredId === item.doc_id && (
-                  <div
-                    className={`absolute flex rounded-md pl-9 pr-9 pb-2 flex-col bg-white w-full h-full overflow-auto z-50 transition-opacity duration-500 ease-in-out ${
-                      hoveredUser && Object?.keys(hoveredUser)?.length > 0
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-5"
-                    }`}
-                  >
-                    {hoveredUser && Object.keys(hoveredUser).length > 0 && (
-                      <div className="flex flex-col gap-1 h-auto">
-                        <h1 className="font-bold text-xl pt-5">
-                          {hoveredUser?.name?.toUpperCase()}
-                        </h1>
-                        {hoveredUser?.position && (
-                          <h2 className="font-semibold text-md underline mb-2">
-                            {hoveredUser?.position.toUpperCase()}
-                          </h2>
-                        )}
-                        <div className="mt-2 flex flex-col space-y-5">
-                          {hoveredUser?.phone_number && (
-                            <section className="flex space-x-4 items-center">
-                              <button className="bg-gray-600 p-[4px] rounded-full">
-                                <IoCallOutline color="white" />
-                              </button>
-                              <span>{hoveredUser?.phone_number}</span>
-                            </section>
-                          )}
-
-                          <section className="flex items-center">
-                            {hoveredUser?.linkedin_url ? (
-                              <div className="flex space-x-4 truncate">
-                                <button className="bg-gray-600 p-[4px] rounded-full">
-                                  <CiLinkedin color="white" />
-                                </button>
-                                <span
-                                  onClick={(event) =>
-                                    handleLinkedin(
-                                      event,
-                                      hoveredUser.linkedin_url
-                                    )
-                                  }
-                                  className="text-blue-600 hover:underline"
-                                >
-                                  {hoveredUser.linkedin_url}
-                                </span>
-                              </div>
-                            ) : hoveredUser?.git_url ? (
-                              <div className="flex space-x-4 truncate">
-                                <button className="bg-gray-600 p-[4px] rounded-full">
-                                  <FaGithub color="white" />
-                                </button>
-                                <span
-                                  onClick={(event) =>
-                                    handleGithub(event, hoveredUser.git_url)
-                                  }
-                                  className="text-blue-600 flex space-x-4 hover:underline"
-                                >
-                                  {hoveredUser.git_url}
-                                </span>
-                              </div>
-                            ) : null}
-                          </section>
-
-                          <section>
-                            <h1 className="text-lg font-semibold">
-                              Experience
-                            </h1>
-                            {hoveredUser?.work_experience?.length > 0 && (
-                              <div key={index} className="flex flex-col">
-                                <h2 className="text-gray-600 font-semibold text-[16px] ml-3">
-                                  {hoveredUser.work_experience[0].job_title}
-                                </h2>
-                                <h3 className="text-gray-600 ml-3">
-                                  {hoveredUser?.work_experience[0].company_name}
-                                </h3>
-                                {hoveredUser?.work_experience[0].start_date && (
-                                  <span className="text-gray-600 ml-3">
-                                    {hoveredUser?.work_experience[0]
-                                      .start_date +
-                                      "-" +
-                                      hoveredUser?.work_experience[0].end_date}
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                          </section>
-
-                          <section>
-                            <h1 className="text-lg font-semibold">Skills</h1>
-                            {hoveredUser.skills
-                              ?.slice(0, 3)
-                              .map((skill, index) => (
-                                <h3 key={index} className="text-gray-600 ml-3">
-                                  {skill}
-                                </h3>
-                              ))}
-                          </section>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )} */}
                 <Image
                   src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cv_images/${item.image_id}.webp`}
                   alt={`Image ${index + 1}`}
