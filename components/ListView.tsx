@@ -11,6 +11,7 @@ import { IFormInputData } from "@/interfaces/FormInputData";
 import ListViewSkeletion from "./ui/Skeleton/ListViewSkeleton";
 import { folderSelectStore } from "@/app/dashboard/store";
 import { useSearchContext } from "@/app/dashboard/context/SearchContext";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
@@ -207,6 +208,24 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     },
   };
 
+  const CustomLeftArrow = ({ onClick }: { onClick?: () => void }) => (
+    <button
+      onClick={onClick}
+      className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-300 p-2 rounded-full shadow-lg hover:bg-opacity-70 transition"
+    >
+      <HiChevronLeft size={24} />
+    </button>
+  );
+
+  const CustomRightArrow = ({ onClick }: { onClick?: () => void }) => (
+    <button
+      onClick={onClick}
+      className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-300 p-2 rounded-full shadow-lg hover:bg-opacity-70 transition"
+    >
+      <HiChevronRight size={24} />
+    </button>
+  );
+
   const displayedData =
     selectFolderId && searchData
       ? searchResultsListView
@@ -401,7 +420,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                   </div>
 
                   {/* Availability */}
-                  <div>Tags</div>
+                  <div></div>
                 </div>
 
                 {/* Skills */}
@@ -415,15 +434,17 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                     draggable={true}
                     keyBoardControl={true}
                     containerClass="carousel-container"
+                    customLeftArrow={<CustomLeftArrow />}
+                    customRightArrow={<CustomRightArrow />}
                   >
                     {item?.parsed_cv?.skills.map(
                       (skill: any, index: number) => (
                         <div
                           key={index}
-                          className="p-2 h-full flex items-center justify-center overflow-hidden"
+                          className="flex gap-3 items-center justify-center overflow-hidden"
                         >
                           <Card
-                            className="h-fit w-fit p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
+                            className="h-fit max-w-[60px] p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
                             title={skill}
                           >
                             {skill}

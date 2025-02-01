@@ -5,6 +5,6 @@ export interface IAvailability {
   star_rating: null | number;
   current_salary: null | number;
   estimated_salary: null | number;
-  // paid_by: null | string;
+  paid_by: null | string;
   votes: null | boolean;
 }

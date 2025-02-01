@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { IAvailability } from "@/interfaces/Availability";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
+import { GrDocumentNotes } from "react-icons/gr";
 import {
   Select,
   SelectContent,
@@ -23,6 +24,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Textarea } from "@/components/ui/textarea";
 
 const CVDetailPage = ({ params }: { params: any }) => {
   const [data, setData] = useState<any>();
@@ -42,7 +60,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
     star_rating: null,
     current_salary: null,
     estimated_salary: null,
-    // paid_by: null,
+    paid_by: null,
     votes: null,
   });
 
@@ -158,6 +176,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
       star_rating: inputData.star_rating,
       current_salary: inputData.current_salary,
       estimated_salary: inputData.estimated_salary,
+      paid_by: inputData.paid_by || "",
       vote: vote,
     };
 
@@ -570,6 +589,32 @@ const CVDetailPage = ({ params }: { params: any }) => {
                 ))}
               </div>
 
+              {/* Notes */}
+              <div>
+                <Sheet>
+                  <SheetTrigger>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger className="cursor-pointer shadow-2xl shadow-gray-600 hover:scale-110 transition-transform bg-slate-300 h-fit w-fit p-2 rounded-md duration-300 ease-in-out">
+                          <GrDocumentNotes />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Note</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Note</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-4">
+                      <Textarea className="h-48" placeholder="Add notes..." />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+
               {/* Like / DisLike */}
               <div>
                 <div className="flex items-center">
@@ -733,10 +778,10 @@ const CVDetailPage = ({ params }: { params: any }) => {
               <div>
                 <div>
                   <Select
-                  // value={inputData.availability || ""}
-                  // onValueChange={(value) =>
-                  //   setInputData({ ...inputData, availability: value })
-                  // }
+                    value={inputData.paid_by || ""}
+                    onValueChange={(value) =>
+                      setInputData({ ...inputData, paid_by: value })
+                    }
                   >
                     <SelectTrigger className="w-[120px] h-[34px] text-xs">
                       <SelectValue
@@ -746,14 +791,13 @@ const CVDetailPage = ({ params }: { params: any }) => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {/* <SelectLabel>Availability</SelectLabel> */}
-                        <SelectItem value="remote" className="text-xs">
+                        <SelectItem value="hourly" className="text-xs">
                           Hourly
                         </SelectItem>
-                        <SelectItem value="onsite" className="text-xs">
+                        <SelectItem value="monthly" className="text-xs">
                           Monthly
                         </SelectItem>
-                        <SelectItem value="hybrid" className="text-xs">
+                        <SelectItem value="annually" className="text-xs">
                           Annually
                         </SelectItem>
                       </SelectGroup>
