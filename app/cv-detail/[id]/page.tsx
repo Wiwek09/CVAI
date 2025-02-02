@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useState, useEffect } from "react";
+import React, { use, useRef, useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { GoDotFill } from "react-icons/go";
@@ -28,7 +28,6 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
@@ -62,10 +61,13 @@ const CVDetailPage = ({ params }: { params: any }) => {
     estimated_salary: null,
     paid_by: null,
     votes: null,
+    note: "",
   });
 
   const { id }: any = use(params);
   const pdfUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/cv/${id}.pdf`;
+  const closeButtonRef = useRef(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Use state for reactivity
 
   useEffect(() => {
     fetchFullCV();
@@ -166,7 +168,19 @@ const CVDetailPage = ({ params }: { params: any }) => {
     setUserChoice((prevChoice) => (prevChoice === choice ? null : choice));
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevents new line in textarea
+
+      if (!isSubmitting) {
+        handleSave();
+      }
+    }
+  };
+
   const handleSave = async () => {
+    if (isSubmitting) return; // Prevent multiple API calls
+    setIsSubmitting(true); // Mark as submitting
     const vote =
       userChoice === "like" ? true : userChoice === "dislike" ? false : null;
     const body = {
@@ -178,6 +192,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
       estimated_salary: inputData.estimated_salary,
       paid_by: inputData.paid_by || "",
       vote: vote,
+      note: inputData.note,
     };
 
     try {
@@ -190,11 +205,13 @@ const CVDetailPage = ({ params }: { params: any }) => {
         },
         duration: 1000,
       });
+      closeButtonRef.current?.click();
     } catch (error) {
       console.error("Error saving data", error);
       toast.error("Error Occured !!", { duration: 1000 });
     } finally {
       setLoader(false);
+      setIsSubmitting(false); // Reset flag after request
     }
   };
 
@@ -604,13 +621,33 @@ const CVDetailPage = ({ params }: { params: any }) => {
                       </Tooltip>
                     </TooltipProvider>
                   </SheetTrigger>
-                  <SheetContent>
+                  <SheetContent className="flex flex-col gap-3">
                     <SheetHeader>
                       <SheetTitle>Note</SheetTitle>
                     </SheetHeader>
-                    <div className="mt-4">
-                      <Textarea className="h-48" placeholder="Add notes..." />
+                    <div>
+                      <Textarea
+                        className="h-48"
+                        placeholder="Add notes..."
+                        value={inputData.note}
+                        onChange={(e) =>
+                          setInputData({ ...inputData, note: e.target.value })
+                        }
+                        onKeyDown={handleKeyDown}
+                      />
                     </div>
+                    <SheetFooter>
+                      <SheetClose asChild>
+                        <Button
+                          className="w-22 h-8"
+                          type="submit"
+                          onClick={handleSave}
+                          ref={closeButtonRef}
+                        >
+                          Save
+                        </Button>
+                      </SheetClose>
+                    </SheetFooter>
                   </SheetContent>
                 </Sheet>
               </div>
@@ -719,7 +756,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                 <label
                   htmlFor="currentSalary"
                   className={`absolute left-3 px-1 text-xs font-medium text-gray-700 ${
-                    inputData.current_salary
+                    inputData.current_salary !== null
                       ? "-top-2 bg-white"
                       : "top-2.5 text-gray-500"
                   }`}
@@ -748,7 +785,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                   <label
                     htmlFor="estimatedSalary"
                     className={`absolute left-3 px-1 text-xs font-medium transition-all duration-100 text-gray-700 ${
-                      inputData.estimated_salary
+                      inputData.estimated_salary !== null
                         ? "-top-2 bg-white"
                         : "top-2.5 text-gray-500"
                     }`}

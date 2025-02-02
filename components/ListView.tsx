@@ -426,7 +426,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                 {/* Skills */}
                 <div
                   onClick={handleCarouselClick}
-                  className="w-full overflow-hidden"
+                  className="mt-4 p-2 overflow-hidden"
                 >
                   <Carousel
                     responsive={responsive}
@@ -439,10 +439,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                   >
                     {item?.parsed_cv?.skills.map(
                       (skill: any, index: number) => (
-                        <div
-                          key={index}
-                          className="flex gap-3 items-center justify-center overflow-hidden"
-                        >
+                        <div key={index} className="">
                           <Card
                             className="h-fit max-w-[60px] p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
                             title={skill}

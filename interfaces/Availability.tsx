@@ -7,4 +7,5 @@ export interface IAvailability {
   estimated_salary: null | number;
   paid_by: null | string;
   votes: null | boolean;
+  note: string;
 }
