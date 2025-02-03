@@ -264,7 +264,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           rel="noopener noreferrer"
                           className="max-w-48 truncate"
                         >
-                          <span className="text-gray-700 hover:opacity-50 text-sm">
+                          <span className="text-gray-700 hover:text-blue-800 hover:underline text-sm">
                             {data.linkedin_url}
                           </span>
                         </a>
@@ -287,7 +287,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           target="_blank"
                           className="max-w-48 truncate"
                         >
-                          <span className="text-gray-700 hover:opacity-50 text-sm ">
+                          <span className="text-gray-700 hover:text-blue-800 hover:underline text-sm ">
                             {data?.git_url}
                           </span>
                         </Link>
@@ -310,7 +310,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           target="_blank"
                           className="max-w-48 truncate"
                         >
-                          <span className="text-gray-700 hover:opacity-50 text-sm">
+                          <span className="text-gray-700 hover:text-blue-800 hover:underline text-sm">
                             {data?.website}
                           </span>
                         </Link>
@@ -330,7 +330,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           target="_blank"
                           className="max-w-48  truncate"
                         >
-                          <span className="text-gray-700 hover:opacity-50 text-sm ">
+                          <span className="text-gray-700 hover:text-blue-800 hover:underline text-sm ">
                             {data?.email}
                           </span>
                         </Link>
@@ -359,30 +359,8 @@ const CVDetailPage = ({ params }: { params: any }) => {
                   </p>
                 </div>
 
-                <div className="flex w-max-[40%] flex-wrap flex-col gap-2 justify-end">
-                  {/* <div>
-                    <div className="flex flex-wrap gap-1">
-                      <span>Phone Number:</span>
-                      <span className=" font-semibold text-gray-700">
-                        {data?.phone_number}
-                      </span>
-                    </div>
-                    <div className="flex flex-1 gap-1">
-                      <span>Address:</span>
-                      <span className="font-semibold text-gray-700">
-                        {data?.address}
-                      </span>
-                    </div>
-                    <div className="flex flex-1 gap-1">
-                      <span>Rating:</span>
-                      <span className="font-semibold text-gray-700">
-                        {data?.rating}
-                      </span>
-                    </div>
-                  </div> */}
-                </div>
+                <div className="flex w-max-[40%] flex-wrap flex-col gap-2 justify-end"></div>
               </div>
-              {/* <hr className="bg-slate-500 h-1 mt-3" /> */}
             </div>
 
             {/* Second Part*/}
@@ -429,9 +407,8 @@ const CVDetailPage = ({ params }: { params: any }) => {
                 <p className="font-semibold flex items-center gap-4 ">
                   Experiences
                   <span className="text-sm">
-                    {data?.years_of_experience
-                      ? "(" + data?.years_of_experience + "years" + ")"
-                      : ""}
+                    {data?.years_of_experience &&
+                      "(" + data?.years_of_experience + " years" + ")"}
                   </span>
                 </p>
                 <div className="flex flex-col gap-3">
