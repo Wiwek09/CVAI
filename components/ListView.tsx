@@ -306,14 +306,14 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                       {item?.parsed_cv?.email && (
                         <div className="flex items-center gap-2">
                           <span>
-                            <MdEmail className="text-base  hover:opacity-60" />
+                            <MdEmail className="text-sm" />
                           </span>
                           <span>
                             <span
                               onClick={(event) =>
                                 handleEmailCLick(event, item?.parsed_cv.email)
                               }
-                              className="text-gray-500  hover:opacity-60"
+                              className="text-gray-500 text-sm hover:text-blue-800 hover:underline"
                             >
                               <span>{item?.parsed_cv.email}</span>
                             </span>
@@ -334,9 +334,9 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                             className="flex gap-2 "
                           >
                             <span>
-                              <FaLinkedin className="cursor-pointer hover:opacity-60" />
+                              <FaLinkedin className="cursor-pointer" />
                             </span>
-                            <span className="text-gray-500 text-sm hover:opacity-75">
+                            <span className="text-gray-500 text-sm hover:text-blue-800 hover:underline">
                               {item?.parsed_cv?.linkedin_url}
                             </span>
                           </span>
@@ -360,7 +360,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                             <span>
                               <FaGithub className="cursor-pointer" />
                             </span>
-                            <span className="text-gray-500 text-sm">
+                            <span className="text-gray-500 text-sm hover:text-blue-800 hover:underline">
                               {item?.parsed_cv?.github_url}
                             </span>
                           </Link>
@@ -420,28 +420,83 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                   </div>
 
                   {/* Availability */}
-                  <div></div>
+                  <div className="flex flex-col gap-2">
+                    {/* Salaries, Availability, Shift */}
+                    <div className="flex gap-6">
+                      <div className="flex flex-col gap-2">
+                        <div>
+                          {item?.parsed_cv?.current_salary && (
+                            <div className="flex flex-col justify-between">
+                              <div className="font-bold text-base">
+                                Current Salary
+                              </div>
+                              <div className="text-gray-500">
+                                ${item?.parsed_cv?.current_salary}
+                                {item?.parsed_cv?.paid_by
+                                  ? ` / ${item?.parsed_cv?.paid_by}`
+                                  : ""}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          {item?.parsed_cv?.availability && (
+                            <Card className="px-2 py-1 text-sm text-gray-600 w-fit h-fit ">
+                              {item?.parsed_cv?.availability}
+                            </Card>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <div>
+                          {item?.parsed_cv?.estimated_salary && (
+                            <div className="flex flex-col justify-between">
+                              <div className="font-bold text-base">
+                                Estimated Salary
+                              </div>
+                              <div className="text-gray-500">
+                                ${item?.parsed_cv?.estimated_salary}
+                                {item?.parsed_cv?.paid_by
+                                  ? ` / ${item?.parsed_cv?.paid_by}`
+                                  : ""}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          {item?.parsed_cv?.time_of_day && (
+                            <Card className="px-2 py-1 text-sm text-gray-600 w-fit h-fit ">
+                              {item?.parsed_cv?.time_of_day}
+                            </Card>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Notes */}
+                    <div></div>
+                  </div>
                 </div>
 
                 {/* Skills */}
                 <div
                   onClick={handleCarouselClick}
-                  className="mt-4 p-2 overflow-hidden"
+                  className="mt-4 w-full p-2 overflow-hidden"
                 >
                   <Carousel
+                    className="w-full"
                     responsive={responsive}
                     swipeable={true}
                     draggable={true}
                     keyBoardControl={true}
-                    containerClass="carousel-container"
+                    containerClass="carousel-container w-full overflow-hidden"
                     customLeftArrow={<CustomLeftArrow />}
                     customRightArrow={<CustomRightArrow />}
                   >
                     {item?.parsed_cv?.skills.map(
                       (skill: any, index: number) => (
-                        <div key={index} className="">
+                        <div key={index} className="w-full">
                           <Card
-                            className="h-fit max-w-[60px] p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
+                            className="h-fit  max-w-[60px] p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
                             title={skill}
                           >
                             {skill}
