@@ -59,6 +59,10 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     }
   }, [selectFolderId, allData]);
 
+  window.addEventListener("beforeunload", () => {
+    sessionStorage.clear();
+  });
+
   const fetchAllData = async () => {
     const fetchedData: any[] = [];
     setLoading(true);
