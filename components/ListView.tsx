@@ -59,9 +59,12 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     }
   }, [selectFolderId, allData]);
 
-  window.addEventListener("beforeunload", () => {
-    sessionStorage.clear();
-  });
+  // Clear sessionStorage on reload
+  useEffect(() => {
+    window.addEventListener("beforeunload", () => {
+      sessionStorage.clear();
+    });
+  }, []);
 
   const fetchAllData = async () => {
     const fetchedData: any[] = [];
@@ -424,7 +427,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                   </div>
 
                   {/* Availability */}
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-6 w-[30%] ">
                     {/* Salaries, Availability, Shift */}
                     <div className="flex gap-6">
                       <div className="flex flex-col gap-2">
@@ -477,30 +480,44 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                       </div>
                     </div>
                     {/* Notes */}
-                    <div></div>
+                    <div className="flex items-center">
+                      {item?.parsed_cv?.note && (
+                        <div className="flex flex-col gap-1">
+                          <h1 className="font-bold">Note</h1>
+                          <p className="text-sm text-gray-600">
+                            {item.parsed_cv.note.length > 100
+                              ? `${item.parsed_cv.note.substring(0, 100)}...`
+                              : item.parsed_cv.note}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 {/* Skills */}
                 <div
                   onClick={handleCarouselClick}
-                  className="mt-4 w-full p-2 overflow-hidden"
+                  className="mt-4 w-full p-2 overflow-hidden max-w-full z-50"
                 >
                   <Carousel
-                    className="w-full"
+                    className="w-full max-w-full z-50"
                     responsive={responsive}
-                    swipeable={true}
-                    draggable={true}
-                    keyBoardControl={true}
-                    containerClass="carousel-container w-full overflow-hidden"
+                    swipeable
+                    draggable
+                    keyBoardControl
+                    containerClass="carousel-container w-full overflow-hidden max-w-full"
                     customLeftArrow={<CustomLeftArrow />}
                     customRightArrow={<CustomRightArrow />}
                   >
                     {item?.parsed_cv?.skills.map(
                       (skill: any, index: number) => (
-                        <div key={index} className="w-full">
+                        <div
+                          key={index}
+                          className="flex-shrink-0 space-x-2 max-w-[70px] overflow-hidden"
+                        >
                           <Card
-                            className="h-fit  max-w-[60px] p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
+                            className="h-fit w-full p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
                             title={skill}
                           >
                             {skill}
