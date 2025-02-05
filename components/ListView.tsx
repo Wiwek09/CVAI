@@ -320,7 +320,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                               onClick={(event) =>
                                 handleEmailCLick(event, item?.parsed_cv.email)
                               }
-                              className="text-gray-500 text-sm hover:text-blue-800 hover:underline"
+                              className=" text-sm text-blue-800 underline hover:traparent hover:opacity-80"
                             >
                               <span>{item?.parsed_cv.email}</span>
                             </span>
@@ -343,7 +343,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                             <span>
                               <FaLinkedin className="cursor-pointer" />
                             </span>
-                            <span className="text-gray-500 text-sm hover:text-blue-800 hover:underline">
+                            <span className="text-sm text-blue-800 underline hover:opacity-80">
                               {item?.parsed_cv?.linkedin_url}
                             </span>
                           </span>
@@ -367,7 +367,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                             <span>
                               <FaGithub className="cursor-pointer" />
                             </span>
-                            <span className="text-gray-500 text-sm hover:text-blue-800 hover:underline">
+                            <span className="text-sm text-blue-800 underline hover:opacity-80">
                               {item?.parsed_cv?.github_url}
                             </span>
                           </Link>
@@ -514,10 +514,10 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                       (skill: any, index: number) => (
                         <div
                           key={index}
-                          className="flex-shrink-0 space-x-2 max-w-[70px] overflow-hidden"
+                          className="flex space-x-2 max-w-[70px] overflow-hidden"
                         >
                           <Card
-                            className="h-fit w-full p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
+                            className="h-fit w-fit p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
                             title={skill}
                           >
                             {skill}
