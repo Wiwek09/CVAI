@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PiPlusCircleDuotone } from "react-icons/pi";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaChevronDown } from "react-icons/fa";
 import { toast } from "sonner";
 import {
   Popover,
@@ -62,7 +63,9 @@ function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
 
   return (
     <div className="flex justify-between items-center">
-      <div className="text-lg font-semibold flex-1 text-white">Folder</div>
+      <div className="text-lg font-semibold flex-1 text-white">
+        Public Folder
+      </div>
       {dialogOpen && (
         <DialogueComponent
           variant="selectMultipleFolders"
@@ -114,8 +117,10 @@ function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
           </PopoverContent>
         </Popover>
 
-        {/* <div>
-        </div> */}
+        {/* Open / Close */}
+        <div className="text-white cursor-pointer">
+          <FaChevronDown />
+        </div>
 
         {/* three dot icons */}
         <Popover>
