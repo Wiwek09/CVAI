@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import DialogueComponent from "./DialogueComponent";
 import { MdFolderZip } from "react-icons/md";
-import { folderSelectStore } from "../store";
+import { folderSelectStore, publicFolderStore } from "../store";
 
 const SideNavBar = () => {
   const context = useContext(ApiDataContext);
@@ -43,11 +43,10 @@ const SideNavBar = () => {
   const [updateFolderList, setUpdateFolderList] = useState(false);
   const [folderListData, setFolderListData] = useState<IFolderData[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
-  // const [displayedFolderName, setDisplayedFolderName] =
-  //   useState<string>("Uploading to....");
 
   const [dialogOpen, setDialogeOpen] = useState(false);
   const { selectFolderId } = folderSelectStore();
+  const { isFolderListOpen } = publicFolderStore();
   const [localFolderId, setLocalFolderId] = useState<string | null>(
     selectFolderId
   );
@@ -171,7 +170,7 @@ const SideNavBar = () => {
 
   return (
     <Sidebar className="h-[100vh] w-1/5">
-      <Card className="border border-black h-[100vh] overflow-y-auto scrollbar-thin rounded-none flex flex-col items-center bg-black space-y-6 py-6">
+      <Card className="border border-black h-[100vh] overflow-y-auto scrollbar-thin rounded-none flex flex-col items-center bg-black space-y-2 pt-2 pb-6">
         {dialogOpen && (
           <DialogueComponent
             variant="archive"
@@ -182,7 +181,7 @@ const SideNavBar = () => {
         <SidebarHeader>
           <h1 className="text-2xl text-center w-full px-4 text-white">CV_AI</h1>
         </SidebarHeader>
-        <SidebarContent className="space-y-6 w-full flex flex-col overflow-y-auto scrollbar-thinSide ">
+        <SidebarContent className="space-y-4 w-full flex flex-col">
           <div className="w-full px-4">
             <div
               onDrop={handleDrop}
@@ -190,7 +189,7 @@ const SideNavBar = () => {
               onDragLeave={handleDragLeave}
               onDragOver={handleDragOver}
               onClick={() => document.getElementById("file-input").click()}
-              className={`relative flex flex-col gap-2 cursor-pointer items-center justify-center h-48 border-2 border-dashed border-gray-400 p-4 rounded-md  bg-black text-white transition-all duration-300 ease-in-out ${
+              className={`relative flex flex-col  cursor-pointer items-center justify-center h-22 border-2 border-dashed border-gray-400 p-4 rounded-md  bg-black text-white transition-all duration-300 ease-in-out ${
                 isDragging ? "opacity-50 backdrop-blur-sm" : "opacity-100"
               }`}
             >
@@ -234,27 +233,32 @@ const SideNavBar = () => {
             </Select>
           </div>
 
-          <div className="w-full px-4">
+          <div className="w-full px-4 overflow-y-auto scrollbar-thinSide ">
             <FolderCreation
               onFolderCreated={handleFolderCreated}
               setUpdateFolderList={setUpdateFolderList}
             />
           </div>
 
-          <div className="w-full px-4 flex-1">
-            <FolderList
-              updateFolderList={updateFolderList}
-              setUpdateFolderList={setUpdateFolderList}
-            />
-            <button
-              className="bg-inherit px-0 items-center py-1 flex justify-start hover:opacity-60 w-full text-white"
-              onClick={() => {
-                handleDialogue(true);
-              }}
-            >
-              <MdFolderZip className="text-gray-300 opacity-70" />
-              <h1 className="ml-6 ">Archive</h1>
-            </button>
+          <div className="w-full px-4 flex-1 overflow-y-auto scrollbar-thinSide">
+            {isFolderListOpen && (
+              <div>
+                <FolderList
+                  updateFolderList={updateFolderList}
+                  setUpdateFolderList={setUpdateFolderList}
+                />
+
+                <button
+                  className="bg-inherit px-0 items-center py-1 flex justify-start hover:opacity-60 w-full text-white"
+                  onClick={() => {
+                    handleDialogue(true);
+                  }}
+                >
+                  <MdFolderZip className="text-gray-300 opacity-70" />
+                  <h1 className="ml-6 ">Archive</h1>
+                </button>
+              </div>
+            )}
           </div>
         </SidebarContent>
       </Card>
