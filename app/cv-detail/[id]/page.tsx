@@ -264,7 +264,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           rel="noopener noreferrer"
                           className="max-w-48 truncate"
                         >
-                          <span className="text-gray-700 hover:text-blue-800 hover:underline text-sm">
+                          <span className="text-blue-800 underline hover:opacity-80 text-sm">
                             {data.linkedin_url}
                           </span>
                         </a>
@@ -287,7 +287,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           target="_blank"
                           className="max-w-48 truncate"
                         >
-                          <span className="text-gray-700 hover:text-blue-800 hover:underline text-sm ">
+                          <span className="text-blue-800 underline hover:opacity-80 text-sm">
                             {data?.git_url}
                           </span>
                         </Link>
@@ -310,7 +310,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           target="_blank"
                           className="max-w-48 truncate"
                         >
-                          <span className="text-gray-700 hover:text-blue-800 hover:underline text-sm">
+                          <span className="text-blue-800 underline hover:opacity-80 text-sm">
                             {data?.website}
                           </span>
                         </Link>
@@ -330,7 +330,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                           target="_blank"
                           className="max-w-48  truncate"
                         >
-                          <span className="text-gray-700 hover:text-blue-800 hover:underline text-sm ">
+                          <span className="text-blue-800 underline hover:opacity-80 text-sm">
                             {data?.email}
                           </span>
                         </Link>
@@ -438,7 +438,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                                   className="flex gap-1 text-gray-700 "
                                   key={index}
                                 >
-                                  <span className="mt-[1px]">
+                                  <span className="mt-[3px]">
                                     <GoDotFill />
                                   </span>
                                   <span>{el}</span>
