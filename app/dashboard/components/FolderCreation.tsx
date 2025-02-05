@@ -13,12 +13,16 @@ import {
 } from "@/components/ui/popover";
 import axiosInstance from "@/utils/axiosConfig";
 import DialogueComponent from "./DialogueComponent";
+import { publicFolderStore } from "../store";
 
 function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
   const [folderName, setFolderName] = useState("");
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogueOpen] = useState(false);
+
+  const { isFolderListOpen, toogleFolderList } = publicFolderStore();
+
   const handleDialogue = (state: boolean) => {
     setDialogueOpen(state);
   };
@@ -74,7 +78,7 @@ function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
         />
       )}
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 mr-2">
         {/* folder creation icon */}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
@@ -118,9 +122,14 @@ function FolderCreation({ onFolderCreated, setUpdateFolderList }) {
         </Popover>
 
         {/* Open / Close */}
-        <div className="text-white cursor-pointer">
-          <FaChevronDown />
-        </div>
+        {/* Toggle Folder List Button */}
+        <button onClick={toogleFolderList} aria-label="Toggle Folder List">
+          <FaChevronDown
+            className={`text-white transform transition-transform duration-300 ${
+              isFolderListOpen ? "rotate-180" : "rotate-0"
+            }`}
+          />
+        </button>
 
         {/* three dot icons */}
         <Popover>

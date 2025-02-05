@@ -438,7 +438,7 @@ const CVDetailPage = ({ params }: { params: any }) => {
                                   className="flex gap-1 text-gray-700 "
                                   key={index}
                                 >
-                                  <span className="mt-[1px]">
+                                  <span className="mt-[3px]">
                                     <GoDotFill />
                                   </span>
                                   <span>{el}</span>
