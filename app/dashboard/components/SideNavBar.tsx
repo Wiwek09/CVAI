@@ -43,7 +43,7 @@ const SideNavBar = () => {
   const [updateFolderList, setUpdateFolderList] = useState(false);
   const [folderListData, setFolderListData] = useState<IFolderData[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
-
+  const [displayFolder, setDisplayFolder] = useState(false);
   const [dialogOpen, setDialogeOpen] = useState(false);
   const { selectFolderId } = folderSelectStore();
   const { isFolderListOpen } = publicFolderStore();
@@ -80,8 +80,11 @@ const SideNavBar = () => {
       try {
         const response = await axiosInstance.get("/folder/getAllFolders");
         setFolderListData(response.data);
+        setDisplayFolder(false);
       } catch (error) {
         console.error("Error fetching Data:", error);
+      } finally {
+        setDisplayFolder(true);
       }
     };
     folderList();
@@ -241,7 +244,7 @@ const SideNavBar = () => {
           </div>
 
           <div className="w-full px-4 flex-1 overflow-y-auto scrollbar-thinSide">
-            {isFolderListOpen && (
+            {isFolderListOpen && displayFolder && (
               <div>
                 <FolderList
                   updateFolderList={updateFolderList}

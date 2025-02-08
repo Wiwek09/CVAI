@@ -29,7 +29,7 @@ function Dashboard() {
 
   const { view } = context;
   return (
-    <div className="bg-gray-100 overflow-hidden">
+    <div className="bg-gray-100">
       {view === "grid" ? (
         <GridView searchData={searchData} data={apiData} />
       ) : (

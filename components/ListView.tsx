@@ -243,7 +243,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
       : allData;
 
   return (
-    <div className="flex flex-col max-w-[100vw] px-4 py-4 overflow-clip rounded-md space-y-5">
+    <div className="flex flex-col max-w-[100vw] px-4 py-4  rounded-md space-y-5">
       {loading ? (
         <div className="flex flex-col gap-3">
           <ListViewSkeletion variant="listView" />
@@ -262,7 +262,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
             >
               <Card
                 key={index}
-                className="px-5 py-8 flex flex-col gap-6 shadow-lg transform mb-3 hover:scale-x-[1.01] hover:scale-y-[1.02] hover:cursor-pointer overflow-clip transition duration-500 ease-in-out "
+                className="px-5 py-8 flex flex-col gap-6 shadow-lg transform mb-3 hover:scale-x-[1.01] hover:scale-y-[1.02] hover:cursor-pointer  transition duration-500 ease-in-out "
               >
                 <div className="flex justify-between ">
                   {/* Basic Information */}
@@ -498,7 +498,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                 {/* Skills */}
                 <div
                   onClick={handleCarouselClick}
-                  className="mt-4 w-full p-2 overflow-hidden max-w-full z-50"
+                  className="mt-4 w-full p-2  max-w-full z-50"
                 >
                   <Carousel
                     className="w-full max-w-full z-50"

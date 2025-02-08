@@ -445,7 +445,7 @@ function DialogueComponent({
           handleDialogue(false);
         }}
       >
-        <DialogContent className="py-4 max-h-[90%] overflow-y-scroll scrollbar-thin">
+        <DialogContent className="py-4 max-h-[90%] overflow-auto scrollbar-thin">
           <DialogHeader>
             <div className=" flex flex-col w-full space-y-6  mb-8 mt-4">
               <h1 className="text-xl">{name}</h1>
@@ -481,7 +481,7 @@ function DialogueComponent({
                             handleDialogue(false);
                           }}
                         >
-                          Archieve
+                          Archive
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -493,21 +493,25 @@ function DialogueComponent({
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className=" justify-between"
+                        className="justify-between"
                       >
                         <BsFolderSymlink />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
+                    <PopoverContent
+                      className="w-[200px] p-0 overflow-auto max-h-[400px]"
+                      side="bottom"
+                      align="start"
+                    >
                       <Command>
                         <CommandInput
-                          placeholder="Search folder"
+                          placeholder="Search folder..."
                           className="h-9"
                         />
-                        <CommandList>
+                        <CommandList className="max-h-[200px]">
                           <CommandEmpty>No folders found.</CommandEmpty>
                           <CommandGroup>
-                            {folders.map((folder) => (
+                            {folders?.map((folder) => (
                               <CommandItem
                                 key={folder.folder_id}
                                 value={folder.folder_name}
@@ -516,7 +520,6 @@ function DialogueComponent({
                                     currentValue === value ? "" : currentValue
                                   );
                                   setFolderId(folder.folder_id);
-                                  // setOpen(false);
                                 }}
                               >
                                 {folder.folder_name}
