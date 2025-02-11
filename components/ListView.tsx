@@ -11,9 +11,7 @@ import { IFormInputData } from "@/interfaces/FormInputData";
 import ListViewSkeletion from "./ui/Skeleton/ListViewSkeleton";
 import { folderSelectStore } from "@/app/dashboard/store";
 import { useSearchContext } from "@/app/dashboard/context/SearchContext";
-import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
-import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
+import EmblaCarousel from "../app/dashboard/components/EmblaCarousel";
 
 interface ListViewProps {
   data: IDocumentData[] | any;
@@ -215,24 +213,6 @@ const ListView = ({ data, searchData }: ListViewProps) => {
     },
   };
 
-  const CustomLeftArrow = ({ onClick }: { onClick?: () => void }) => (
-    <button
-      onClick={onClick}
-      className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-300 p-2 rounded-full shadow-lg hover:bg-opacity-70 transition"
-    >
-      <HiChevronLeft size={24} />
-    </button>
-  );
-
-  const CustomRightArrow = ({ onClick }: { onClick?: () => void }) => (
-    <button
-      onClick={onClick}
-      className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-300 p-2 rounded-full shadow-lg hover:bg-opacity-70 transition"
-    >
-      <HiChevronRight size={24} />
-    </button>
-  );
-
   const displayedData =
     selectFolderId && searchData
       ? searchResultsListView
@@ -243,7 +223,7 @@ const ListView = ({ data, searchData }: ListViewProps) => {
       : allData;
 
   return (
-    <div className="flex flex-col max-w-[100vw] px-4 py-4  rounded-md space-y-5">
+    <div className="flex flex-col max-w-screen p-4 rounded-md gap-5">
       {loading ? (
         <div className="flex flex-col gap-3">
           <ListViewSkeletion variant="listView" />
@@ -259,10 +239,12 @@ const ListView = ({ data, searchData }: ListViewProps) => {
               key={item._id}
               href={`/cv-detail/${item._id}`}
               target="_blank"
+              // className="overflow-hidden items-center w-full bg-red-500"
+              className="flex flex-col shadow-lg transform mb-3 hover:scale-x-[1.01] hover:scale-y-[1.02] hover:cursor-pointer transition duration-500 ease-in-out w-full "
             >
               <Card
                 key={index}
-                className="px-5 py-8 flex flex-col gap-6 shadow-lg transform mb-3 hover:scale-x-[1.01] hover:scale-y-[1.02] hover:cursor-pointer  transition duration-500 ease-in-out "
+                className="flex flex-col gap-2 w-[100%] px-5 py-8 z-0 relative  "
               >
                 <div className="flex justify-between ">
                   {/* Basic Information */}
@@ -498,34 +480,9 @@ const ListView = ({ data, searchData }: ListViewProps) => {
                 {/* Skills */}
                 <div
                   onClick={handleCarouselClick}
-                  className="mt-4 w-full p-2  max-w-full z-50"
+                  className="overflow-hidden flex justify-between max-w-full z-10"
                 >
-                  <Carousel
-                    className="w-full max-w-full z-50"
-                    responsive={responsive}
-                    swipeable
-                    draggable
-                    keyBoardControl
-                    containerClass="carousel-container w-full overflow-hidden max-w-full"
-                    customLeftArrow={<CustomLeftArrow />}
-                    customRightArrow={<CustomRightArrow />}
-                  >
-                    {item?.parsed_cv?.skills.map(
-                      (skill: any, index: number) => (
-                        <div
-                          key={index}
-                          className="flex space-x-2 max-w-[70px] overflow-hidden"
-                        >
-                          <Card
-                            className="h-fit w-fit p-2 bg-slate-100 shadow-4xl rounded-lg text-sm overflow-hidden whitespace-nowrap text-ellipsis"
-                            title={skill}
-                          >
-                            {skill}
-                          </Card>
-                        </div>
-                      )
-                    )}
-                  </Carousel>
+                  <EmblaCarousel skills={item?.parsed_cv?.skills || []} />
                 </div>
               </Card>
             </Link>

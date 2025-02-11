@@ -187,7 +187,7 @@ function GridView({ data, searchData }: GridViewProps) {
   //     : data;
 
   return (
-    <div className="masonry-container overflow-clip max-w-[100vw] p-4">
+    <div className="overflow-hidden max-w-[100vw] p-4">
       {loading ? (
         <div>
           {Array.from({ length: 1 }).map((_, index) => (

@@ -22,7 +22,6 @@ import {
 import axiosInstance from "@/utils/axiosConfig";
 import { toast } from "sonner";
 import { Check } from "lucide-react";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { FaTrashAlt } from "react-icons/fa";
 import { BsFolderSymlink } from "react-icons/bs";
@@ -445,7 +444,7 @@ function DialogueComponent({
           handleDialogue(false);
         }}
       >
-        <DialogContent className="py-4 max-h-[90%] overflow-auto scrollbar-thin">
+        <DialogContent className="py-4 max-h-[90%] overflow-y-scroll scrollbar-thin">
           <DialogHeader>
             <div className=" flex flex-col w-full space-y-6  mb-8 mt-4">
               <h1 className="text-xl">{name}</h1>
@@ -487,7 +486,7 @@ function DialogueComponent({
                     </AlertDialogContent>
                   </AlertDialog>
 
-                  <Popover open={open} onOpenChange={setOpen}>
+                  <Popover open={open} onOpenChange={setOpen} modal={true}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -499,7 +498,7 @@ function DialogueComponent({
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-[200px] p-0 overflow-auto max-h-[400px]"
+                      className="w-[200px] p-0 max-h-[400px]"
                       side="bottom"
                       align="start"
                     >

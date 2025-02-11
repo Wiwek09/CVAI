@@ -25,8 +25,8 @@ export default function DashboardLayout({
                   <SideNavBar />
                 </div>
                 <SidebarInset className="w-[80%]">
-                  <header className="flex pt-2 justify-start shrink-0 items-center gap-2 "></header>
-                  <div className="pr-6 flex flex-col space-y-8">
+                  {/* <header className="flex pt-2 justify-start shrink-0 items-center gap-2 "></header> */}
+                  <div className="pr-6 flex flex-col gap-8">
                     <SearchFields />
                     <div>{children}</div>
                   </div>
